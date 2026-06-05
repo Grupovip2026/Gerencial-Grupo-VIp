@@ -1,308 +1,342 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard Financeiro – Grupo VIP 2026</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.12.7/Recharts.min.js"></script>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #0d0d1a; }
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: #111; }
-    ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-    .tab-btn { transition: all 0.2s; cursor: pointer; }
-    .tab-btn:hover { opacity: 0.85; }
-    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap');
-  </style>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<!-- saved from url=(0057)file:///C:/Users/Igor%20Vargas/Downloads/INDEX~1.HTM.html -->
+<html lang="pt-BR"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Financeiro – Grupo VIP 2026</title>
+<script src="./INDEX~1.HTM_files/chart.umd.min.js.baixados"></script>
+<link href="./INDEX~1.HTM_files/css2" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0d0d1a;color:#f0f0f0;font-family:'Inter',sans-serif;min-height:100vh;padding:28px 24px}
+  ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#111}::-webkit-scrollbar-thumb{background:#333;border-radius:4px}
+  h1{font-size:26px;font-weight:700;color:#fff}
+  .subtitle{font-size:11px;color:#666;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+  .period{font-size:13px;color:#555;margin-top:4px;margin-bottom:28px}
+  .tabs{display:flex;gap:8px;margin-bottom:28px;flex-wrap:wrap}
+  .tab{padding:10px 22px;border-radius:8px;border:2px solid rgba(255,255,255,0.1);background:transparent;color:#888;font-weight:400;font-size:14px;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif}
+  .tab:hover{opacity:.85}
+  .tab.active-vip{border-color:#00C9A7;background:rgba(0,201,167,.13);color:#00C9A7;font-weight:700}
+  .tab.active-vidal{border-color:#6C63FF;background:rgba(108,99,255,.13);color:#6C63FF;font-weight:700}
+  .tab.active-v3{border-color:#FF6B6B;background:rgba(255,107,107,.13);color:#FF6B6B;font-weight:700}
+  .tab.active-grupo{border-color:#F5A623;background:rgba(245,166,35,.13);color:#F5A623;font-weight:700}
+  .kpis{display:flex;gap:12px;margin-bottom:28px;flex-wrap:wrap}
+  .kpi{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:18px 22px;min-width:160px;flex:1}
+  .kpi-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:6px}
+  .kpi-value{font-size:22px;font-weight:700;font-family:'DM Mono',monospace}
+  .kpi-delta{font-size:12px;margin-top:4px}
+  .charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+  .chart-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:20px 16px}
+  .chart-title{font-size:12px;color:#aaa;margin-bottom:14px;font-weight:600;letter-spacing:.8px;text-transform:uppercase}
+  .chart-wrap{position:relative;height:220px}
+  .table-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:20px;overflow-x:auto;margin-bottom:16px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{padding:8px 12px;text-align:right;color:#666;font-weight:500;font-size:11px;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;border-bottom:1px solid rgba(255,255,255,.08)}
+  th:first-child{text-align:left}
+  td{padding:10px 12px;text-align:right;border-bottom:1px solid rgba(255,255,255,.04);font-family:'DM Mono',monospace}
+  td:first-child{text-align:left;font-weight:600;color:#ccc;font-family:'Inter',sans-serif}
+  tr.total-row td{border-top:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.03);font-weight:700}
+  .footer{text-align:right;font-size:11px;color:#444;margin-top:8px}
+  .pos{color:#00C9A7}.neg{color:#FF6B6B}.neutral{color:#f0f0f0}.dim{color:#777}
+  @media(max-width:700px){.charts-row{grid-template-columns:1fr}.kpis{flex-direction:column}}
+</style>
 </head>
 <body>
-  <div id="root"></div>
 
-  <script type="text/babel">
-    const {
-      BarChart, Bar, LineChart, Line,
-      XAxis, YAxis, CartesianGrid, Tooltip,
-      Legend, ResponsiveContainer, Cell
-    } = Recharts;
-    const { useState } = React;
+<div class="subtitle">Grupo VIP — Resultado Gerencial 2026</div>
+<h1>Dashboard Financeiro</h1>
+<div class="period">Janeiro – Abril 2026 · Previsto vs Realizado</div>
 
-    const companies = {
-      VIP: {
-        label: "VIP MX",
-        color: "#00C9A7",
-        accent: "#00856E",
-        months: [
-          { mes: "Jan", receitaPrevista: 266500, receitaRealizada: 435355, despesasPrevistas: 395348, despesasRealizadas: 439765, resultadoPrevisto: -128849, resultadoRealizado: -4410 },
-          { mes: "Fev", receitaPrevista: 266500, receitaRealizada: 363194, despesasPrevistas: 343181, despesasRealizadas: 389392, resultadoPrevisto: -76681, resultadoRealizado: -26198 },
-          { mes: "Mar", receitaPrevista: 263000, receitaRealizada: 446258, despesasPrevistas: 301861, despesasRealizadas: 464461, resultadoPrevisto: -38861, resultadoRealizado: -18203 },
-          { mes: "Abr", receitaPrevista: 293150, receitaRealizada: 545913, despesasPrevistas: 228300, despesasRealizadas: 409522, resultadoPrevisto: 64850, resultadoRealizado: 136392 },
-        ],
-        despesas: [
-          { categoria: "Matéria Prima", previsto: 263154, realizado: 252773 },
-          { categoria: "Taxas Plataforma", previsto: 69290, realizado: 100406 },
-          { categoria: "Cancelamentos", previsto: 13325, realizado: 35768 },
-          { categoria: "Impostos", previsto: 29900, realizado: 33357 },
-          { categoria: "Pessoal", previsto: 6228, realizado: 7654 },
-          { categoria: "Financiamentos", previsto: 6602, realizado: 6602 },
-        ],
-        canais: [
-          { canal: "Mercado Livre", previsto: 260000, realizado: 413272 },
-          { canal: "Shopee", previsto: 3000, realizado: 11861 },
-          { canal: "Amazon", previsto: 3500, realizado: 10223 },
-        ],
-      },
-      VIDAL: {
-        label: "VIDAL",
-        color: "#6C63FF",
-        accent: "#4B44CC",
-        months: [
-          { mes: "Jan", receitaPrevista: 207000, receitaRealizada: 196571, despesasPrevistas: 182854, despesasRealizadas: 71161, resultadoPrevisto: 24147, resultadoRealizado: 125409 },
-          { mes: "Fev", receitaPrevista: 207000, receitaRealizada: 167144, despesasPrevistas: 182854, despesasRealizadas: 86782, resultadoPrevisto: 24147, resultadoRealizado: 80362 },
-          { mes: "Mar", receitaPrevista: 207000, receitaRealizada: 229018, despesasPrevistas: 182854, despesasRealizadas: 101714, resultadoPrevisto: 24147, resultadoRealizado: 127305 },
-          { mes: "Abr", receitaPrevista: 227700, receitaRealizada: 251048, despesasPrevistas: 194014, despesasRealizadas: 135847, resultadoPrevisto: 33686, resultadoRealizado: 115201 },
-        ],
-        despesas: [
-          { categoria: "Matéria Prima", previsto: 90000, realizado: 0 },
-          { categoria: "Taxas Plataforma", previsto: 40820, realizado: 22835 },
-          { categoria: "Cancelamentos", previsto: 7850, realizado: 16053 },
-          { categoria: "Pessoal", previsto: 22734, realizado: 17178 },
-          { categoria: "Impostos", previsto: 13000, realizado: 8843 },
-          { categoria: "Despesas Gerais", previsto: 8250, realizado: 6053 },
-        ],
-        canais: [
-          { canal: "Mercado Livre", previsto: 155000, realizado: 138853 },
-          { canal: "Loja Física", previsto: 50000, realizado: 44022 },
-          { canal: "Shopee", previsto: 2000, realizado: 13696 },
-        ],
-      },
-      V3: {
-        label: "V3",
-        color: "#FF6B6B",
-        accent: "#CC4444",
-        months: [
-          { mes: "Jan", receitaPrevista: 7500, receitaRealizada: 2706, despesasPrevistas: 2250, despesasRealizadas: 578, resultadoPrevisto: 5250, resultadoRealizado: 2128 },
-          { mes: "Fev", receitaPrevista: 7500, receitaRealizada: 3774, despesasPrevistas: 2250, despesasRealizadas: 1002, resultadoPrevisto: 5250, resultadoRealizado: 2772 },
-          { mes: "Mar", receitaPrevista: 7500, receitaRealizada: 3913, despesasPrevistas: 2250, despesasRealizadas: 1206, resultadoPrevisto: 5250, resultadoRealizado: 2707 },
-          { mes: "Abr", receitaPrevista: 3913, receitaRealizada: 3918, despesasPrevistas: 1174, despesasRealizadas: 1405, resultadoPrevisto: 2739, resultadoRealizado: 2514 },
-        ],
-        despesas: [
-          { categoria: "Taxas Plataforma", previsto: 1875, realizado: 578 },
-          { categoria: "Cancelamentos", previsto: 375, realizado: 0 },
-        ],
-        canais: [
-          { canal: "Mercado Livre", previsto: 7500, realizado: 2706 },
-        ],
-      },
-    };
+<div class="tabs">
+  <button class="tab active-vip" onclick="setCompany(&#39;VIP&#39;)">VIP MX</button>
+  <button class="tab" onclick="setCompany(&#39;VIDAL&#39;)">VIDAL</button>
+  <button class="tab" onclick="setCompany(&#39;V3&#39;)">V3</button>
+  <button class="tab" onclick="setCompany(&#39;GRUPO&#39;)">Grupo VIP</button>
+</div>
 
-    const fmt = (v) =>
-      new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }).format(v);
+<div class="kpis" id="kpis">
+    <div class="kpi"><div class="kpi-label">Receita Realizada</div><div class="kpi-value pos">R$&nbsp;1.790.720</div><div class="kpi-delta pos">▲ 64.4% vs previsto</div></div>
+    <div class="kpi"><div class="kpi-label">Despesas Realizadas</div><div class="kpi-value neg">R$&nbsp;1.703.140</div><div class="kpi-delta neg">▲ 34.2% vs previsto</div></div>
+    <div class="kpi"><div class="kpi-label">Resultado Realizado</div><div class="kpi-value pos">R$&nbsp;87.581</div><div class="kpi-delta pos">▲ 148.8% vs previsto</div></div>
+    <div class="kpi"><div class="kpi-label">Receita Prevista</div><div class="kpi-value dim">R$&nbsp;1.089.150</div></div>
+    <div class="kpi"><div class="kpi-label">Resultado Previsto</div><div class="kpi-value dim">-R$&nbsp;179.541</div></div>
+  </div>
 
-    const KPI = ({ label, value, sub, positive }) => (
-      <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: "18px 22px", minWidth: 160, flex: 1 }}>
-        <div style={{ fontSize: 11, color: "#888", textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 6 }}>{label}</div>
-        <div style={{ fontSize: 22, fontWeight: 700, color: positive ? "#00C9A7" : value < 0 ? "#FF6B6B" : "#f0f0f0", fontFamily: "'DM Mono', monospace" }}>{fmt(value)}</div>
-        {sub != null && (
-          <div style={{ fontSize: 12, color: sub >= 0 ? "#00C9A7" : "#FF6B6B", marginTop: 4 }}>
-            {sub >= 0 ? "▲" : "▼"} {Math.abs(sub).toFixed(1)}% vs previsto
-          </div>
-        )}
-      </div>
-    );
+<div class="charts-row">
+  <div class="chart-box"><div class="chart-title">Receita Bruta · Mês a Mês</div><div class="chart-wrap"><canvas id="chartReceita" width="870" height="275" style="display: block; box-sizing: border-box; height: 220px; width: 696px;"></canvas></div></div>
+  <div class="chart-box"><div class="chart-title">Resultado Líquido · Mês a Mês</div><div class="chart-wrap"><canvas id="chartResultado" width="870" height="275" style="display: block; box-sizing: border-box; height: 220px; width: 696px;"></canvas></div></div>
+</div>
+<div class="charts-row">
+  <div class="chart-box"><div class="chart-title">Despesas por Categoria · Acumulado</div><div class="chart-wrap"><canvas id="chartDespesas" width="870" height="275" style="display: block; box-sizing: border-box; height: 220px; width: 696px;"></canvas></div></div>
+  <div class="chart-box"><div class="chart-title">Canais de Venda · Acumulado</div><div class="chart-wrap"><canvas id="chartCanais" width="870" height="275" style="display: block; box-sizing: border-box; height: 220px; width: 696px;"></canvas></div></div>
+</div>
 
-    const CustomTooltip = ({ active, payload, label }) => {
-      if (!active || !payload?.length) return null;
-      return (
-        <div style={{ background: "#1a1a2e", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8, padding: "10px 14px", fontSize: 12 }}>
-          <div style={{ color: "#aaa", marginBottom: 6, fontWeight: 600 }}>{label}</div>
-          {payload.map((p, i) => (
-            <div key={i} style={{ color: p.color, marginBottom: 2 }}>{p.name}: {fmt(p.value)}</div>
-          ))}
-        </div>
-      );
-    };
+<div class="table-box">
+  <div class="chart-title">Resumo Mensal</div>
+  <table id="tbl"><thead><tr><th>Mês</th><th>Rec. Prevista</th><th>Rec. Realizada</th><th>Δ Receita</th><th>Desp. Prev.</th><th>Desp. Real.</th><th>Δ Despesas</th><th>Res. Previsto</th><th>Res. Realizado</th></tr></thead><tbody><tr>
+      <td>Jan/26</td>
+      <td class="dim">R$&nbsp;266.500</td>
+      <td class="neutral">R$&nbsp;435.355</td>
+      <td class="pos">+63.4%</td>
+      <td class="dim">R$&nbsp;395.349</td>
+      <td class="neutral">R$&nbsp;439.765</td>
+      <td class="neg">+11.2%</td>
+      <td class="dim">-R$&nbsp;128.849</td>
+      <td class="neg">-R$&nbsp;4.410</td>
+    </tr><tr>
+      <td>Fev/26</td>
+      <td class="dim">R$&nbsp;266.500</td>
+      <td class="neutral">R$&nbsp;363.194</td>
+      <td class="pos">+36.3%</td>
+      <td class="dim">R$&nbsp;343.181</td>
+      <td class="neutral">R$&nbsp;389.392</td>
+      <td class="neg">+13.5%</td>
+      <td class="dim">-R$&nbsp;76.681</td>
+      <td class="neg">-R$&nbsp;26.198</td>
+    </tr><tr>
+      <td>Mar/26</td>
+      <td class="dim">R$&nbsp;263.000</td>
+      <td class="neutral">R$&nbsp;446.258</td>
+      <td class="pos">+69.7%</td>
+      <td class="dim">R$&nbsp;301.861</td>
+      <td class="neutral">R$&nbsp;464.461</td>
+      <td class="neg">+53.9%</td>
+      <td class="dim">-R$&nbsp;38.861</td>
+      <td class="neg">-R$&nbsp;18.203</td>
+    </tr><tr>
+      <td>Abr/26</td>
+      <td class="dim">R$&nbsp;293.150</td>
+      <td class="neutral">R$&nbsp;545.913</td>
+      <td class="pos">+86.2%</td>
+      <td class="dim">R$&nbsp;228.300</td>
+      <td class="neutral">R$&nbsp;409.522</td>
+      <td class="neg">+79.4%</td>
+      <td class="dim">R$&nbsp;64.850</td>
+      <td class="pos">R$&nbsp;136.392</td>
+    </tr><tr class="total-row">
+    <td>TOTAL</td>
+    <td class="dim">R$&nbsp;1.089.150</td>
+    <td class="neutral">R$&nbsp;1.790.720</td>
+    <td class="pos">+64.4%</td>
+    <td class="dim">R$&nbsp;1.268.691</td>
+    <td class="neutral">R$&nbsp;1.703.140</td>
+    <td class="neg">+34.2%</td>
+    <td class="dim">-R$&nbsp;179.541</td>
+    <td class="pos">R$&nbsp;87.581</td>
+  </tr></tbody></table>
+</div>
+<div class="footer">Dados: Jan–Abr 2026 · Fonte: Resultado_Gerencial_2026.xlsx</div>
 
-    function Dashboard() {
-      const [active, setActive] = useState("VIP");
-      const co = companies[active];
-      const totalReceitaReal = co.months.reduce((s, m) => s + m.receitaRealizada, 0);
-      const totalReceitaPrev = co.months.reduce((s, m) => s + m.receitaPrevista, 0);
-      const totalDespReal = co.months.reduce((s, m) => s + m.despesasRealizadas, 0);
-      const totalDespPrev = co.months.reduce((s, m) => s + m.despesasPrevistas, 0);
-      const totalResReal = co.months.reduce((s, m) => s + m.resultadoRealizado, 0);
-      const totalResPrev = co.months.reduce((s, m) => s + m.resultadoPrevisto, 0);
-      const receitaDelta = ((totalReceitaReal - totalReceitaPrev) / Math.abs(totalReceitaPrev)) * 100;
-      const despDelta = ((totalDespReal - totalDespPrev) / Math.abs(totalDespPrev)) * 100;
-      const resDelta = totalResPrev !== 0 ? ((totalResReal - totalResPrev) / Math.abs(totalResPrev)) * 100 : null;
+<script>
+const fmt = v => new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0}).format(v);
+const pct = (r,p) => p ? (((r-p)/Math.abs(p))*100) : 0;
+const fmtPct = v => (v>=0?'+':'')+v.toFixed(1)+'%';
 
-      return (
-        <div style={{ background: "#0d0d1a", minHeight: "100vh", color: "#f0f0f0", fontFamily: "'Inter', sans-serif", padding: "28px 24px" }}>
-          {/* Header */}
-          <div style={{ marginBottom: 28 }}>
-            <div style={{ fontSize: 11, color: "#666", letterSpacing: 2, textTransform: "uppercase", marginBottom: 4 }}>Grupo VIP — Resultado Gerencial 2026</div>
-            <h1 style={{ fontSize: 26, fontWeight: 700, margin: 0, color: "#fff" }}>Dashboard Financeiro</h1>
-            <div style={{ fontSize: 13, color: "#555", marginTop: 4 }}>Janeiro – Abril 2026 · Previsto vs Realizado</div>
-          </div>
+const DATA = {
+  VIP:{
+    color:'#00C9A7', accent:'#00856E', label:'VIP MX',
+    months:[
+      {mes:'Jan',rPrev:266500,rReal:435355,dPrev:395349,dReal:439765,resPrev:-128849,resReal:-4410},
+      {mes:'Fev',rPrev:266500,rReal:363194,dPrev:343181,dReal:389392,resPrev:-76681,resReal:-26198},
+      {mes:'Mar',rPrev:263000,rReal:446258,dPrev:301861,dReal:464461,resPrev:-38861,resReal:-18203},
+      {mes:'Abr',rPrev:293150,rReal:545913,dPrev:228300,dReal:409522,resPrev:64850,resReal:136392},
+    ],
+    despesas:[
+      {cat:'Matéria Prima',prev:263154,real:252773},
+      {cat:'Taxas Plataforma',prev:69290,real:100406},
+      {cat:'Cancelamentos',prev:13325,real:35768},
+      {cat:'Impostos',prev:29900,real:33357},
+      {cat:'Pessoal',prev:6228,real:7654},
+      {cat:'Financiamentos',prev:6602,real:6602},
+    ],
+    canais:[
+      {canal:'Mercado Livre',prev:260000,real:413272},
+      {canal:'Shopee',prev:3000,real:11861},
+      {canal:'Amazon',prev:3500,real:10223},
+    ],
+  },
+  VIDAL:{
+    color:'#6C63FF', accent:'#4B44CC', label:'VIDAL',
+    months:[
+      {mes:'Jan',rPrev:207000,rReal:196571,dPrev:182854,dReal:71161,resPrev:24147,resReal:125409},
+      {mes:'Fev',rPrev:207000,rReal:167144,dPrev:182854,dReal:86782,resPrev:24147,resReal:80362},
+      {mes:'Mar',rPrev:207000,rReal:229018,dPrev:182854,dReal:101714,resPrev:24147,resReal:127305},
+      {mes:'Abr',rPrev:227700,rReal:251048,dPrev:194014,dReal:135847,resPrev:33686,resReal:115201},
+    ],
+    despesas:[
+      {cat:'Matéria Prima',prev:90000,real:3059},
+      {cat:'Taxas Plataforma',prev:40820,real:22835},
+      {cat:'Cancelamentos',prev:7850,real:16053},
+      {cat:'Pessoal',prev:22734,real:17178},
+      {cat:'Impostos',prev:13000,real:8843},
+      {cat:'Desp. Gerais',prev:8250,real:6053},
+    ],
+    canais:[
+      {canal:'Mercado Livre',prev:155000,real:138853},
+      {canal:'Loja Física',prev:50000,real:44022},
+      {canal:'Shopee',prev:2000,real:13696},
+    ],
+  },
+  V3:{
+    color:'#FF6B6B', accent:'#CC4444', label:'V3',
+    months:[
+      {mes:'Jan',rPrev:7500,rReal:2706,dPrev:2250,dReal:578,resPrev:5250,resReal:2128},
+      {mes:'Fev',rPrev:7500,rReal:3774,dPrev:2250,dReal:1002,resPrev:5250,resReal:2772},
+      {mes:'Mar',rPrev:7500,rReal:3913,dPrev:2250,dReal:1206,resPrev:5250,resReal:2707},
+      {mes:'Abr',rPrev:3913,rReal:3918,dPrev:1174,dReal:1405,resPrev:2739,resReal:2514},
+    ],
+    despesas:[
+      {cat:'Taxas Plataforma',prev:1875,real:578},
+      {cat:'Cancelamentos',prev:375,real:0},
+    ],
+    canais:[
+      {canal:'Mercado Livre',prev:7500,real:2706},
+    ],
+  },
+  GRUPO:{
+    color:'#F5A623', accent:'#C47D0E', label:'Grupo VIP',
+    months:[
+      {mes:'Jan',rPrev:481000,rReal:634632,dPrev:580453,dReal:511504,resPrev:-99452,resReal:123128},
+      {mes:'Fev',rPrev:481000,rReal:534112,dPrev:528285,dReal:477176,resPrev:-47284,resReal:56936},
+      {mes:'Mar',rPrev:477500,rReal:679189,dPrev:486965,dReal:567381,resPrev:-8462,resReal:111809},
+      {mes:'Abr',rPrev:524763,rReal:800879,dPrev:423488,dReal:546774,resPrev:101275,resReal:254332},
+    ],
+    despesas:[
+      {cat:'Matéria Prima',prev:353154,real:255832},
+      {cat:'Taxas Plataforma',prev:111985,real:123241},
+      {cat:'Cancelamentos',prev:21550,real:51821},
+      {cat:'Impostos',prev:42900,real:42200},
+      {cat:'Pessoal',prev:28962,real:24832},
+      {cat:'Financiamentos',prev:6602,real:6602},
+    ],
+    canais:[
+      {canal:'Mercado Livre',prev:422500,real:554831},
+      {canal:'Loja Física',prev:50000,real:44022},
+      {canal:'Shopee',prev:5000,real:25557},
+      {canal:'Amazon',prev:3500,real:10223},
+    ],
+  },
+};
 
-          {/* Company Tabs */}
-          <div style={{ display: "flex", gap: 8, marginBottom: 28, flexWrap: "wrap" }}>
-            {Object.entries(companies).map(([key, c]) => (
-              <button
-                key={key}
-                className="tab-btn"
-                onClick={() => setActive(key)}
-                style={{
-                  padding: "10px 22px",
-                  borderRadius: 8,
-                  border: active === key ? `2px solid ${c.color}` : "2px solid rgba(255,255,255,0.1)",
-                  background: active === key ? `${c.color}22` : "transparent",
-                  color: active === key ? c.color : "#888",
-                  fontWeight: active === key ? 700 : 400,
-                  fontSize: 14,
-                  letterSpacing: 0.5,
-                }}
-              >
-                {c.label}
-              </button>
-            ))}
-          </div>
+let charts = {};
+let current = 'VIP';
 
-          {/* KPI Cards */}
-          <div style={{ display: "flex", gap: 12, marginBottom: 28, flexWrap: "wrap" }}>
-            <KPI label="Receita Realizada" value={totalReceitaReal} sub={receitaDelta} positive />
-            <KPI label="Despesas Realizadas" value={totalDespReal} sub={despDelta} />
-            <KPI label="Resultado Realizado" value={totalResReal} sub={resDelta} />
-            <KPI label="Receita Prevista" value={totalReceitaPrev} />
-            <KPI label="Resultado Previsto" value={totalResPrev} />
-          </div>
+function setCompany(key){
+  current = key;
+  document.querySelectorAll('.tab').forEach((t,i)=>{
+    t.className = 'tab';
+    if(['VIP','VIDAL','V3','GRUPO'][i]===key) t.classList.add('active-'+key.toLowerCase());
+  });
+  render();
+}
 
-          {/* Charts Row 1 */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
-            <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "20px 16px" }}>
-              <div style={{ fontSize: 12, color: "#aaa", marginBottom: 14, fontWeight: 600, letterSpacing: 0.8, textTransform: "uppercase" }}>Receita Bruta · Mês a Mês</div>
-              <ResponsiveContainer width="100%" height={220}>
-                <BarChart data={co.months} barGap={4}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                  <XAxis dataKey="mes" tick={{ fill: "#666", fontSize: 11 }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fill: "#666", fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={v => `${(v/1000).toFixed(0)}k`} />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Legend wrapperStyle={{ fontSize: 11, color: "#888" }} />
-                  <Bar dataKey="receitaPrevista" name="Previsto" fill="rgba(255,255,255,0.1)" radius={[4,4,0,0]} />
-                  <Bar dataKey="receitaRealizada" name="Realizado" fill={co.color} radius={[4,4,0,0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-            <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "20px 16px" }}>
-              <div style={{ fontSize: 12, color: "#aaa", marginBottom: 14, fontWeight: 600, letterSpacing: 0.8, textTransform: "uppercase" }}>Resultado Líquido · Mês a Mês</div>
-              <ResponsiveContainer width="100%" height={220}>
-                <BarChart data={co.months} barGap={4}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                  <XAxis dataKey="mes" tick={{ fill: "#666", fontSize: 11 }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fill: "#666", fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={v => `${(v/1000).toFixed(0)}k`} />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Legend wrapperStyle={{ fontSize: 11, color: "#888" }} />
-                  <Bar dataKey="resultadoPrevisto" name="Previsto" fill="rgba(255,255,255,0.1)" radius={[4,4,0,0]} />
-                  <Bar dataKey="resultadoRealizado" name="Realizado" radius={[4,4,0,0]}>
-                    {co.months.map((m, i) => (
-                      <Cell key={i} fill={m.resultadoRealizado >= 0 ? co.color : "#FF6B6B"} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+function destroyCharts(){
+  Object.values(charts).forEach(c=>c.destroy());
+  charts={};
+}
 
-          {/* Charts Row 2 */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
-            <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "20px 16px" }}>
-              <div style={{ fontSize: 12, color: "#aaa", marginBottom: 14, fontWeight: 600, letterSpacing: 0.8, textTransform: "uppercase" }}>Despesas por Categoria · Acumulado</div>
-              <ResponsiveContainer width="100%" height={220}>
-                <BarChart data={co.despesas} layout="vertical" barGap={4}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" horizontal={false} />
-                  <XAxis type="number" tick={{ fill: "#666", fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={v => `${(v/1000).toFixed(0)}k`} />
-                  <YAxis type="category" dataKey="categoria" tick={{ fill: "#888", fontSize: 10 }} axisLine={false} tickLine={false} width={110} />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Legend wrapperStyle={{ fontSize: 11, color: "#888" }} />
-                  <Bar dataKey="previsto" name="Previsto" fill="rgba(255,255,255,0.1)" radius={[0,4,4,0]} />
-                  <Bar dataKey="realizado" name="Realizado" fill={co.accent} radius={[0,4,4,0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-            <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "20px 16px" }}>
-              <div style={{ fontSize: 12, color: "#aaa", marginBottom: 14, fontWeight: 600, letterSpacing: 0.8, textTransform: "uppercase" }}>Canais de Venda · Acumulado</div>
-              <ResponsiveContainer width="100%" height={220}>
-                <BarChart data={co.canais} barGap={4}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                  <XAxis dataKey="canal" tick={{ fill: "#666", fontSize: 10 }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fill: "#666", fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={v => `${(v/1000).toFixed(0)}k`} />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Legend wrapperStyle={{ fontSize: 11, color: "#888" }} />
-                  <Bar dataKey="previsto" name="Previsto" fill="rgba(255,255,255,0.1)" radius={[4,4,0,0]} />
-                  <Bar dataKey="realizado" name="Realizado" fill={co.color} radius={[4,4,0,0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          {/* Table */}
-          <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "20px", overflowX: "auto" }}>
-            <div style={{ fontSize: 12, color: "#aaa", marginBottom: 14, fontWeight: 600, letterSpacing: 0.8, textTransform: "uppercase" }}>Resumo Mensal</div>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
-              <thead>
-                <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-                  {["Mês","Receita Prevista","Receita Realizada","Δ Receita","Despesas Prev.","Despesas Real.","Δ Despesas","Resultado Prev.","Resultado Real."].map(h => (
-                    <th key={h} style={{ padding: "8px 12px", textAlign: "right", color: "#666", fontWeight: 500, fontSize: 11, letterSpacing: 0.5, textTransform: "uppercase", whiteSpace: "nowrap" }}>
-                      {h === "Mês" ? <span style={{ textAlign: "left", display: "block" }}>{h}</span> : h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {co.months.map((m, i) => {
-                  const rDelta = ((m.receitaRealizada - m.receitaPrevista) / Math.abs(m.receitaPrevista)) * 100;
-                  const dDelta = ((m.despesasRealizadas - m.despesasPrevistas) / Math.abs(m.despesasPrevistas)) * 100;
-                  return (
-                    <tr key={i} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-                      <td style={{ padding: "10px 12px", fontWeight: 600, color: "#ccc" }}>{m.mes}/26</td>
-                      <td style={{ padding: "10px 12px", textAlign: "right", color: "#777", fontFamily: "'DM Mono', monospace" }}>{fmt(m.receitaPrevista)}</td>
-                      <td style={{ padding: "10px 12px", textAlign: "right", color: "#f0f0f0", fontFamily: "'DM Mono', monospace", fontWeight: 600 }}>{fmt(m.receitaRealizada)}</td>
-                      <td style={{ padding: "10px 12px", textAlign: "right", color: rDelta >= 0 ? "#00C9A7" : "#FF6B6B", fontFamily: "'DM Mono', monospace" }}>{rDelta >= 0 ? "+" : ""}{rDelta.toFixed(1)}%</td>
-                      <td style={{ padding: "10px 12px", textAlign: "right", color: "#777", fontFamily: "'DM Mono', monospace" }}>{fmt(m.despesasPrevistas)}</td>
-                      <td style={{ padding: "10px 12px", textAlign: "right", color: "#f0f0f0", fontFamily: "'DM Mono', monospace", fontWeight: 600 }}>{fmt(m.despesasRealizadas)}</td>
-                      <td style={{ padding: "10px 12px", textAlign: "right", color: dDelta <= 0 ? "#00C9A7" : "#FF6B6B", fontFamily: "'DM Mono', monospace" }}>{dDelta >= 0 ? "+" : ""}{dDelta.toFixed(1)}%</td>
-                      <td style={{ padding: "10px 12px", textAlign: "right", color: "#777", fontFamily: "'DM Mono', monospace" }}>{fmt(m.resultadoPrevisto)}</td>
-                      <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'DM Mono', monospace", fontWeight: 700, color: m.resultadoRealizado >= 0 ? "#00C9A7" : "#FF6B6B" }}>{fmt(m.resultadoRealizado)}</td>
-                    </tr>
-                  );
-                })}
-                <tr style={{ borderTop: "1px solid rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.03)" }}>
-                  <td style={{ padding: "12px 12px", fontWeight: 700, color: "#fff" }}>TOTAL</td>
-                  <td style={{ padding: "12px 12px", textAlign: "right", color: "#777", fontFamily: "'DM Mono', monospace" }}>{fmt(totalReceitaPrev)}</td>
-                  <td style={{ padding: "12px 12px", textAlign: "right", color: "#f0f0f0", fontFamily: "'DM Mono', monospace", fontWeight: 700 }}>{fmt(totalReceitaReal)}</td>
-                  <td style={{ padding: "12px 12px", textAlign: "right", color: receitaDelta >= 0 ? "#00C9A7" : "#FF6B6B", fontFamily: "'DM Mono', monospace", fontWeight: 700 }}>{receitaDelta >= 0 ? "+" : ""}{receitaDelta.toFixed(1)}%</td>
-                  <td style={{ padding: "12px 12px", textAlign: "right", color: "#777", fontFamily: "'DM Mono', monospace" }}>{fmt(totalDespPrev)}</td>
-                  <td style={{ padding: "12px 12px", textAlign: "right", color: "#f0f0f0", fontFamily: "'DM Mono', monospace", fontWeight: 700 }}>{fmt(totalDespReal)}</td>
-                  <td style={{ padding: "12px 12px", textAlign: "right", color: despDelta <= 0 ? "#00C9A7" : "#FF6B6B", fontFamily: "'DM Mono', monospace", fontWeight: 700 }}>{despDelta >= 0 ? "+" : ""}{despDelta.toFixed(1)}%</td>
-                  <td style={{ padding: "12px 12px", textAlign: "right", color: "#777", fontFamily: "'DM Mono', monospace" }}>{fmt(totalResPrev)}</td>
-                  <td style={{ padding: "12px 12px", textAlign: "right", fontFamily: "'DM Mono', monospace", fontWeight: 700, color: totalResReal >= 0 ? "#00C9A7" : "#FF6B6B" }}>{fmt(totalResReal)}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div style={{ marginTop: 16, textAlign: "right", fontSize: 11, color: "#444" }}>
-            Dados: Jan–Abr 2026 · Fonte: Resultado_Gerencial_2026.xlsx
-          </div>
-        </div>
-      );
+function makeBarChart(id, labels, datasets, horizontal=false){
+  const ctx = document.getElementById(id).getContext('2d');
+  charts[id] = new Chart(ctx,{
+    type:'bar',
+    data:{labels, datasets},
+    options:{
+      indexAxis: horizontal ? 'y' : 'x',
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#888',font:{size:11}}},tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmt(c.raw)}}},
+      scales:{
+        x:{ticks:{color:'#666',font:{size:10},callback:v=>horizontal?(fmt(v)):(Math.abs(v)>=1000?(v/1000).toFixed(0)+'k':v)},grid:{color:'rgba(255,255,255,.05)'},border:{display:false}},
+        y:{ticks:{color:'#666',font:{size:10},callback:v=>horizontal?v:(Math.abs(v)>=1000?(v/1000).toFixed(0)+'k':v)},grid:{color:'rgba(255,255,255,.05)'},border:{display:false}},
+      }
     }
+  });
+}
 
-    ReactDOM.createRoot(document.getElementById("root")).render(<Dashboard />);
-  </script>
-</body>
-</html>
+function render(){
+  const co = DATA[current];
+  destroyCharts();
+
+  // KPIs
+  const totRR = co.months.reduce((s,m)=>s+m.rReal,0);
+  const totRP = co.months.reduce((s,m)=>s+m.rPrev,0);
+  const totDR = co.months.reduce((s,m)=>s+m.dReal,0);
+  const totDP = co.months.reduce((s,m)=>s+m.dPrev,0);
+  const totResR = co.months.reduce((s,m)=>s+m.resReal,0);
+  const totResP = co.months.reduce((s,m)=>s+m.resPrev,0);
+  const dRec = pct(totRR,totRP), dDesp = pct(totDR,totDP), dRes = pct(totResR,totResP);
+
+  document.getElementById('kpis').innerHTML = `
+    <div class="kpi"><div class="kpi-label">Receita Realizada</div><div class="kpi-value pos">${fmt(totRR)}</div><div class="kpi-delta ${dRec>=0?'pos':'neg'}">${dRec>=0?'▲':'▼'} ${Math.abs(dRec).toFixed(1)}% vs previsto</div></div>
+    <div class="kpi"><div class="kpi-label">Despesas Realizadas</div><div class="kpi-value ${totDR>totDP?'neg':'neutral'}">${fmt(totDR)}</div><div class="kpi-delta ${dDesp<=0?'pos':'neg'}">${dDesp>=0?'▲':'▼'} ${Math.abs(dDesp).toFixed(1)}% vs previsto</div></div>
+    <div class="kpi"><div class="kpi-label">Resultado Realizado</div><div class="kpi-value ${totResR>=0?'pos':'neg'}">${fmt(totResR)}</div><div class="kpi-delta ${dRes>=0?'pos':'neg'}">${dRes>=0?'▲':'▼'} ${Math.abs(dRes).toFixed(1)}% vs previsto</div></div>
+    <div class="kpi"><div class="kpi-label">Receita Prevista</div><div class="kpi-value dim">${fmt(totRP)}</div></div>
+    <div class="kpi"><div class="kpi-label">Resultado Previsto</div><div class="kpi-value dim">${fmt(totResP)}</div></div>
+  `;
+
+  const meses = co.months.map(m=>m.mes);
+  const color = co.color;
+
+  // Receita chart
+  makeBarChart('chartReceita', meses, [
+    {label:'Previsto',data:co.months.map(m=>m.rPrev),backgroundColor:'rgba(255,255,255,.1)',borderRadius:4},
+    {label:'Realizado',data:co.months.map(m=>m.rReal),backgroundColor:color,borderRadius:4},
+  ]);
+
+  // Resultado chart (colored by positive/negative)
+  makeBarChart('chartResultado', meses, [
+    {label:'Previsto',data:co.months.map(m=>m.resPrev),backgroundColor:'rgba(255,255,255,.1)',borderRadius:4},
+    {label:'Realizado',data:co.months.map(m=>m.resReal),backgroundColor:co.months.map(m=>m.resReal>=0?color:'#FF6B6B'),borderRadius:4},
+  ]);
+
+  // Despesas chart
+  makeBarChart('chartDespesas', co.despesas.map(d=>d.cat), [
+    {label:'Previsto',data:co.despesas.map(d=>d.prev),backgroundColor:'rgba(255,255,255,.1)',borderRadius:4},
+    {label:'Realizado',data:co.despesas.map(d=>d.real),backgroundColor:co.accent,borderRadius:4},
+  ], true);
+
+  // Canais chart
+  makeBarChart('chartCanais', co.canais.map(c=>c.canal), [
+    {label:'Previsto',data:co.canais.map(c=>c.prev),backgroundColor:'rgba(255,255,255,.1)',borderRadius:4},
+    {label:'Realizado',data:co.canais.map(c=>c.real),backgroundColor:color,borderRadius:4},
+  ]);
+
+  // Table
+  const cols = ['Mês','Rec. Prevista','Rec. Realizada','Δ Receita','Desp. Prev.','Desp. Real.','Δ Despesas','Res. Previsto','Res. Realizado'];
+  let html = '<thead><tr>'+cols.map(c=>`<th>${c}</th>`).join('')+'</tr></thead><tbody>';
+  let [srp,srr,sdp,sdr,srrp,srrr] = [0,0,0,0,0,0];
+  co.months.forEach(m=>{
+    srp+=m.rPrev;srr+=m.rReal;sdp+=m.dPrev;sdr+=m.dReal;srrp+=m.resPrev;srrr+=m.resReal;
+    const dr=pct(m.rReal,m.rPrev), dd=pct(m.dReal,m.dPrev);
+    html+=`<tr>
+      <td>${m.mes}/26</td>
+      <td class="dim">${fmt(m.rPrev)}</td>
+      <td class="neutral">${fmt(m.rReal)}</td>
+      <td class="${dr>=0?'pos':'neg'}">${fmtPct(dr)}</td>
+      <td class="dim">${fmt(m.dPrev)}</td>
+      <td class="neutral">${fmt(m.dReal)}</td>
+      <td class="${dd<=0?'pos':'neg'}">${fmtPct(dd)}</td>
+      <td class="dim">${fmt(m.resPrev)}</td>
+      <td class="${m.resReal>=0?'pos':'neg'}">${fmt(m.resReal)}</td>
+    </tr>`;
+  });
+  const tdr=pct(srr,srp), tdd=pct(sdr,sdp);
+  html+=`<tr class="total-row">
+    <td>TOTAL</td>
+    <td class="dim">${fmt(srp)}</td>
+    <td class="neutral">${fmt(srr)}</td>
+    <td class="${tdr>=0?'pos':'neg'}">${fmtPct(tdr)}</td>
+    <td class="dim">${fmt(sdp)}</td>
+    <td class="neutral">${fmt(sdr)}</td>
+    <td class="${tdd<=0?'pos':'neg'}">${fmtPct(tdd)}</td>
+    <td class="dim">${fmt(srrp)}</td>
+    <td class="${srrr>=0?'pos':'neg'}">${fmt(srrr)}</td>
+  </tr></tbody>`;
+  document.getElementById('tbl').innerHTML = html;
+}
+
+// Init
+setCompany('VIP');
+</script>
+
+
+</body></html>
