@@ -1,0 +1,41 @@
+name: Atualizar Dashboard
+
+on:
+  push:
+    paths:
+      - "Resultado_Gerencial_2026.xlsx"   # dispara ao fazer push da planilha
+  schedule:
+    - cron: "0 6 * * *"                   # todo dia às 06:00 BRT (09:00 UTC)
+  workflow_dispatch:                       # botão manual no GitHub
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependências
+        run: pip install openpyxl
+
+      - name: Gerar data.json a partir do xlsx
+        run: python scripts/gerar_dados.py
+
+      - name: Commit e push do data.json
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/data.json
+          git diff --cached --quiet || git commit -m "chore: atualiza data.json [$(date '+%d/%m/%Y %H:%M')]"
+          git push

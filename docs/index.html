@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Financeiro – Grupo VIP 2026</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0d0d1a;color:#f0f0f0;font-family:'Inter',sans-serif;min-height:100vh;padding:28px 24px}
+  ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#111}::-webkit-scrollbar-thumb{background:#333;border-radius:4px}
+  h1{font-size:26px;font-weight:700;color:#fff}
+  .subtitle{font-size:11px;color:#666;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+  .period{font-size:13px;color:#555;margin-top:4px;margin-bottom:28px}
+  .badge-update{display:inline-block;font-size:10px;color:#444;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:20px;padding:3px 10px;margin-left:10px;vertical-align:middle}
+  .tabs{display:flex;gap:8px;margin-bottom:28px;flex-wrap:wrap}
+  .tab{padding:10px 22px;border-radius:8px;border:2px solid rgba(255,255,255,0.1);background:transparent;color:#888;font-weight:400;font-size:14px;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif}
+  .tab:hover{opacity:.85}
+  .tab.active-vip{border-color:#00C9A7;background:rgba(0,201,167,.13);color:#00C9A7;font-weight:700}
+  .tab.active-vidal{border-color:#6C63FF;background:rgba(108,99,255,.13);color:#6C63FF;font-weight:700}
+  .tab.active-v3{border-color:#FF6B6B;background:rgba(255,107,107,.13);color:#FF6B6B;font-weight:700}
+  .tab.active-grupo{border-color:#F5A623;background:rgba(245,166,35,.13);color:#F5A623;font-weight:700}
+  .kpis{display:flex;gap:12px;margin-bottom:28px;flex-wrap:wrap}
+  .kpi{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:18px 22px;min-width:160px;flex:1}
+  .kpi-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:6px}
+  .kpi-value{font-size:22px;font-weight:700;font-family:'DM Mono',monospace}
+  .kpi-delta{font-size:12px;margin-top:4px}
+  .charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+  .chart-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:20px 16px}
+  .chart-title{font-size:12px;color:#aaa;margin-bottom:14px;font-weight:600;letter-spacing:.8px;text-transform:uppercase}
+  .chart-wrap{position:relative;height:220px}
+  .table-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:20px;overflow-x:auto;margin-bottom:16px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{padding:8px 12px;text-align:right;color:#666;font-weight:500;font-size:11px;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;border-bottom:1px solid rgba(255,255,255,.08)}
+  th:first-child{text-align:left}
+  td{padding:10px 12px;text-align:right;border-bottom:1px solid rgba(255,255,255,.04);font-family:'DM Mono',monospace}
+  td:first-child{text-align:left;font-weight:600;color:#ccc;font-family:'Inter',sans-serif}
+  tr.total-row td{border-top:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.03);font-weight:700}
+  .footer{text-align:right;font-size:11px;color:#444;margin-top:8px}
+  .loading{text-align:center;padding:60px;color:#555;font-size:14px}
+  .error{text-align:center;padding:40px;color:#FF6B6B;font-size:13px;background:rgba(255,107,107,.05);border-radius:12px;margin:20px 0}
+  .pos{color:#00C9A7}.neg{color:#FF6B6B}.neutral{color:#f0f0f0}.dim{color:#777}
+  @media(max-width:700px){.charts-row{grid-template-columns:1fr}.kpis{flex-direction:column}}
+</style>
+</head>
+<body>
+
+<div class="subtitle">Grupo VIP — Resultado Gerencial 2026</div>
+<h1>Dashboard Financeiro <span class="badge-update" id="badge-update">carregando...</span></h1>
+<div class="period" id="period">Carregando dados...</div>
+
+<div class="tabs">
+  <button class="tab active-vip"  onclick="setCompany('VIP')">VIP MX</button>
+  <button class="tab"             onclick="setCompany('VIDAL')">VIDAL</button>
+  <button class="tab"             onclick="setCompany('V3')">V3</button>
+  <button class="tab"             onclick="setCompany('GRUPO')">Grupo VIP</button>
+</div>
+
+<div id="kpis" class="kpis"><div class="loading">Carregando indicadores...</div></div>
+
+<div class="charts-row">
+  <div class="chart-box"><div class="chart-title">Receita Bruta · Mês a Mês</div><div class="chart-wrap"><canvas id="chartReceita"></canvas></div></div>
+  <div class="chart-box"><div class="chart-title">Resultado Líquido · Mês a Mês</div><div class="chart-wrap"><canvas id="chartResultado"></canvas></div></div>
+</div>
+<div class="charts-row">
+  <div class="chart-box"><div class="chart-title">Despesas por Categoria · Acumulado</div><div class="chart-wrap"><canvas id="chartDespesas"></canvas></div></div>
+  <div class="chart-box"><div class="chart-title">Canais de Venda · Acumulado</div><div class="chart-wrap"><canvas id="chartCanais"></canvas></div></div>
+</div>
+
+<div class="table-box">
+  <div class="chart-title">Resumo Mensal</div>
+  <table id="tbl"><tbody><tr><td class="loading">Carregando tabela...</td></tr></tbody></table>
+</div>
+<div class="footer" id="footer"></div>
+
+<script>
+const fmt  = v => new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0}).format(v);
+const pct  = (r,p) => p ? (((r-p)/Math.abs(p))*100) : 0;
+const fmtP = v => (v>=0?'+':'')+v.toFixed(1)+'%';
+
+let DATA    = null;
+let charts  = {};
+let current = 'VIP';
+
+// ── Carrega data.json ────────────────────────────────────────────────────────
+async function loadData() {
+  try {
+    const res = await fetch('data.json?v=' + Date.now());
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
+    DATA = json.empresas;
+
+    // Atualiza cabeçalho
+    document.getElementById('badge-update').textContent = 'Atualizado ' + json.gerado_em;
+    const mesesAtivos = (DATA.GRUPO?.months || []).filter(m => m.rReal > 0).map(m => m.mes);
+    if (mesesAtivos.length) {
+      document.getElementById('period').textContent =
+        mesesAtivos[0] + ' – ' + mesesAtivos[mesesAtivos.length-1] + ' 2026 · Previsto vs Realizado';
+    }
+    document.getElementById('footer').textContent =
+      'Dados: ' + (mesesAtivos.join(', ') || '—') + ' 2026 · Fonte: ' + json.fonte;
+
+    setCompany('VIP');
+  } catch(e) {
+    document.getElementById('kpis').innerHTML =
+      '<div class="error">⚠️ Não foi possível carregar data.json.<br>' +
+      'Verifique se o arquivo existe em docs/data.json no repositório.<br><small>' + e.message + '</small></div>';
+  }
+}
+
+// ── Render ───────────────────────────────────────────────────────────────────
+function setCompany(key) {
+  if (!DATA) return;
+  current = key;
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    t.className = 'tab';
+    if (['VIP','VIDAL','V3','GRUPO'][i] === key)
+      t.classList.add('active-' + key.toLowerCase());
+  });
+  render();
+}
+
+function destroyCharts() {
+  Object.values(charts).forEach(c => c.destroy());
+  charts = {};
+}
+
+function makeBarChart(id, labels, datasets, horizontal=false) {
+  const ctx = document.getElementById(id);
+  if (!ctx) return;
+  charts[id] = new Chart(ctx.getContext('2d'), {
+    type: 'bar',
+    data: {labels, datasets},
+    options: {
+      indexAxis: horizontal ? 'y' : 'x',
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: {labels:{color:'#888',font:{size:11}}},
+        tooltip: {callbacks:{label: c => c.dataset.label+': '+fmt(c.raw)}}
+      },
+      scales: {
+        x: {ticks:{color:'#666',font:{size:10},callback:v=>horizontal?fmt(v):(Math.abs(v)>=1000?(v/1000).toFixed(0)+'k':v)},grid:{color:'rgba(255,255,255,.05)'},border:{display:false}},
+        y: {ticks:{color:'#666',font:{size:10},callback:v=>horizontal?v:(Math.abs(v)>=1000?(v/1000).toFixed(0)+'k':v)},grid:{color:'rgba(255,255,255,.05)'},border:{display:false}},
+      }
+    }
+  });
+}
+
+function buildDespesas(months) {
+  const cats = {
+    'Matéria Prima':     ['dMateriaPrev','dMateriaReal'],
+    'Taxas Plataforma':  ['dTaxasPrev','dTaxasReal'],
+    'Cancelamentos':     ['dCancelPrev','dCancelReal'],
+    'Impostos':          ['dImpostosPrev','dImpostosReal'],
+    'Pessoal':           ['dPessoalPrev','dPessoalReal'],
+    'Marketing':         ['dMarketingPrev','dMarketingReal'],
+    'Financiamentos':    ['dFinancPrev','dFinancReal'],
+  };
+  const result = [];
+  for (const [cat, [fp, fr]] of Object.entries(cats)) {
+    const prev = months.reduce((s,m) => s + (m[fp]||0), 0);
+    const real = months.reduce((s,m) => s + (m[fr]||0), 0);
+    if (prev > 0 || real > 0) result.push({cat, prev, real});
+  }
+  return result;
+}
+
+function buildCanais(months) {
+  const map = {};
+  months.forEach(m => {
+    if (!m.canais) return;
+    for (const [cname, cv] of Object.entries(m.canais)) {
+      if (!map[cname]) map[cname] = {prev:0,real:0};
+      map[cname].prev += cv.prev || 0;
+      map[cname].real += cv.real || 0;
+    }
+  });
+  return Object.entries(map)
+    .map(([canal,v]) => ({canal,...v}))
+    .filter(c => c.prev > 0 || c.real > 0);
+}
+
+function render() {
+  const co = DATA[current];
+  if (!co) return;
+  destroyCharts();
+
+  const months = co.months || [];
+  const color  = co.color;
+
+  // KPIs
+  const totRR   = months.reduce((s,m) => s+m.rReal,   0);
+  const totRP   = months.reduce((s,m) => s+m.rPrev,   0);
+  const totDR   = months.reduce((s,m) => s+m.dReal,   0);
+  const totDP   = months.reduce((s,m) => s+m.dPrev,   0);
+  const totResR = months.reduce((s,m) => s+m.resReal,  0);
+  const totResP = months.reduce((s,m) => s+m.resPrev,  0);
+  const dRec  = pct(totRR, totRP);
+  const dDesp = pct(totDR, totDP);
+  const dRes  = pct(totResR, totResP);
+
+  document.getElementById('kpis').innerHTML = `
+    <div class="kpi"><div class="kpi-label">Receita Realizada</div><div class="kpi-value pos">${fmt(totRR)}</div><div class="kpi-delta ${dRec>=0?'pos':'neg'}">${dRec>=0?'▲':'▼'} ${Math.abs(dRec).toFixed(1)}% vs previsto</div></div>
+    <div class="kpi"><div class="kpi-label">Despesas Realizadas</div><div class="kpi-value ${totDR>totDP?'neg':'neutral'}">${fmt(totDR)}</div><div class="kpi-delta ${dDesp<=0?'pos':'neg'}">${dDesp>=0?'▲':'▼'} ${Math.abs(dDesp).toFixed(1)}% vs previsto</div></div>
+    <div class="kpi"><div class="kpi-label">Resultado Realizado</div><div class="kpi-value ${totResR>=0?'pos':'neg'}">${fmt(totResR)}</div><div class="kpi-delta ${dRes>=0?'pos':'neg'}">${dRes>=0?'▲':'▼'} ${Math.abs(dRes).toFixed(1)}% vs previsto</div></div>
+    <div class="kpi"><div class="kpi-label">Receita Prevista</div><div class="kpi-value dim">${fmt(totRP)}</div></div>
+    <div class="kpi"><div class="kpi-label">Resultado Previsto</div><div class="kpi-value dim">${fmt(totResP)}</div></div>
+  `;
+
+  const meses = months.map(m => m.mes);
+
+  makeBarChart('chartReceita', meses, [
+    {label:'Previsto', data:months.map(m=>m.rPrev), backgroundColor:'rgba(255,255,255,.1)', borderRadius:4},
+    {label:'Realizado',data:months.map(m=>m.rReal), backgroundColor:color, borderRadius:4},
+  ]);
+
+  makeBarChart('chartResultado', meses, [
+    {label:'Previsto', data:months.map(m=>m.resPrev), backgroundColor:'rgba(255,255,255,.1)', borderRadius:4},
+    {label:'Realizado',data:months.map(m=>m.resReal), backgroundColor:months.map(m=>m.resReal>=0?color:'#FF6B6B'), borderRadius:4},
+  ]);
+
+  const despesas = buildDespesas(months);
+  makeBarChart('chartDespesas', despesas.map(d=>d.cat), [
+    {label:'Previsto', data:despesas.map(d=>d.prev), backgroundColor:'rgba(255,255,255,.1)', borderRadius:4},
+    {label:'Realizado',data:despesas.map(d=>d.real), backgroundColor:co.accent, borderRadius:4},
+  ], true);
+
+  const canais = buildCanais(months);
+  makeBarChart('chartCanais', canais.map(c=>c.canal), [
+    {label:'Previsto', data:canais.map(c=>c.prev), backgroundColor:'rgba(255,255,255,.1)', borderRadius:4},
+    {label:'Realizado',data:canais.map(c=>c.real), backgroundColor:color, borderRadius:4},
+  ]);
+
+  // Tabela
+  const cols = ['Mês','Rec. Prevista','Rec. Realizada','Δ Receita','Desp. Prev.','Desp. Real.','Δ Despesas','Res. Previsto','Res. Realizado'];
+  let html = '<thead><tr>'+cols.map(c=>`<th>${c}</th>`).join('')+'</tr></thead><tbody>';
+  let [srp,srr,sdp,sdr,srrp,srrr] = [0,0,0,0,0,0];
+  months.forEach(m => {
+    srp+=m.rPrev; srr+=m.rReal; sdp+=m.dPrev; sdr+=m.dReal; srrp+=m.resPrev; srrr+=m.resReal;
+    const dr=pct(m.rReal,m.rPrev), dd=pct(m.dReal,m.dPrev);
+    html+=`<tr>
+      <td>${m.mes}/26</td>
+      <td class="dim">${fmt(m.rPrev)}</td>
+      <td class="neutral">${fmt(m.rReal)}</td>
+      <td class="${dr>=0?'pos':'neg'}">${fmtP(dr)}</td>
+      <td class="dim">${fmt(m.dPrev)}</td>
+      <td class="neutral">${fmt(m.dReal)}</td>
+      <td class="${dd<=0?'pos':'neg'}">${fmtP(dd)}</td>
+      <td class="dim">${fmt(m.resPrev)}</td>
+      <td class="${m.resReal>=0?'pos':'neg'}">${fmt(m.resReal)}</td>
+    </tr>`;
+  });
+  const tdr=pct(srr,srp), tdd=pct(sdr,sdp);
+  html+=`<tr class="total-row">
+    <td>TOTAL</td>
+    <td class="dim">${fmt(srp)}</td>
+    <td class="neutral">${fmt(srr)}</td>
+    <td class="${tdr>=0?'pos':'neg'}">${fmtP(tdr)}</td>
+    <td class="dim">${fmt(sdp)}</td>
+    <td class="neutral">${fmt(sdr)}</td>
+    <td class="${tdd<=0?'pos':'neg'}">${fmtP(tdd)}</td>
+    <td class="dim">${fmt(srrp)}</td>
+    <td class="${srrr>=0?'pos':'neg'}">${fmt(srrr)}</td>
+  </tr></tbody>`;
+  document.getElementById('tbl').innerHTML = html;
+}
+
+loadData();
+</script>
+</body>
+</html>
