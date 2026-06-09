@@ -85,10 +85,45 @@ def parse_aba(ws):
         return [m for m in result if m["order"]<=ultimo]
     return []
 
+def parse_financeiro(wb):
+    result_div = {}
+    if "Custos" in wb.sheetnames:
+        ws = wb["Custos"]
+        for row in ws.iter_rows(values_only=True):
+            v_mes = row[11] if len(row) > 11 else None
+            v_val = row[12] if len(row) > 12 else None
+            if isinstance(v_mes, (datetime, date)):
+                mn = MESES_NOMES.get(v_mes.month,"?")
+                result_div[mn] = {"mes":mn,"mes_num":v_mes.month,"ano":v_mes.year,"order":v_mes.year*100+v_mes.month,"divida":safe(v_val)}
+    fluxos = {}
+    for emp, ws_name in [("VIP","Fluxo De caixa - VIP"),("VIDAL","Fluxo De caixa - VIDAL")]:
+        if ws_name not in wb.sheetnames: fluxos[emp]={};continue
+        ws = wb[ws_name]
+        md = {}; mes_atual = None
+        for row in ws.iter_rows(values_only=True):
+            lbl = str(row[1]).strip().upper() if row[1] else ""
+            for m_num,m_nome in MESES_NOMES.items():
+                if m_nome.upper() in lbl and ("26" in lbl or "2026" in lbl):
+                    mes_atual=m_nome
+                    if mes_atual not in md: md[mes_atual]={"despesas":0.0}
+                    break
+            if lbl=="TOTAL" and mes_atual:
+                md[mes_atual]["despesas"]+=abs(safe(row[5]))
+        fluxos[emp]=md
+    result=[]
+    for m in sorted(result_div.values(),key=lambda x:x["order"]):
+        mes=m["mes"]
+        row={"mes":mes,"mes_num":m["mes_num"],"ano":m["ano"],"order":m["order"],"divida":m["divida"],
+             "VIP":fluxos.get("VIP",{}).get(mes,{}).get("despesas",0),
+             "VIDAL":fluxos.get("VIDAL",{}).get(mes,{}).get("despesas",0),
+             "V3":0}
+        row["GRUPO"]=row["VIP"]+row["VIDAL"]+row["V3"]
+        result.append(row)
+    return result
+
 def build_json():
     if not XLSX_PATH.exists(): print(f"ERRO: {XLSX_PATH} nao encontrado."); sys.exit(1)
     wb = load_workbook(XLSX_PATH, read_only=True, data_only=True)
-    print(f"Abas: {wb.sheetnames}")
     colors = {"VIP":{"color":"#00C9A7","accent":"#00856E","label":"VIP MX"},
               "VIDAL":{"color":"#6C63FF","accent":"#4B44CC","label":"VIDAL"},
               "V3":{"color":"#FF6B6B","accent":"#CC4444","label":"V3"},
@@ -97,10 +132,10 @@ def build_json():
     data = {}
     for key, aba in aba_map.items():
         real_aba = next((s for s in wb.sheetnames if s.upper().replace("\u00c7","C").replace("\u00c3","A") == aba), None)
-        if not real_aba: print(f"Aba '{aba}' nao encontrada."); continue
+        if not real_aba: continue
         months = parse_aba(wb[real_aba])
         data[key] = {**colors[key], "months": months}
-        print(f"  {key}: {len(months)} meses {[m['mes'] for m in months]}")
+        print(f"  {key}: {len(months)} meses")
     all_keys = {}
     for emp in ["VIP","VIDAL","V3"]:
         if emp not in data: continue
@@ -118,9 +153,11 @@ def build_json():
                 all_keys[k]["canais"][cname]["prev"]+=cv.get("prev",0)
                 all_keys[k]["canais"][cname]["real"]+=cv.get("real",0)
     data["GRUPO"] = {**colors["GRUPO"],"months":sorted(all_keys.values(),key=lambda x:x["order"])}
-    print(f"  GRUPO: {len(data['GRUPO']['months'])} meses")
+    financeiro = parse_financeiro(wb)
+    print(f"  Financeiro: {len(financeiro)} meses")
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    out = {"gerado_em":datetime.now().strftime("%d/%m/%Y %H:%M"),"fonte":XLSX_PATH.name,"empresas":data}
+    out = {"gerado_em":datetime.now().strftime("%d/%m/%Y %H:%M"),"fonte":XLSX_PATH.name,
+           "empresas":data,"financeiro":financeiro}
     with open(OUT_PATH,"w",encoding="utf-8") as f: json.dump(out,f,ensure_ascii=False,indent=2)
     print(f"OK {OUT_PATH} gerado ({OUT_PATH.stat().st_size} bytes)")
 
