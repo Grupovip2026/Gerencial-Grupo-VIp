@@ -1,5 +1,5 @@
 {
-  "gerado_em": "09/06/2026 16:19",
+  "gerado_em": "10/06/2026 12:43",
   "fonte": "Resultado_Gerencial_2026.xlsx",
   "empresas": {
     "VIP": {
@@ -626,5 +626,84 @@
         }
       ]
     }
-  }
+  },
+  "financeiro": [
+    {
+      "mes": "Jan",
+      "mes_num": 1,
+      "ano": 2026,
+      "order": 202601,
+      "divida": 24124.0,
+      "VIP": 0.0,
+      "VIDAL": 324733.04,
+      "V3": 0,
+      "GRUPO": 324733.04
+    },
+    {
+      "mes": "Fev",
+      "mes_num": 2,
+      "ano": 2026,
+      "order": 202602,
+      "divida": 217067.97,
+      "VIP": 215027.70999999996,
+      "VIDAL": 240139.27,
+      "V3": 0,
+      "GRUPO": 455166.98
+    },
+    {
+      "mes": "Mar",
+      "mes_num": 3,
+      "ano": 2026,
+      "order": 202603,
+      "divida": 176833.13,
+      "VIP": 93054.0,
+      "VIDAL": 90054.0,
+      "V3": 0,
+      "GRUPO": 183108.0
+    },
+    {
+      "mes": "Abr",
+      "mes_num": 4,
+      "ano": 2026,
+      "order": 202604,
+      "divida": 91175.7,
+      "VIP": 93304.0,
+      "VIDAL": 90304.0,
+      "V3": 0,
+      "GRUPO": 183608.0
+    },
+    {
+      "mes": "Mai",
+      "mes_num": 5,
+      "ano": 2026,
+      "order": 202605,
+      "divida": 48922.88,
+      "VIP": 93304.0,
+      "VIDAL": 90304.0,
+      "V3": 0,
+      "GRUPO": 183608.0
+    },
+    {
+      "mes": "Jun",
+      "mes_num": 6,
+      "ano": 2026,
+      "order": 202606,
+      "divida": 21761.12,
+      "VIP": 93304.0,
+      "VIDAL": 90304.0,
+      "V3": 0,
+      "GRUPO": 183608.0
+    },
+    {
+      "mes": "Jul",
+      "mes_num": 7,
+      "ano": 2026,
+      "order": 202607,
+      "divida": 0.0,
+      "VIP": 0.0,
+      "VIDAL": 0.0,
+      "V3": 0,
+      "GRUPO": 0.0
+    }
+  ]
 }
