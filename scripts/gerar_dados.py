@@ -100,7 +100,7 @@ def parse_aba(ws):
     return []
 
 def parse_divida_fornecedores(wb):
-    aba_nome = next((s for s in wb.sheetnames if "divida" in s.lower() or "dívida" in s.lower()), None)
+    aba_nome = next((s for s in wb.sheetnames if 'fornecedores' in s.lower()), None)
     if not aba_nome:
         print("  [Divida Fornecedores] aba NAO encontrada! Abas:", wb.sheetnames)
         return []
@@ -192,3 +192,4 @@ def build_json():
     print(f"OK {OUT_PATH} gerado ({OUT_PATH.stat().st_size} bytes)")
 
 if __name__ == "__main__": build_json()
+
