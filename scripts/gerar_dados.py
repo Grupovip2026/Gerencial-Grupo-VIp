@@ -125,7 +125,7 @@ def parse_divida_fornecedores(wb):
         e=row[4] if len(row)>4 else None
         j=row[9] if len(row)>9 else None
         m=row[12] if len(row)>12 else None
-        print(f'  [DEBUG] L{i+7}: B={b}({type(b).__name__}) E={e}({type(e).__name__}) J={j}({type(j).__name__}) M={m}({type(m).__name__})')
+        print(f'  [DEBUG] L{i+7}: '+' '.join(f'{chr(65+ci)}={v}' for ci,v in enumerate(row) if v is not None))
     for row in rows[6:]:
         blocos = [
             ("pagas_vip",   "pagas_vip_mes",   "pagas_vip_val"),
@@ -202,6 +202,7 @@ def build_json():
     print(f"OK {OUT_PATH} gerado ({OUT_PATH.stat().st_size} bytes)")
 
 if __name__ == "__main__": build_json()
+
 
 
 
