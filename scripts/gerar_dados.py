@@ -40,7 +40,7 @@ def parse_aba(ws):
         col_map[ci] = {"mes":mes_nome,"ano":ano,"mes_num":mes_num,"tipo":tipo,"order":ano*100+mes_num}
     LABEL_MAP = {
         "receita bruta":"rBruta","(-) despesas do negocio":"despTotal",
-        "(-) despesas do neg\u00f3cio":"despTotal","resultado":"resultado","resultado ":"resultado",
+        "(-) despesas do negócio":"despTotal","resultado":"resultado","resultado ":"resultado",
         "despesas de pessoal":"dPessoal","despesas de materia prima":"dMateria",
         "impostos":"dImpostos","taxas plataforma":"dTaxas",
         "cancelamentos e remmbolso":"dCancel","despesas de marketing":"dMarketing",
@@ -89,35 +89,59 @@ def parse_financeiro(wb):
     result_div = {}
     if "Custos" in wb.sheetnames:
         ws = wb["Custos"]
+        print("  [Custos] lendo aba...")
         for row in ws.iter_rows(values_only=True):
             v_mes = row[11] if len(row) > 11 else None
             v_val = row[12] if len(row) > 12 else None
-            if isinstance(v_mes, (datetime, date)):
-                mn = MESES_NOMES.get(v_mes.month,"?")
-                result_div[mn] = {"mes":mn,"mes_num":v_mes.month,"ano":v_mes.year,"order":v_mes.year*100+v_mes.month,"divida":safe(v_val)}
+            if v_mes is None or v_val is None:
+                continue
+            key = to_mes_key(v_mes)
+            if key is None:
+                continue
+            ano, mes_num, mes_nome = key
+            order = ano * 100 + mes_num
+            valor = safe(v_val)
+            if order not in result_div:
+                result_div[order] = {"mes": mes_nome, "mes_num": mes_num, "ano": ano, "order": order, "divida": 0.0}
+            result_div[order]["divida"] += valor
+        print(f"  [Custos] {len(result_div)} meses encontrados: {sorted(result_div.keys())}")
+    else:
+        print("  [Custos] aba NAO encontrada! Abas disponiveis:", wb.sheetnames)
     fluxos = {}
-    for emp, ws_name in [("VIP","Fluxo De caixa - VIP"),("VIDAL","Fluxo De caixa - VIDAL")]:
-        if ws_name not in wb.sheetnames: fluxos[emp]={};continue
-        ws = wb[ws_name]
-        md = {}; mes_atual = None
+    for emp, ws_name in [("VIP", "Fluxo De caixa - VIP"), ("VIDAL", "Fluxo De caixa - VIDAL")]:
+        real_name = next((s for s in wb.sheetnames if s.strip().lower() == ws_name.strip().lower()), None)
+        if not real_name:
+            print(f"  [Fluxo {emp}] aba NAO encontrada! Abas: {wb.sheetnames}")
+            fluxos[emp] = {}
+            continue
+        ws = wb[real_name]
+        md = {}
+        mes_atual = None
+        print(f"  [Fluxo {emp}] lendo aba '{real_name}'...")
         for row in ws.iter_rows(values_only=True):
-            lbl = str(row[1]).strip().upper() if row[1] else ""
-            for m_num,m_nome in MESES_NOMES.items():
+            lbl = str(row[1]).strip().upper() if len(row) > 1 and row[1] else ""
+            for m_num, m_nome in MESES_NOMES.items():
                 if m_nome.upper() in lbl and ("26" in lbl or "2026" in lbl):
-                    mes_atual=m_nome
-                    if mes_atual not in md: md[mes_atual]={"despesas":0.0}
+                    mes_atual = m_nome
+                    if mes_atual not in md:
+                        md[mes_atual] = {"despesas": 0.0}
                     break
-            if lbl=="TOTAL" and mes_atual:
-                md[mes_atual]["despesas"]+=abs(safe(row[5]))
-        fluxos[emp]=md
-    result=[]
-    for m in sorted(result_div.values(),key=lambda x:x["order"]):
-        mes=m["mes"]
-        row={"mes":mes,"mes_num":m["mes_num"],"ano":m["ano"],"order":m["order"],"divida":m["divida"],
-             "VIP":fluxos.get("VIP",{}).get(mes,{}).get("despesas",0),
-             "VIDAL":fluxos.get("VIDAL",{}).get(mes,{}).get("despesas",0),
-             "V3":0}
-        row["GRUPO"]=row["VIP"]+row["VIDAL"]+row["V3"]
+            if mes_atual and lbl == "TOTAL":
+                v = safe(row[5]) if len(row) > 5 else 0.0
+                md[mes_atual]["despesas"] += abs(v)
+        fluxos[emp] = md
+        print(f"  [Fluxo {emp}] meses: {list(md.keys())}")
+    result = []
+    for m in sorted(result_div.values(), key=lambda x: x["order"]):
+        mes = m["mes"]
+        row = {
+            "mes": mes, "mes_num": m["mes_num"], "ano": m["ano"],
+            "order": m["order"], "divida": m["divida"],
+            "VIP":   fluxos.get("VIP",   {}).get(mes, {}).get("despesas", 0),
+            "VIDAL": fluxos.get("VIDAL", {}).get(mes, {}).get("despesas", 0),
+            "V3":    0,
+        }
+        row["GRUPO"] = row["VIP"] + row["VIDAL"] + row["V3"]
         result.append(row)
     return result
 
@@ -131,7 +155,7 @@ def build_json():
     aba_map = {"VIP":"PLANO ORCAMENTARIO - VIP","VIDAL":"PLANO ORCAMENTARIO - VIDAL","V3":"PLANO ORCAMENTARIO - V3"}
     data = {}
     for key, aba in aba_map.items():
-        real_aba = next((s for s in wb.sheetnames if s.upper().replace("\u00c7","C").replace("\u00c3","A") == aba), None)
+        real_aba = next((s for s in wb.sheetnames if s.upper().replace("Ç","C").replace("Ã","A") == aba), None)
         if not real_aba: continue
         months = parse_aba(wb[real_aba])
         data[key] = {**colors[key], "months": months}
