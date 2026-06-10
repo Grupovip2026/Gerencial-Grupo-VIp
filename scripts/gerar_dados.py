@@ -28,7 +28,10 @@ def to_mes_key(v):
     except: return None
 
 def parse_mes_str(v):
-    if not v: return None
+    if v is None: return None
+    # Se for datetime nativo, converte direto
+    if isinstance(v, (datetime, date)):
+        return v.year, v.month, MESES_NOMES.get(v.month, str(v.month))
     s = str(v).strip().lower()
     for nome, num in MESES_PARSE.items():
         if s.startswith(nome):
@@ -116,6 +119,9 @@ def parse_divida_fornecedores(wb):
     result = {}
     def get(row, idx):
         return row[idx] if len(row) > idx else None
+    # DEBUG: mostra primeiras linhas
+    for i, row in enumerate(rows[6:10]):
+        print(f'  [DEBUG] linha {i+7}: B={row[1] if len(row)>1 else None} C={row[2] if len(row)>2 else None} tipo_B={type(row[1]).__name__ if len(row)>1 else None}')
     for row in rows[6:]:
         blocos = [
             ("pagas_vip",   "pagas_vip_mes",   "pagas_vip_val"),
@@ -192,4 +198,6 @@ def build_json():
     print(f"OK {OUT_PATH} gerado ({OUT_PATH.stat().st_size} bytes)")
 
 if __name__ == "__main__": build_json()
+
+
 
