@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -19,14 +19,12 @@ h1{font-size:26px;font-weight:700;color:#fff}
 .nav-tab:hover{color:#ccc;border-color:rgba(255,255,255,.2)}
 .nav-tab.active{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2);color:#fff;font-weight:600}
 .page{display:none}.page.active{display:block}
-/* empresa tabs */
 .tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
 .tab{padding:10px 22px;border-radius:8px;border:2px solid rgba(255,255,255,0.1);background:transparent;color:#888;font-weight:400;font-size:14px;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif}
 .tab.active-vip{border-color:#00C9A7;background:rgba(0,201,167,.13);color:#00C9A7;font-weight:700}
 .tab.active-vidal{border-color:#6C63FF;background:rgba(108,99,255,.13);color:#6C63FF;font-weight:700}
 .tab.active-v3{border-color:#FF6B6B;background:rgba(255,107,107,.13);color:#FF6B6B;font-weight:700}
 .tab.active-grupo{border-color:#F5A623;background:rgba(245,166,35,.13);color:#F5A623;font-weight:700}
-/* filtro */
 .filter-bar{display:flex;align-items:center;gap:8px;margin-bottom:24px;flex-wrap:wrap;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:12px 16px}
 .filter-label{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-right:4px;white-space:nowrap}
 .mes-btn{padding:5px 13px;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:transparent;color:#666;font-size:12px;cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif;white-space:nowrap}
@@ -39,18 +37,17 @@ h1{font-size:26px;font-weight:700;color:#fff}
 .filter-actions{margin-left:auto;display:flex;gap:6px}
 .filter-action{font-size:11px;color:#555;background:none;border:1px solid rgba(255,255,255,.07);border-radius:5px;padding:4px 10px;cursor:pointer;font-family:'Inter',sans-serif}
 .filter-action:hover{color:#aaa}
-/* kpis */
 .kpis{display:flex;gap:12px;margin-bottom:28px;flex-wrap:wrap}
 .kpi{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:18px 22px;min-width:160px;flex:1}
 .kpi-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:6px}
 .kpi-value{font-size:22px;font-weight:700;font-family:'DM Mono',monospace}
 .kpi-delta{font-size:12px;margin-top:4px}
-/* charts */
+.kpi.kpi-pago{border-color:rgba(0,201,167,.25);background:rgba(0,201,167,.05)}
+.kpi.kpi-apagar{border-color:rgba(255,107,107,.25);background:rgba(255,107,107,.05)}
 .charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
 .chart-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:20px 16px}
 .chart-title{font-size:12px;color:#aaa;margin-bottom:14px;font-weight:600;letter-spacing:.8px;text-transform:uppercase}
 .chart-wrap{position:relative;height:220px}
-/* table */
 .table-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:20px;overflow-x:auto;margin-bottom:16px}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th{padding:8px 12px;text-align:right;color:#666;font-weight:500;font-size:11px;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;border-bottom:1px solid rgba(255,255,255,.08)}
@@ -59,10 +56,12 @@ td{padding:10px 12px;text-align:right;border-bottom:1px solid rgba(255,255,255,.
 td:first-child{text-align:left;font-weight:600;color:#ccc;font-family:'Inter',sans-serif}
 tr.total-row td{border-top:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.03);font-weight:700}
 .section-head td{background:rgba(255,255,255,.05);color:#aaa!important;font-size:11px;letter-spacing:1px;text-transform:uppercase;font-family:'Inter',sans-serif!important}
+th.th-pago{color:#00C9A7}
+th.th-apagar{color:#FF6B6B}
 .footer{text-align:right;font-size:11px;color:#444;margin-top:8px}
 .loading{text-align:center;padding:60px;color:#555;font-size:14px}
 .error{text-align:center;padding:40px;color:#FF6B6B;font-size:13px;background:rgba(255,107,107,.05);border-radius:12px;margin:20px 0}
-.pos{color:#00C9A7}.neg{color:#FF6B6B}.neutral{color:#f0f0f0}.dim{color:#777}.sky{color:#38bdf8}
+.pos{color:#00C9A7}.neg{color:#FF6B6B}.neutral{color:#f0f0f0}.dim{color:#777}.sky{color:#38bdf8}.warn{color:#F5A623}
 @media(max-width:700px){.charts-row{grid-template-columns:1fr}.kpis{flex-direction:column}}
 </style>
 </head>
@@ -71,10 +70,9 @@ tr.total-row td{border-top:1px solid rgba(255,255,255,.15);background:rgba(255,2
 <h1>Dashboard Financeiro <span class="badge-update" id="badge-update">carregando...</span></h1>
 <div class="period" id="period">Carregando dados...</div>
 
-<!-- Navegação principal -->
 <div class="nav-tabs">
   <button class="nav-tab active" onclick="setPage('gerencial')">📊 Gerencial</button>
-  <button class="nav-tab" onclick="setPage('financeiro')">💳 Fornecedores & Caixa</button>
+  <button class="nav-tab" onclick="setPage('financeiro')">🧾 Dívidas Fornecedores</button>
 </div>
 
 <!-- PAGE: GERENCIAL -->
@@ -108,13 +106,11 @@ tr.total-row td{border-top:1px solid rgba(255,255,255,.15);background:rgba(255,2
   </div>
 </div>
 
-<!-- PAGE: FINANCEIRO -->
+<!-- PAGE: DÍVIDAS FORNECEDORES -->
 <div id="page-financeiro" class="page">
-  <!-- Filtro empresa financeiro -->
   <div class="tabs" style="margin-bottom:16px">
     <button class="tab active-vip" onclick="setFinEmp('VIP')">VIP MX</button>
     <button class="tab" onclick="setFinEmp('VIDAL')">VIDAL</button>
-    <button class="tab" onclick="setFinEmp('V3')">V3</button>
     <button class="tab" onclick="setFinEmp('GRUPO')">Grupo VIP</button>
   </div>
   <div class="filter-bar">
@@ -127,8 +123,8 @@ tr.total-row td{border-top:1px solid rgba(255,255,255,.15);background:rgba(255,2
   </div>
   <div id="fin-kpis" class="kpis"><div class="loading">Carregando...</div></div>
   <div class="charts-row">
-    <div class="chart-box"><div class="chart-title">Dívida Fornecedores · Evolução Mensal</div><div class="chart-wrap"><canvas id="chartDivida"></canvas></div></div>
-    <div class="chart-box"><div class="chart-title">Despesas Pagas · Mês a Mês</div><div class="chart-wrap"><canvas id="chartPagas"></canvas></div></div>
+    <div class="chart-box"><div class="chart-title">✅ Contas Pagas · Mês a Mês</div><div class="chart-wrap"><canvas id="chartPagas"></canvas></div></div>
+    <div class="chart-box"><div class="chart-title">🔴 Contas a Pagar · Mês a Mês</div><div class="chart-wrap"><canvas id="chartAPagar"></canvas></div></div>
   </div>
   <div class="table-box">
     <div class="chart-title">Detalhe por Empresa · Mês a Mês</div>
@@ -163,7 +159,6 @@ async function loadData(){
   }
 }
 
-// ── Navegação ─────────────────────────────────────────────────────────────────
 function setPage(p){
   activePage=p;
   document.querySelectorAll('.nav-tab').forEach((t,i)=>{t.classList.toggle('active',['gerencial','financeiro'][i]===p)});
@@ -171,7 +166,6 @@ function setPage(p){
   document.getElementById('page-'+p).classList.add('active');
 }
 
-// ── GERENCIAL ─────────────────────────────────────────────────────────────────
 function setCompany(key){
   if(!DATA)return; current=key;
   document.querySelectorAll('#page-gerencial .tab').forEach((t,i)=>{t.className='tab';if(['VIP','VIDAL','V3','GRUPO'][i]===key)t.classList.add('active-'+key.toLowerCase())});
@@ -188,12 +182,12 @@ function selectAllMonths(){selectedMonths=new Set((DATA[current]?.months||[]).ma
 function clearMonths(){const months=DATA[current]?.months||[];const lr=months.reduce((l,m,i)=>m.rReal>0?i:l,0);selectedMonths=new Set([lr]);buildMonthFilter();render()}
 
 function destroyCharts(){Object.values(charts).forEach(c=>c.destroy());charts={}}
-function makeBarChart(id,labels,datasets,horizontal=false){
+function makeBarChart(id,labels,datasets,horizontal=false,stacked=false){
   const ctx=document.getElementById(id);if(!ctx)return;
   charts[id]=new Chart(ctx.getContext('2d'),{type:'bar',data:{labels,datasets},options:{indexAxis:horizontal?'y':'x',responsive:true,maintainAspectRatio:false,
     plugins:{legend:{labels:{color:'#888',font:{size:11}}},tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmt(c.raw)}}},
-    scales:{x:{ticks:{color:'#666',font:{size:10},callback:v=>horizontal?fmt(v):(Math.abs(v)>=1000?(v/1000).toFixed(0)+'k':v)},grid:{color:'rgba(255,255,255,.05)'},border:{display:false}},
-            y:{ticks:{color:'#666',font:{size:10},callback:v=>horizontal?v:(Math.abs(v)>=1000?(v/1000).toFixed(0)+'k':v)},grid:{color:'rgba(255,255,255,.05)'},border:{display:false}}}}});
+    scales:{x:{stacked,ticks:{color:'#666',font:{size:10},callback:v=>horizontal?fmt(v):(Math.abs(v)>=1000?(v/1000).toFixed(0)+'k':v)},grid:{color:'rgba(255,255,255,.05)'},border:{display:false}},
+            y:{stacked,ticks:{color:'#666',font:{size:10},callback:v=>horizontal?v:(Math.abs(v)>=1000?(v/1000).toFixed(0)+'k':v)},grid:{color:'rgba(255,255,255,.05)'},border:{display:false}}}}});
 }
 function makeLineChart(id,labels,datasets){
   const ctx=document.getElementById(id);if(!ctx)return;
@@ -239,10 +233,9 @@ function render(){
   document.getElementById('tbl').innerHTML=html;
 }
 
-// ── FINANCEIRO ────────────────────────────────────────────────────────────────
 function setFinEmp(key){
   if(!FINANCEIRO)return; finCurrent=key;
-  document.querySelectorAll('#page-financeiro .tab').forEach((t,i)=>{t.className='tab';if(['VIP','VIDAL','V3','GRUPO'][i]===key)t.classList.add('active-'+key.toLowerCase())});
+  document.querySelectorAll('#page-financeiro .tab').forEach((t,i)=>{t.className='tab';if(['VIP','VIDAL','GRUPO'][i]===key)t.classList.add('active-'+key.toLowerCase())});
   finSelected=new Set(FINANCEIRO.map((_,i)=>i));
   buildFinFilter(); renderFin();
 }
@@ -255,46 +248,71 @@ function finClear(){finSelected=new Set([FINANCEIRO.length-1]);buildFinFilter();
 
 function renderFin(){
   if(!FINANCEIRO||FINANCEIRO.length===0)return;
-  // destrói apenas charts do financeiro
-  ['chartDivida','chartPagas'].forEach(id=>{if(charts[id]){charts[id].destroy();delete charts[id]}});
-
+  ['chartPagas','chartAPagar'].forEach(id=>{if(charts[id]){charts[id].destroy();delete charts[id]}});
   const rows=FINANCEIRO.filter((_,i)=>finSelected.has(i));
   if(rows.length===0)return;
-
   const emp=finCurrent;
-  const totalDivida=rows.reduce((s,m)=>s+m.divida,0);
-  const totalPagas=rows.reduce((s,m)=>s+(m[emp]||0),0);
-  const ultimaDivida=rows[rows.length-1]?.divida||0;
-
-  document.getElementById('fin-kpis').innerHTML=`
-    <div class="kpi"><div class="kpi-label">Dívida Fornecedores · Acumulado</div><div class="kpi-value neg">${fmt(totalDivida)}</div><div class="kpi-delta dim">Total do período selecionado</div></div>
-    <div class="kpi"><div class="kpi-label">Último Saldo · ${rows[rows.length-1]?.mes||'—'}</div><div class="kpi-value ${ultimaDivida>0?'neg':'pos'}">${fmt(ultimaDivida)}</div><div class="kpi-delta dim">Saldo mais recente</div></div>
-    <div class="kpi"><div class="kpi-label">Despesas Pagas · ${emp==='GRUPO'?'Consolidado':emp}</div><div class="kpi-value sky">${fmt(totalPagas)}</div><div class="kpi-delta dim">Fluxo de caixa realizado</div></div>
-    <div class="kpi"><div class="kpi-label">Meses Selecionados</div><div class="kpi-value neutral">${rows.length}</div><div class="kpi-delta dim">${rows.map(m=>m.mes).join(', ')}</div></div>`;
-
   const meses=rows.map(m=>m.mes);
-  makeLineChart('chartDivida',meses,[{label:'Dívida Fornecedores',data:rows.map(m=>m.divida),borderColor:'#FF6B6B',backgroundColor:'rgba(255,107,107,.15)',fill:true,tension:.3,pointRadius:4}]);
-
-  const empColors={'VIP':'#00C9A7','VIDAL':'#6C63FF','V3':'#FF6B6B','GRUPO':'#F5A623'};
+  const pfx=emp==='GRUPO'?'grupo':emp.toLowerCase();
+  const totalPago=rows.reduce((s,m)=>s+(m['pagas_'+pfx]||0),0);
+  const totalAPagar=rows.reduce((s,m)=>s+(m['pagar_'+pfx]||0),0);
+  const totalGeral=totalPago+totalAPagar;
+  document.getElementById('fin-kpis').innerHTML=`
+    <div class="kpi kpi-pago">
+      <div class="kpi-label">✅ Total Pago · ${emp==='GRUPO'?'Grupo':emp}</div>
+      <div class="kpi-value pos">${fmt(totalPago)}</div>
+      <div class="kpi-delta dim">Contas pagas no período</div>
+    </div>
+    <div class="kpi kpi-apagar">
+      <div class="kpi-label">🔴 Total a Pagar · ${emp==='GRUPO'?'Grupo':emp}</div>
+      <div class="kpi-value neg">${fmt(totalAPagar)}</div>
+      <div class="kpi-delta dim">Contas em aberto no período</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">📊 Total Geral · ${emp==='GRUPO'?'Grupo':emp}</div>
+      <div class="kpi-value warn">${fmt(totalGeral)}</div>
+      <div class="kpi-delta dim">Pagas + A pagar</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Meses Selecionados</div>
+      <div class="kpi-value neutral">${rows.length}</div>
+      <div class="kpi-delta dim">${rows.map(m=>m.mes).join(', ')}</div>
+    </div>`;
   if(emp==='GRUPO'){
     makeBarChart('chartPagas',meses,[
-      {label:'VIP',data:rows.map(m=>m.VIP),backgroundColor:'#00C9A7',borderRadius:3},
-      {label:'VIDAL',data:rows.map(m=>m.VIDAL),backgroundColor:'#6C63FF',borderRadius:3},
-      {label:'V3',data:rows.map(m=>m.V3),backgroundColor:'#FF6B6B',borderRadius:3},
-    ]);
+      {label:'VIP Pago',data:rows.map(m=>m.pagas_vip),backgroundColor:'#00C9A7',borderRadius:3},
+      {label:'VIDAL Pago',data:rows.map(m=>m.pagas_vidal),backgroundColor:'#6C63FF',borderRadius:3},
+    ],false,true);
+    makeBarChart('chartAPagar',meses,[
+      {label:'VIP a Pagar',data:rows.map(m=>m.pagar_vip),backgroundColor:'rgba(0,201,167,.5)',borderRadius:3},
+      {label:'VIDAL a Pagar',data:rows.map(m=>m.pagar_vidal),backgroundColor:'rgba(108,99,255,.5)',borderRadius:3},
+    ],false,true);
   } else {
-    makeBarChart('chartPagas',meses,[{label:'Despesas Pagas',data:rows.map(m=>m[emp]||0),backgroundColor:empColors[emp],borderRadius:4}]);
+    const cor=emp==='VIP'?'#00C9A7':'#6C63FF';
+    makeBarChart('chartPagas',meses,[{label:emp+' Pago',data:rows.map(m=>m['pagas_'+pfx]),backgroundColor:cor,borderRadius:4}]);
+    makeBarChart('chartAPagar',meses,[{label:emp+' a Pagar',data:rows.map(m=>m['pagar_'+pfx]),backgroundColor:'#FF6B6B',borderRadius:4}]);
   }
-
-  // Tabela detalhada
-  let html='<thead><tr><th>Mês</th><th>Dívida Fornecedores</th><th>Pago VIP</th><th>Pago VIDAL</th><th>Pago V3</th><th>Total Pago</th></tr></thead><tbody>';
-  let[sdiv,svip,svidal,sv3]=[0,0,0,0];
-  rows.forEach(m=>{
-    sdiv+=m.divida;svip+=m.VIP||0;svidal+=m.VIDAL||0;sv3+=m.V3||0;
-    const tot=(m.VIP||0)+(m.VIDAL||0)+(m.V3||0);
-    html+=`<tr><td>${m.mes}/26</td><td class="neg">${fmt(m.divida)}</td><td class="${m.VIP>0?'sky':'dim'}">${fmt(m.VIP||0)}</td><td class="${m.VIDAL>0?'sky':'dim'}">${fmt(m.VIDAL||0)}</td><td class="${m.V3>0?'sky':'dim'}">${fmt(m.V3||0)}</td><td class="neutral">${fmt(tot)}</td></tr>`;
-  });
-  html+=`<tr class="total-row"><td>TOTAL</td><td class="neg">${fmt(sdiv)}</td><td class="sky">${fmt(svip)}</td><td class="sky">${fmt(svidal)}</td><td class="sky">${fmt(sv3)}</td><td class="neutral">${fmt(svip+svidal+sv3)}</td></tr></tbody>`;
+  let html;
+  if(emp==='GRUPO'){
+    html='<thead><tr><th>Mês</th><th class="th-pago">Pago VIP</th><th class="th-pago">Pago VIDAL</th><th class="th-pago">Total Pago</th><th class="th-apagar">A Pagar VIP</th><th class="th-apagar">A Pagar VIDAL</th><th class="th-apagar">Total A Pagar</th><th>Total Geral</th></tr></thead><tbody>';
+    let[spv,spvid,sapv,sapvid]=[0,0,0,0];
+    rows.forEach(m=>{
+      spv+=m.pagas_vip||0;spvid+=m.pagas_vidal||0;sapv+=m.pagar_vip||0;sapvid+=m.pagar_vidal||0;
+      const tp=(m.pagas_vip||0)+(m.pagas_vidal||0),ta=(m.pagar_vip||0)+(m.pagar_vidal||0);
+      html+=`<tr><td>${m.mes}/26</td><td class="${m.pagas_vip>0?'pos':'dim'}">${fmt(m.pagas_vip||0)}</td><td class="${m.pagas_vidal>0?'pos':'dim'}">${fmt(m.pagas_vidal||0)}</td><td class="pos">${fmt(tp)}</td><td class="${m.pagar_vip>0?'neg':'dim'}">${fmt(m.pagar_vip||0)}</td><td class="${m.pagar_vidal>0?'neg':'dim'}">${fmt(m.pagar_vidal||0)}</td><td class="neg">${fmt(ta)}</td><td class="warn">${fmt(tp+ta)}</td></tr>`;
+    });
+    const tp=spv+spvid,ta=sapv+sapvid;
+    html+=`<tr class="total-row"><td>TOTAL</td><td class="pos">${fmt(spv)}</td><td class="pos">${fmt(spvid)}</td><td class="pos">${fmt(tp)}</td><td class="neg">${fmt(sapv)}</td><td class="neg">${fmt(sapvid)}</td><td class="neg">${fmt(ta)}</td><td class="warn">${fmt(tp+ta)}</td></tr></tbody>`;
+  } else {
+    html='<thead><tr><th>Mês</th><th class="th-pago">Contas Pagas</th><th class="th-apagar">Contas a Pagar</th><th>Total</th></tr></thead><tbody>';
+    let[sp,sa]=[0,0];
+    rows.forEach(m=>{
+      const pago=m['pagas_'+pfx]||0,apagar=m['pagar_'+pfx]||0;
+      sp+=pago;sa+=apagar;
+      html+=`<tr><td>${m.mes}/26</td><td class="${pago>0?'pos':'dim'}">${fmt(pago)}</td><td class="${apagar>0?'neg':'dim'}">${fmt(apagar)}</td><td class="warn">${fmt(pago+apagar)}</td></tr>`;
+    });
+    html+=`<tr class="total-row"><td>TOTAL</td><td class="pos">${fmt(sp)}</td><td class="neg">${fmt(sa)}</td><td class="warn">${fmt(sp+sa)}</td></tr></tbody>`;
+  }
   document.getElementById('fin-tbl').innerHTML=html;
 }
 

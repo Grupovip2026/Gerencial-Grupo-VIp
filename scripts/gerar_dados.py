@@ -12,6 +12,7 @@ except ImportError:
 XLSX_PATH = Path("Resultado_Gerencial_2026.xlsx")
 OUT_PATH  = Path("docs/data.json")
 MESES_NOMES = {1:"Jan",2:"Fev",3:"Mar",4:"Abr",5:"Mai",6:"Jun",7:"Jul",8:"Ago",9:"Set",10:"Out",11:"Nov",12:"Dez"}
+MESES_PARSE = {"jan":1,"fev":2,"mar":3,"abr":4,"mai":5,"jun":6,"jul":7,"ago":8,"set":9,"out":10,"nov":11,"dez":12}
 
 def safe(v):
     if v is None: return 0.0
@@ -25,6 +26,19 @@ def to_mes_key(v):
         d = datetime(1899,12,30) + timedelta(days=int(float(v)))
         return d.year, d.month, MESES_NOMES.get(d.month, str(d.month))
     except: return None
+
+def parse_mes_str(v):
+    if not v: return None
+    s = str(v).strip().lower()
+    for nome, num in MESES_PARSE.items():
+        if s.startswith(nome):
+            partes = s.replace(nome,"").strip("/").strip()
+            try:
+                ano = int(partes)
+                if ano < 100: ano += 2000
+                return ano, num, MESES_NOMES[num]
+            except: pass
+    return None
 
 def parse_aba(ws):
     rows = list(ws.iter_rows(values_only=True))
@@ -85,65 +99,57 @@ def parse_aba(ws):
         return [m for m in result if m["order"]<=ultimo]
     return []
 
-def parse_financeiro(wb):
-    result_div = {}
-    if "Custos" in wb.sheetnames:
-        ws = wb["Custos"]
-        print("  [Custos] lendo aba...")
-        for row in ws.iter_rows(values_only=True):
-            v_mes = row[11] if len(row) > 11 else None
-            v_val = row[12] if len(row) > 12 else None
-            if v_mes is None or v_val is None:
-                continue
-            key = to_mes_key(v_mes)
-            if key is None:
-                continue
-            ano, mes_num, mes_nome = key
+def parse_divida_fornecedores(wb):
+    aba_nome = next((s for s in wb.sheetnames if "divida" in s.lower() or "dívida" in s.lower()), None)
+    if not aba_nome:
+        print("  [Divida Fornecedores] aba NAO encontrada! Abas:", wb.sheetnames)
+        return []
+    print(f"  [Divida Fornecedores] lendo aba '{aba_nome}'...")
+    ws = wb[aba_nome]
+    rows = list(ws.iter_rows(values_only=True))
+    COL = {
+        "pagas_vip_mes":1,   "pagas_vip_val":2,
+        "pagas_vidal_mes":4, "pagas_vidal_val":5,
+        "pagar_vip_mes":9,   "pagar_vip_val":10,
+        "pagar_vidal_mes":12,"pagar_vidal_val":13,
+    }
+    result = {}
+    def get(row, idx):
+        return row[idx] if len(row) > idx else None
+    for row in rows[6:]:
+        blocos = [
+            ("pagas_vip",   "pagas_vip_mes",   "pagas_vip_val"),
+            ("pagas_vidal", "pagas_vidal_mes",  "pagas_vidal_val"),
+            ("pagar_vip",   "pagar_vip_mes",    "pagar_vip_val"),
+            ("pagar_vidal", "pagar_vidal_mes",  "pagar_vidal_val"),
+        ]
+        for bloco, col_mes, col_val in blocos:
+            v_mes = get(row, COL[col_mes])
+            v_val = get(row, COL[col_val])
+            if not v_mes: continue
+            info = parse_mes_str(v_mes)
+            if not info: continue
+            ano, mes_num, mes_nome = info
             order = ano * 100 + mes_num
+            if order not in result:
+                result[order] = {
+                    "mes": mes_nome, "mes_num": mes_num, "ano": ano, "order": order,
+                    "pagas_vip": 0.0, "pagas_vidal": 0.0,
+                    "pagar_vip": 0.0, "pagar_vidal": 0.0,
+                }
             valor = safe(v_val)
-            if order not in result_div:
-                result_div[order] = {"mes": mes_nome, "mes_num": mes_num, "ano": ano, "order": order, "divida": 0.0}
-            result_div[order]["divida"] += valor
-        print(f"  [Custos] {len(result_div)} meses encontrados: {sorted(result_div.keys())}")
-    else:
-        print("  [Custos] aba NAO encontrada! Abas disponiveis:", wb.sheetnames)
-    fluxos = {}
-    for emp, ws_name in [("VIP", "Fluxo De caixa - VIP"), ("VIDAL", "Fluxo De caixa - VIDAL")]:
-        real_name = next((s for s in wb.sheetnames if s.strip().lower() == ws_name.strip().lower()), None)
-        if not real_name:
-            print(f"  [Fluxo {emp}] aba NAO encontrada! Abas: {wb.sheetnames}")
-            fluxos[emp] = {}
-            continue
-        ws = wb[real_name]
-        md = {}
-        mes_atual = None
-        print(f"  [Fluxo {emp}] lendo aba '{real_name}'...")
-        for row in ws.iter_rows(values_only=True):
-            lbl = str(row[1]).strip().upper() if len(row) > 1 and row[1] else ""
-            for m_num, m_nome in MESES_NOMES.items():
-                if m_nome.upper() in lbl and ("26" in lbl or "2026" in lbl):
-                    mes_atual = m_nome
-                    if mes_atual not in md:
-                        md[mes_atual] = {"despesas": 0.0}
-                    break
-            if mes_atual and lbl == "TOTAL":
-                v = safe(row[5]) if len(row) > 5 else 0.0
-                md[mes_atual]["despesas"] += abs(v)
-        fluxos[emp] = md
-        print(f"  [Fluxo {emp}] meses: {list(md.keys())}")
-    result = []
-    for m in sorted(result_div.values(), key=lambda x: x["order"]):
-        mes = m["mes"]
-        row = {
-            "mes": mes, "mes_num": m["mes_num"], "ano": m["ano"],
-            "order": m["order"], "divida": m["divida"],
-            "VIP":   fluxos.get("VIP",   {}).get(mes, {}).get("despesas", 0),
-            "VIDAL": fluxos.get("VIDAL", {}).get(mes, {}).get("despesas", 0),
-            "V3":    0,
-        }
-        row["GRUPO"] = row["VIP"] + row["VIDAL"] + row["V3"]
-        result.append(row)
-    return result
+            if valor != 0:
+                result[order][bloco] += valor
+    lista = []
+    for m in sorted(result.values(), key=lambda x: x["order"]):
+        m["pagas_grupo"] = m["pagas_vip"] + m["pagas_vidal"]
+        m["pagar_grupo"] = m["pagar_vip"] + m["pagar_vidal"]
+        m["total_vip"]   = m["pagas_vip"] + m["pagar_vip"]
+        m["total_vidal"] = m["pagas_vidal"] + m["pagar_vidal"]
+        m["total_grupo"] = m["pagas_grupo"] + m["pagar_grupo"]
+        lista.append(m)
+    print(f"  [Divida Fornecedores] {len(lista)} meses: {[m['mes'] for m in lista]}")
+    return lista
 
 def build_json():
     if not XLSX_PATH.exists(): print(f"ERRO: {XLSX_PATH} nao encontrado."); sys.exit(1)
@@ -177,7 +183,7 @@ def build_json():
                 all_keys[k]["canais"][cname]["prev"]+=cv.get("prev",0)
                 all_keys[k]["canais"][cname]["real"]+=cv.get("real",0)
     data["GRUPO"] = {**colors["GRUPO"],"months":sorted(all_keys.values(),key=lambda x:x["order"])}
-    financeiro = parse_financeiro(wb)
+    financeiro = parse_divida_fornecedores(wb)
     print(f"  Financeiro: {len(financeiro)} meses")
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     out = {"gerado_em":datetime.now().strftime("%d/%m/%Y %H:%M"),"fonte":XLSX_PATH.name,
