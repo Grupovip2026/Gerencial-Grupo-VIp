@@ -112,9 +112,9 @@ def parse_divida_fornecedores(wb):
     rows = list(ws.iter_rows(values_only=True))
     COL = {
         "pagas_vip_mes":1,   "pagas_vip_val":2,
-        "pagas_vidal_mes":4, "pagas_vidal_val":5,
-        "pagar_vip_mes":9,   "pagar_vip_val":10,
-        "pagar_vidal_mes":12,"pagar_vidal_val":13,
+        "pagas_vidal_mes":5, "pagas_vidal_val":6,
+        "pagar_vip_mes":10,  "pagar_vip_val":11,
+        "pagar_vidal_mes":14,"pagar_vidal_val":15,
     }
     result = {}
     def get(row, idx):
@@ -202,6 +202,7 @@ def build_json():
     print(f"OK {OUT_PATH} gerado ({OUT_PATH.stat().st_size} bytes)")
 
 if __name__ == "__main__": build_json()
+
 
 
 
