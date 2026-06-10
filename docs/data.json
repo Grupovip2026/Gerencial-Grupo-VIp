@@ -1,5 +1,5 @@
 {
-  "gerado_em": "10/06/2026 15:03",
+  "gerado_em": "10/06/2026 15:06",
   "fonte": "Resultado_Gerencial_2026.xlsx",
   "empresas": {
     "VIP": {
@@ -649,14 +649,14 @@
       "ano": 2026,
       "order": 202602,
       "pagas_vip": 228525.11,
-      "pagas_vidal": 0.0,
+      "pagas_vidal": 3059.0,
       "pagar_vip": 0.0,
       "pagar_vidal": 0.0,
-      "pagas_grupo": 228525.11,
+      "pagas_grupo": 231584.11,
       "pagar_grupo": 0.0,
       "total_vip": 228525.11,
-      "total_vidal": 0.0,
-      "total_grupo": 228525.11
+      "total_vidal": 3059.0,
+      "total_grupo": 231584.11
     },
     {
       "mes": "Mar",
@@ -664,14 +664,14 @@
       "ano": 2026,
       "order": 202603,
       "pagas_vip": 268703.5,
-      "pagas_vidal": 0.0,
+      "pagas_vidal": 10570.07,
       "pagar_vip": 0.0,
-      "pagar_vidal": 0.0,
-      "pagas_grupo": 268703.5,
-      "pagar_grupo": 0.0,
+      "pagar_vidal": 1116.63,
+      "pagas_grupo": 279273.57,
+      "pagar_grupo": 1116.63,
       "total_vip": 268703.5,
-      "total_vidal": 0.0,
-      "total_grupo": 268703.5
+      "total_vidal": 11686.7,
+      "total_grupo": 280390.2
     },
     {
       "mes": "Abr",
@@ -679,14 +679,14 @@
       "ano": 2026,
       "order": 202604,
       "pagas_vip": 223982.07,
-      "pagas_vidal": 0.0,
+      "pagas_vidal": 30495.45,
       "pagar_vip": 0.0,
       "pagar_vidal": 0.0,
-      "pagas_grupo": 223982.07,
+      "pagas_grupo": 254477.52000000002,
       "pagar_grupo": 0.0,
       "total_vip": 223982.07,
-      "total_vidal": 0.0,
-      "total_grupo": 223982.07
+      "total_vidal": 30495.45,
+      "total_grupo": 254477.52000000002
     },
     {
       "mes": "Mai",
@@ -694,14 +694,14 @@
       "ano": 2026,
       "order": 202605,
       "pagas_vip": 319945.38,
-      "pagas_vidal": 0.0,
+      "pagas_vidal": 52752.71,
       "pagar_vip": 0.0,
       "pagar_vidal": 0.0,
-      "pagas_grupo": 319945.38,
+      "pagas_grupo": 372698.09,
       "pagar_grupo": 0.0,
       "total_vip": 319945.38,
-      "total_vidal": 0.0,
-      "total_grupo": 319945.38
+      "total_vidal": 52752.71,
+      "total_grupo": 372698.09
     },
     {
       "mes": "Jun",
@@ -709,14 +709,14 @@
       "ano": 2026,
       "order": 202606,
       "pagas_vip": 71959.33,
-      "pagas_vidal": 0.0,
-      "pagar_vip": 0.0,
-      "pagar_vidal": 0.0,
-      "pagas_grupo": 71959.33,
-      "pagar_grupo": 0.0,
-      "total_vip": 71959.33,
-      "total_vidal": 0.0,
-      "total_grupo": 71959.33
+      "pagas_vidal": 4702.05,
+      "pagar_vip": 242737.6,
+      "pagar_vidal": 34120.22,
+      "pagas_grupo": 76661.38,
+      "pagar_grupo": 276857.82,
+      "total_vip": 314696.93,
+      "total_vidal": 38822.270000000004,
+      "total_grupo": 353519.2
     },
     {
       "mes": "Jul",
@@ -725,13 +725,13 @@
       "order": 202607,
       "pagas_vip": 0.0,
       "pagas_vidal": 0.0,
-      "pagar_vip": 0.0,
-      "pagar_vidal": 0.0,
+      "pagar_vip": 279660.9,
+      "pagar_vidal": 26388.28,
       "pagas_grupo": 0.0,
-      "pagar_grupo": 0.0,
-      "total_vip": 0.0,
-      "total_vidal": 0.0,
-      "total_grupo": 0.0
+      "pagar_grupo": 306049.18000000005,
+      "total_vip": 279660.9,
+      "total_vidal": 26388.28,
+      "total_grupo": 306049.18000000005
     },
     {
       "mes": "Ago",
@@ -740,13 +740,13 @@
       "order": 202608,
       "pagas_vip": 0.0,
       "pagas_vidal": 0.0,
-      "pagar_vip": 0.0,
+      "pagar_vip": 193891.55,
       "pagar_vidal": 0.0,
       "pagas_grupo": 0.0,
-      "pagar_grupo": 0.0,
-      "total_vip": 0.0,
+      "pagar_grupo": 193891.55,
+      "total_vip": 193891.55,
       "total_vidal": 0.0,
-      "total_grupo": 0.0
+      "total_grupo": 193891.55
     },
     {
       "mes": "Set",
@@ -755,13 +755,13 @@
       "order": 202609,
       "pagas_vip": 0.0,
       "pagas_vidal": 0.0,
-      "pagar_vip": 0.0,
+      "pagar_vip": 112354.99,
       "pagar_vidal": 0.0,
       "pagas_grupo": 0.0,
-      "pagar_grupo": 0.0,
-      "total_vip": 0.0,
+      "pagar_grupo": 112354.99,
+      "total_vip": 112354.99,
       "total_vidal": 0.0,
-      "total_grupo": 0.0
+      "total_grupo": 112354.99
     },
     {
       "mes": "Out",
@@ -770,13 +770,13 @@
       "order": 202610,
       "pagas_vip": 0.0,
       "pagas_vidal": 0.0,
-      "pagar_vip": 0.0,
+      "pagar_vip": 50055.49,
       "pagar_vidal": 0.0,
       "pagas_grupo": 0.0,
-      "pagar_grupo": 0.0,
-      "total_vip": 0.0,
+      "pagar_grupo": 50055.49,
+      "total_vip": 50055.49,
       "total_vidal": 0.0,
-      "total_grupo": 0.0
+      "total_grupo": 50055.49
     },
     {
       "mes": "Nov",
@@ -785,13 +785,13 @@
       "order": 202611,
       "pagas_vip": 0.0,
       "pagas_vidal": 0.0,
-      "pagar_vip": 0.0,
+      "pagar_vip": 18763.44,
       "pagar_vidal": 0.0,
       "pagas_grupo": 0.0,
-      "pagar_grupo": 0.0,
-      "total_vip": 0.0,
+      "pagar_grupo": 18763.44,
+      "total_vip": 18763.44,
       "total_vidal": 0.0,
-      "total_grupo": 0.0
+      "total_grupo": 18763.44
     },
     {
       "mes": "Dez",
