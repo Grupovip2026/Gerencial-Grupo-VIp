@@ -66,6 +66,20 @@ th.th-apagar{color:#FF6B6B}
 .loading{text-align:center;padding:60px;color:#555;font-size:14px}
 .error{text-align:center;padding:40px;color:#FF6B6B;font-size:13px;background:rgba(255,107,107,.05);border-radius:12px;margin:20px 0}
 .pos{color:#00C9A7}.neg{color:#FF6B6B}.neutral{color:#f0f0f0}.dim{color:#777}.sky{color:#38bdf8}.warn{color:#F5A623}.purple{color:#a78bfa}
+.analise-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:20px;margin-bottom:16px}
+.analise-box .chart-title{margin-bottom:16px}
+.margem-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:20px}
+.margem-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:14px 16px}
+.margem-card-mes{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.margem-card-val{font-size:18px;font-weight:700;font-family:'DM Mono',monospace;margin-bottom:4px}
+.margem-card-delta{font-size:11px}
+.insight-lista{display:flex;flex-direction:column;gap:8px}
+.insight-item{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:8px;font-size:13px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)}
+.insight-item.ok{border-color:rgba(0,201,167,.2);background:rgba(0,201,167,.04)}
+.insight-item.warn{border-color:rgba(245,166,35,.2);background:rgba(245,166,35,.04)}
+.insight-item.bad{border-color:rgba(255,107,107,.2);background:rgba(255,107,107,.04)}
+.insight-icon{font-size:16px;flex-shrink:0}
+.insight-text{color:#ccc;line-height:1.5}
 @media(max-width:700px){.charts-row{grid-template-columns:1fr}.kpis{flex-direction:column}}
 </style>
 </head>
@@ -106,6 +120,12 @@ th.th-apagar{color:#FF6B6B}
     <div class="chart-title">Resumo Mensal</div>
     <table id="tbl"><tbody><tr><td class="loading">Carregando...</td></tr></tbody></table>
   </div>
+  <div class="analise-box">
+    <div class="chart-title">📈 Análise de Margem · Mês a Mês</div>
+    <div id="ger-margem-grid" class="margem-grid"></div>
+    <div class="chart-title" style="margin-bottom:12px">💡 Insights Automáticos</div>
+    <div id="ger-insights" class="insight-lista"></div>
+  </div>
 </div>
 <div id="page-dre" class="page">
   <div class="tabs" style="margin-bottom:16px">
@@ -129,6 +149,12 @@ th.th-apagar{color:#FF6B6B}
   <div class="table-box">
     <div class="chart-title">DRE Contábil · Linha a Linha</div>
     <table id="dre-tbl"><tbody><tr><td class="loading">Carregando...</td></tr></tbody></table>
+  </div>
+  <div class="analise-box">
+    <div class="chart-title">📈 Margens · Mês a Mês</div>
+    <div id="dre-margem-grid" class="margem-grid"></div>
+    <div class="chart-title" style="margin-bottom:12px">💡 Insights Automáticos</div>
+    <div id="dre-insights" class="insight-lista"></div>
   </div>
 </div>
 <div id="page-financeiro" class="page">
@@ -161,6 +187,7 @@ const fmt=v=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maxi
 const fmtM=v=>v===0?'—':fmt(v);
 const pct=(r,p)=>p?(((r-p)/Math.abs(p))*100):0;
 const fmtP=v=>(v>=0?'+':'')+v.toFixed(1)+'%';
+const fmtPP=v=>(v>=0?'+':'')+v.toFixed(1)+'pp';
 let DATA=null,FINANCEIRO=null,DRE=null,charts={},current='VIP',selectedMonths=new Set();
 let finCurrent='GRUPO',finSelected=new Set();
 let dreCurrent='VIP',dreSelected=new Set();
@@ -259,6 +286,7 @@ function render(){
   const tdr=pct(srr,srp),tdd=pct(sdr,sdp);
   html+=`<tr class="total-row"><td>TOTAL</td><td class="dim">${fmt(srp)}</td><td class="neutral">${fmt(srr)}</td><td class="${tdr>=0?'pos':'neg'}">${fmtP(tdr)}</td><td class="dim">${fmt(sdp)}</td><td class="neutral">${fmt(sdr)}</td><td class="${tdd<=0?'pos':'neg'}">${fmtP(tdd)}</td><td class="dim">${fmt(srrp)}</td><td class="${srrr>=0?'pos':'neg'}">${fmt(srrr)}</td></tr></tbody>`;
   document.getElementById('tbl').innerHTML=html;
+  renderMargemGer(months,'ger-margem-grid','ger-insights');
 }
 
 const DRE_COR={'VIP':'#00C9A7','VIDAL':'#6C63FF','GRUPO':'#F5A623'};
@@ -337,6 +365,7 @@ function renderDre(){
   });
   html+='</tbody>';
   document.getElementById('dre-tbl').innerHTML=html;
+  renderMargemDre(meses,'dre-margem-grid','dre-insights');
 }
 
 function setFinEmp(key){
@@ -395,6 +424,58 @@ function renderFin(){
     html+=`<tr class="total-row"><td>TOTAL</td><td class="pos">${fmt(sp)}</td><td class="neg">${fmt(sa)}</td><td class="warn">${fmt(sp+sa)}</td></tr></tbody>`;
   }
   document.getElementById('fin-tbl').innerHTML=html;
+}
+
+function margCard(mes,val,delta){
+  const dCls=delta===null?'dim':delta>=0?'pos':'neg';
+  const dTxt=delta===null?'primeiro mês':fmtPP(delta)+' vs mês ant.';
+  const vCls=val>=15?'pos':val>=8?'warn':'neg';
+  return `<div class="margem-card"><div class="margem-card-mes">${mes}</div><div class="margem-card-val ${vCls}">${val.toFixed(1)}%</div><div class="margem-card-delta ${dCls}">${dTxt}</div></div>`;
+}
+
+function gerarInsights(margens,nomeMargem){
+  const items=[];
+  if(margens.length>=2){
+    const first=margens[0].val,last=margens[margens.length-1].val,diff=last-first;
+    if(diff>=2) items.push({cls:'ok',icon:'✅',txt:`${nomeMargem} subiu ${fmtPP(diff)} de ${margens[0].mes} a ${margens[margens.length-1].mes} — tendência positiva.`});
+    else if(diff<=-2) items.push({cls:'bad',icon:'⚠️',txt:`${nomeMargem} caiu ${fmtPP(Math.abs(diff))} de ${margens[0].mes} a ${margens[margens.length-1].mes} — atenção.`});
+    else items.push({cls:'warn',icon:'➡️',txt:`${nomeMargem} estável no período: variação de ${fmtPP(Math.abs(diff))}.`});
+  }
+  if(margens.length>=2){
+    const melhor=margens.reduce((a,b)=>a.val>b.val?a:b);
+    const pior=margens.reduce((a,b)=>a.val<b.val?a:b);
+    items.push({cls:'ok',icon:'🏆',txt:`Melhor mês: ${melhor.mes} com ${nomeMargem} de ${melhor.val.toFixed(1)}%.`});
+    if(pior.mes!==melhor.mes) items.push({cls:pior.val<5?'bad':'warn',icon:pior.val<5?'🔴':'⚠️',txt:`Pior mês: ${pior.mes} com ${nomeMargem} de ${pior.val.toFixed(1)}%.`});
+  }
+  if(margens.length>=2){
+    const ult=margens[margens.length-1],ant=margens[margens.length-2],diff=ult.val-ant.val;
+    if(Math.abs(diff)>=1){
+      const cls=diff>=0?'ok':'bad',icon=diff>=0?'📈':'📉';
+      items.push({cls,icon,txt:`${ult.mes}: ${nomeMargem} ${diff>=0?'subiu':'caiu'} ${fmtPP(Math.abs(diff))} vs ${ant.mes}.`});
+    }
+  }
+  return items;
+}
+
+function renderInsights(insightsList,containerId){
+  const el=document.getElementById(containerId);if(!el)return;
+  if(!insightsList.length){el.innerHTML='<div class="dim" style="font-size:13px;padding:8px">Selecione mais de um mês para ver insights.</div>';return;}
+  el.innerHTML=insightsList.map(i=>`<div class="insight-item ${i.cls}"><span class="insight-icon">${i.icon}</span><span class="insight-text">${i.txt}</span></div>`).join('');
+}
+
+function renderMargemGer(months,gridId,insightId){
+  const grid=document.getElementById(gridId);if(!grid)return;
+  const margens=months.map(m=>({mes:m.mes,val:m.rReal>0?(m.resReal/m.rReal*100):0}));
+  grid.innerHTML=margens.map((m,i)=>margCard(m.mes,m.val,i>0?m.val-margens[i-1].val:null)).join('');
+  renderInsights(gerarInsights(margens,'Margem de Resultado'),insightId);
+}
+
+function renderMargemDre(meses,gridId,insightId){
+  const grid=document.getElementById(gridId);if(!grid)return;
+  const margens=meses.map(m=>({mes:m.mes,val:m.recLiq>0?(m.ebitda/m.recLiq*100):0}));
+  grid.innerHTML=margens.map((m,i)=>margCard(m.mes,m.val,i>0?m.val-margens[i-1].val:null)).join('');
+  const margensLiq=meses.map(m=>({mes:m.mes,val:m.recLiq>0?(m.lucroLiq/m.recLiq*100):0}));
+  renderInsights([...gerarInsights(margens,'Margem EBITDA'),...gerarInsights(margensLiq,'Margem Líquida')],insightId);
 }
 
 loadData();
