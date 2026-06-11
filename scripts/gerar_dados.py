@@ -209,6 +209,7 @@ def parse_dre(wb):
             i += 1
         return sorted(meses.values(), key=lambda x: x["order"])
 
+    print('  [DRE] abas disponiveis:', wb.sheetnames)
     resultado = {}
     for emp, aba_nome in [("VIP", "DRE - VIP"), ("VIDAL", "DRE - VIDAL")]:
         real = next((s for s in wb.sheetnames if s.strip() == aba_nome), None)
@@ -273,3 +274,4 @@ def build_json():
     print(f"OK {OUT_PATH} gerado ({OUT_PATH.stat().st_size} bytes)")
 
 if __name__ == "__main__": build_json()
+
