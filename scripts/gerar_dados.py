@@ -29,7 +29,6 @@ def to_mes_key(v):
 
 def parse_mes_str(v):
     if v is None: return None
-    # Se for datetime nativo, converte direto
     if isinstance(v, (datetime, date)):
         return v.year, v.month, MESES_NOMES.get(v.month, str(v.month))
     s = str(v).strip().lower()
@@ -119,13 +118,6 @@ def parse_divida_fornecedores(wb):
     result = {}
     def get(row, idx):
         return row[idx] if len(row) > idx else None
-    # DEBUG: mostra primeiras linhas
-    for i, row in enumerate(rows[6:10]):
-        b=row[1] if len(row)>1 else None
-        e=row[4] if len(row)>4 else None
-        j=row[9] if len(row)>9 else None
-        m=row[12] if len(row)>12 else None
-        print(f'  [DEBUG] L{i+7}: '+' '.join(f'{chr(65+ci)}={v}' for ci,v in enumerate(row) if v is not None))
     for row in rows[6:]:
         blocos = [
             ("pagas_vip",   "pagas_vip_mes",   "pagas_vip_val"),
@@ -161,6 +153,84 @@ def parse_divida_fornecedores(wb):
     print(f"  [Divida Fornecedores] {len(lista)} meses: {[m['mes'] for m in lista]}")
     return lista
 
+def parse_dre(wb):
+    LABEL_MAP = {
+        "receita bruta de vendas": "recBruta",
+        "(-) devoluções e cancelamentos": "devol",
+        "(-) impostos sobre vendas": "impostos",
+        "receita líquida": "recLiq",
+        "(-) custo de mercadoria vendida (cmv)": "cmv",
+        "= lucro bruto": "lucroBruto",
+        "(-) despesas de pessoal": "dPessoal",
+        "(-) despesas de marketing": "dMarketing",
+        "(-) taxas de plataforma": "dTaxas",
+        "(-) despesas financeiras / financiamentos": "dFinanc",
+        "(-) outras despesas operacionais": "dOutras",
+        "ebitda": "ebitda",
+        "(-) depreciação / amortização": "deprec",
+        "ebit": "ebit",
+        "lucro líquido": "lucroLiq",
+    }
+    CAMPOS = ["recBruta","devol","impostos","recLiq","cmv","lucroBruto",
+              "dPessoal","dMarketing","dTaxas","dFinanc","dOutras",
+              "ebitda","deprec","ebit","lucroLiq"]
+
+    def ler_aba(ws):
+        rows = list(ws.iter_rows(values_only=True))
+        date_row = rows[3] if len(rows) > 3 else []
+        col_mes = {}
+        for ci in range(5, len(date_row)):
+            info = to_mes_key(date_row[ci])
+            if info:
+                ano, mes_num, mes_nome = info
+                col_mes[ci] = {"order": ano*100+mes_num, "mes": mes_nome, "mes_num": mes_num, "ano": ano}
+        meses = {}
+        for ci, info in col_mes.items():
+            k = info["order"]
+            if k not in meses:
+                meses[k] = {"mes": info["mes"], "mes_num": info["mes_num"], "ano": info["ano"], "order": k}
+                for c in CAMPOS: meses[k][c] = 0.0
+        i = 0
+        while i < len(rows):
+            row = rows[i]
+            lbl_raw = row[5] if len(row) > 5 else None
+            if lbl_raw and isinstance(lbl_raw, str):
+                lbl = lbl_raw.strip().lower()
+                if lbl in LABEL_MAP:
+                    campo = LABEL_MAP[lbl]
+                    if i+1 < len(rows):
+                        val_row = rows[i+1]
+                        for ci, info in col_mes.items():
+                            k = info["order"]
+                            v = val_row[ci] if len(val_row) > ci else None
+                            meses[k][campo] = safe(v)
+                    i += 2
+                    continue
+            i += 1
+        return sorted(meses.values(), key=lambda x: x["order"])
+
+    resultado = {}
+    for emp, aba_nome in [("VIP", "DRE - VIP"), ("VIDAL", "DRE - VIDAL")]:
+        real = next((s for s in wb.sheetnames if s.strip() == aba_nome), None)
+        if not real:
+            print(f"  [DRE] aba '{aba_nome}' NAO encontrada!")
+            resultado[emp] = []
+            continue
+        resultado[emp] = ler_aba(wb[real])
+        print(f"  [DRE] {emp}: {len(resultado[emp])} meses")
+    grupo = {}
+    for emp in ["VIP", "VIDAL"]:
+        for m in resultado.get(emp, []):
+            k = m["order"]
+            if k not in grupo:
+                grupo[k] = {"mes": m["mes"], "mes_num": m["mes_num"], "ano": m["ano"], "order": k}
+                for c in CAMPOS: grupo[k][c] = 0.0
+            for c in CAMPOS:
+                grupo[k][c] += m.get(c, 0.0)
+    resultado["GRUPO"] = sorted(grupo.values(), key=lambda x: x["order"])
+    print(f"  [DRE] GRUPO: {len(resultado['GRUPO'])} meses consolidados")
+    return resultado
+
 def build_json():
     if not XLSX_PATH.exists(): print(f"ERRO: {XLSX_PATH} nao encontrado."); sys.exit(1)
     wb = load_workbook(XLSX_PATH, read_only=True, data_only=True)
@@ -195,17 +265,11 @@ def build_json():
     data["GRUPO"] = {**colors["GRUPO"],"months":sorted(all_keys.values(),key=lambda x:x["order"])}
     financeiro = parse_divida_fornecedores(wb)
     print(f"  Financeiro: {len(financeiro)} meses")
+    dre = parse_dre(wb)
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     out = {"gerado_em":datetime.now().strftime("%d/%m/%Y %H:%M"),"fonte":XLSX_PATH.name,
-           "empresas":data,"financeiro":financeiro}
+           "empresas":data,"financeiro":financeiro,"dre":dre}
     with open(OUT_PATH,"w",encoding="utf-8") as f: json.dump(out,f,ensure_ascii=False,indent=2)
     print(f"OK {OUT_PATH} gerado ({OUT_PATH.stat().st_size} bytes)")
 
 if __name__ == "__main__": build_json()
-
-
-
-
-
-
-
