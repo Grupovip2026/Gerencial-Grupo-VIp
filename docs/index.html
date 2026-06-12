@@ -90,6 +90,7 @@ th.th-apagar{color:#FF6B6B}
 <div class="nav-tabs">
   <button class="nav-tab active" onclick="setPage('gerencial')">📊 Gerencial</button>
   <button class="nav-tab" onclick="setPage('dre')">📋 DRE</button>
+  <button class="nav-tab" onclick="setPage('custos')">💰 Custos</button>
   <button class="nav-tab" onclick="setPage('financeiro')">🧾 Dívidas Fornecedores</button>
 </div>
 <div id="page-gerencial" class="page active">
@@ -157,6 +158,24 @@ th.th-apagar{color:#FF6B6B}
     <div id="dre-insights" class="insight-lista"></div>
   </div>
 </div>
+<div id="page-custos" class="page">
+  <div id="custos-kpis" class="kpis"><div class="loading">Carregando...</div></div>
+  <div class="charts-row">
+    <div class="chart-box"><div class="chart-title">Custos Fixos · Distribuição</div><div class="chart-wrap"><canvas id="chartCustosFixo"></canvas></div></div>
+    <div class="chart-box"><div class="chart-title">Custos Variáveis · Distribuição</div><div class="chart-wrap"><canvas id="chartCustosVar"></canvas></div></div>
+  </div>
+  <div class="charts-row">
+    <div class="table-box">
+      <div class="chart-title">💰 Custos Fixos</div>
+      <table id="tbl-custos-fixo"><tbody><tr><td class="loading">Carregando...</td></tr></tbody></table>
+    </div>
+    <div class="table-box">
+      <div class="chart-title">📊 Custos Variáveis</div>
+      <table id="tbl-custos-var"><tbody><tr><td class="loading">Carregando...</td></tr></tbody></table>
+    </div>
+  </div>
+</div>
+
 <div id="page-financeiro" class="page">
   <div class="tabs" style="margin-bottom:16px">
     <button class="tab active-vip" onclick="setFinEmp('VIP')">VIP MX</button>
@@ -197,7 +216,7 @@ async function loadData(){
     const res=await fetch('data.json?v='+Date.now());
     if(!res.ok)throw new Error('HTTP '+res.status);
     const json=await res.json();
-    DATA=json.empresas; FINANCEIRO=json.financeiro||[]; DRE=json.dre||{};
+    DATA=json.empresas; FINANCEIRO=json.financeiro||[]; DRE=json.dre||{}; window.CUSTOS=json.custos||{};
     document.getElementById('badge-update').textContent='Atualizado '+json.gerado_em;
     const ma=(DATA.GRUPO?.months||[]).filter(m=>m.rReal>0).map(m=>m.mes);
     if(ma.length)document.getElementById('period').textContent=ma[0]+' – '+ma[ma.length-1]+' 2026 · Previsto vs Realizado';
@@ -215,7 +234,7 @@ async function loadData(){
 function setPage(p){
   document.querySelectorAll('.nav-tab').forEach((t,i)=>{t.classList.toggle('active',['gerencial','dre','financeiro'][i]===p)});
   document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
-  document.getElementById('page-'+p).classList.add('active');
+  document.getElementById('page-'+p).classList.add('active'); if(p==='custos')renderCustos();
 }
 
 function setCompany(key){
@@ -479,6 +498,41 @@ function renderMargemDre(meses,gridId,insightId){
 }
 
 loadData();
+
+function renderCustos(){
+  if(!window.CUSTOS)return;
+  const c=window.CUSTOS;
+  const totalGeral=c.total_fixo+c.total_variavel;
+  const pFixo=totalGeral>0?(c.total_fixo/totalGeral*100):0;
+  const pVar=totalGeral>0?(c.total_variavel/totalGeral*100):0;
+  document.getElementById('custos-kpis').innerHTML=
+    <div class='kpi kpi-dre'><div class='kpi-label'>Total Custos Fixos</div><div class='kpi-value warn'></div><div class='kpi-delta dim'>% do total</div></div>
+    <div class='kpi kpi-apagar'><div class='kpi-label'>Total Custos Variáveis</div><div class='kpi-value neg'></div><div class='kpi-delta dim'>% do total</div></div>
+    <div class='kpi'><div class='kpi-label'>Total Geral de Custos</div><div class='kpi-value neutral'></div><div class='kpi-delta dim'> itens no total</div></div>;
+  const cores=['#00C9A7','#6C63FF','#F5A623','#FF6B6B','#38bdf8','#a78bfa','#f472b6','#34d399','#fb923c','#60a5fa'];
+  ['chartCustosFixo','chartCustosVar'].forEach(id=>{if(charts[id]){charts[id].destroy();delete charts[id]}});
+  const ctxF=document.getElementById('chartCustosFixo');
+  if(ctxF&&c.fixo.length){
+    charts['chartCustosFixo']=new Chart(ctxF.getContext('2d'),{type:'doughnut',data:{labels:c.fixo.map(i=>i.origem),datasets:[{data:c.fixo.map(i=>i.valor),backgroundColor:cores,borderWidth:2,borderColor:'#0d0d1a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#888',font:{size:11},boxWidth:12}},tooltip:{callbacks:{label:i=>i.label+': '+fmt(i.raw)}}}}});
+  }
+  const ctxV=document.getElementById('chartCustosVar');
+  if(ctxV&&c.variavel.length){
+    charts['chartCustosVar']=new Chart(ctxV.getContext('2d'),{type:'doughnut',data:{labels:c.variavel.map(i=>i.origem),datasets:[{data:c.variavel.map(i=>i.valor),backgroundColor:cores,borderWidth:2,borderColor:'#0d0d1a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#888',font:{size:11},boxWidth:12}},tooltip:{callbacks:{label:i=>i.label+': '+fmt(i.raw)}}}}});
+  }
+  let htmlF='<thead><tr><th>Origem</th><th>Valor</th><th>% do Fixo</th></tr></thead><tbody>';
+  c.fixo.forEach(i=>{const p=c.total_fixo>0?(i.valor/c.total_fixo*100):0;htmlF+=<tr><td></td><td class='warn'></td><td class='dim'>%</td></tr>;});
+  htmlF+=<tr class='total-row'><td>TOTAL FIXO</td><td class='warn'></td><td class='dim'>100%</td></tr></tbody>;
+  document.getElementById('tbl-custos-fixo').innerHTML=htmlF;
+  let htmlV='<thead><tr><th>Origem</th><th>Valor</th><th>% do Variável</th></tr></thead><tbody>';
+  c.variavel.forEach(i=>{const p=c.total_variavel>0?(i.valor/c.total_variavel*100):0;htmlV+=<tr><td></td><td class='neg'></td><td class='dim'>%</td></tr>;});
+  htmlV+=<tr class='total-row'><td>TOTAL VARIÁVEL</td><td class='neg'></td><td class='dim'>100%</td></tr></tbody>;
+  document.getElementById('tbl-custos-var').innerHTML=htmlV;
+}
 </script>
 </body>
 </html>
+
+
+
+
+

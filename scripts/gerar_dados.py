@@ -232,6 +232,30 @@ def parse_dre(wb):
     print(f"  [DRE] GRUPO: {len(resultado['GRUPO'])} meses consolidados")
     return resultado
 
+def parse_custos(wb):
+    aba = next((s for s in wb.sheetnames if s.strip().lower() == 'custos'), None)
+    if not aba:
+        print('  [Custos] aba NAO encontrada!')
+        return {'fixo': [], 'variavel': [], 'total_fixo': 0, 'total_variavel': 0}
+    ws = wb[aba]
+    rows = list(ws.iter_rows(values_only=True))
+    fixo, variavel = [], []
+    for row in rows[4:]:
+        origem_f = str(row[2]).strip() if row[2] else None
+        valor_f = row[3]
+        if origem_f and origem_f.upper() not in ('ORIGEM', 'ORIGEM ') and valor_f:
+            v = float(valor_f) if valor_f else 0
+            if v > 0: fixo.append({'origem': origem_f, 'valor': v})
+        origem_v = str(row[7]).strip() if len(row) > 7 and row[7] else None
+        valor_v = row[8] if len(row) > 8 else None
+        if origem_v and origem_v.upper() not in ('ORIGEM', 'ORIGEM ') and valor_v:
+            v = float(valor_v) if valor_v else 0
+            if v > 0: variavel.append({'origem': origem_v, 'valor': v})
+    total_fixo = sum(i['valor'] for i in fixo)
+    total_variavel = sum(i['valor'] for i in variavel)
+    print(f'  [Custos] fixo: {len(fixo)} itens | variavel: {len(variavel)} itens')
+    return {'fixo': fixo, 'variavel': variavel, 'total_fixo': total_fixo, 'total_variavel': total_variavel}
+
 def build_json():
     if not XLSX_PATH.exists(): print(f"ERRO: {XLSX_PATH} nao encontrado."); sys.exit(1)
     wb = load_workbook(XLSX_PATH, read_only=True, data_only=True)
@@ -269,9 +293,12 @@ def build_json():
     dre = parse_dre(wb)
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     out = {"gerado_em":datetime.now().strftime("%d/%m/%Y %H:%M"),"fonte":XLSX_PATH.name,
-           "empresas":data,"financeiro":financeiro,"dre":dre}
+           "empresas":data,"financeiro":financeiro,"dre":dre,"custos":custos}
     with open(OUT_PATH,"w",encoding="utf-8") as f: json.dump(out,f,ensure_ascii=False,indent=2)
     print(f"OK {OUT_PATH} gerado ({OUT_PATH.stat().st_size} bytes)")
 
 if __name__ == "__main__": build_json()
+
+
+
 
