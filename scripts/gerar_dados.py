@@ -291,6 +291,7 @@ def build_json():
     financeiro = parse_divida_fornecedores(wb)
     print(f"  Financeiro: {len(financeiro)} meses")
     dre = parse_dre(wb)
+    custos = parse_custos(wb)
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     out = {"gerado_em":datetime.now().strftime("%d/%m/%Y %H:%M"),"fonte":XLSX_PATH.name,
            "empresas":data,"financeiro":financeiro,"dre":dre,"custos":custos}
@@ -298,6 +299,7 @@ def build_json():
     print(f"OK {OUT_PATH} gerado ({OUT_PATH.stat().st_size} bytes)")
 
 if __name__ == "__main__": build_json()
+
 
 
 
