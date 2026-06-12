@@ -165,17 +165,16 @@ th.th-apagar{color:#FF6B6B}
     <div class="chart-box"><div class="chart-title">Custos Variáveis · Distribuição</div><div class="chart-wrap"><canvas id="chartCustosVar"></canvas></div></div>
   </div>
   <div class="charts-row">
-    <div class="table-box">
+    <div class="table-box" style="margin-bottom:0">
       <div class="chart-title">💰 Custos Fixos</div>
       <table id="tbl-custos-fixo"><tbody><tr><td class="loading">Carregando...</td></tr></tbody></table>
     </div>
-    <div class="table-box">
+    <div class="table-box" style="margin-bottom:0">
       <div class="chart-title">📊 Custos Variáveis</div>
       <table id="tbl-custos-var"><tbody><tr><td class="loading">Carregando...</td></tr></tbody></table>
     </div>
   </div>
 </div>
-
 <div id="page-financeiro" class="page">
   <div class="tabs" style="margin-bottom:16px">
     <button class="tab active-vip" onclick="setFinEmp('VIP')">VIP MX</button>
@@ -207,16 +206,17 @@ const fmtM=v=>v===0?'—':fmt(v);
 const pct=(r,p)=>p?(((r-p)/Math.abs(p))*100):0;
 const fmtP=v=>(v>=0?'+':'')+v.toFixed(1)+'%';
 const fmtPP=v=>(v>=0?'+':'')+v.toFixed(1)+'pp';
-let DATA=null,FINANCEIRO=null,DRE=null,charts={},current='VIP',selectedMonths=new Set();
-let finCurrent='GRUPO',finSelected=new Set();
-let dreCurrent='VIP',dreSelected=new Set();
+var DATA=null,FINANCEIRO=null,DRE=null,CUSTOS=null,charts={};
+var current='VIP',selectedMonths=new Set();
+var finCurrent='GRUPO',finSelected=new Set();
+var dreCurrent='VIP',dreSelected=new Set();
 
 async function loadData(){
   try{
     const res=await fetch('data.json?v='+Date.now());
     if(!res.ok)throw new Error('HTTP '+res.status);
     const json=await res.json();
-    DATA=json.empresas; FINANCEIRO=json.financeiro||[]; DRE=json.dre||{}; window.CUSTOS=json.custos||{};
+    DATA=json.empresas; FINANCEIRO=json.financeiro||[]; DRE=json.dre||{}; CUSTOS=json.custos||{};
     document.getElementById('badge-update').textContent='Atualizado '+json.gerado_em;
     const ma=(DATA.GRUPO?.months||[]).filter(m=>m.rReal>0).map(m=>m.mes);
     if(ma.length)document.getElementById('period').textContent=ma[0]+' – '+ma[ma.length-1]+' 2026 · Previsto vs Realizado';
@@ -227,14 +227,15 @@ async function loadData(){
     dreSelected=new Set((DRE['VIP']||[]).map((_,i)=>i));
     setDreEmp('VIP');
   }catch(e){
-    document.getElementById('kpis').innerHTML='<div class="error">⚠️ Não foi possível carregar data.json.<br><small>'+e.message+'</small></div>';
+    document.getElementById('kpis').innerHTML='<div class="error">Nao foi possivel carregar data.json.<br><small>'+e.message+'</small></div>';
   }
 }
 
 function setPage(p){
-  document.querySelectorAll('.nav-tab').forEach((t,i)=>{t.classList.toggle('active',['gerencial','dre','financeiro'][i]===p)});
+  document.querySelectorAll('.nav-tab').forEach((t,i)=>{t.classList.toggle('active',['gerencial','dre','custos','financeiro'][i]===p)});
   document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
-  document.getElementById('page-'+p).classList.add('active'); if(p==='custos')renderCustos();
+  document.getElementById('page-'+p).classList.add('active');
+  if(p==='custos')renderCustos();
 }
 
 function setCompany(key){
@@ -246,14 +247,15 @@ function setCompany(key){
 function buildMonthFilter(){
   const months=DATA[current]?.months||[];
   const cls='ativo-'+current.toLowerCase();
-  document.getElementById('mes-btns').innerHTML=months.map((m,i)=>`<button class="mes-btn ${selectedMonths.has(i)?cls:''}" onclick="toggleMonth(${i})">${m.mes}</button>`).join('');
+  document.getElementById('mes-btns').innerHTML=months.map((m,i)=>'<button class="mes-btn '+(selectedMonths.has(i)?cls:'')+'" onclick="toggleMonth('+i+')">'+m.mes+'</button>').join('');
 }
 function toggleMonth(i){if(selectedMonths.has(i)){if(selectedMonths.size===1)return;selectedMonths.delete(i)}else selectedMonths.add(i);buildMonthFilter();render()}
 function selectAllMonths(){selectedMonths=new Set((DATA[current]?.months||[]).map((_,i)=>i));buildMonthFilter();render()}
 function clearMonths(){const months=DATA[current]?.months||[];const lr=months.reduce((l,m,i)=>m.rReal>0?i:l,0);selectedMonths=new Set([lr]);buildMonthFilter();render()}
 
 function destroyChart(id){if(charts[id]){charts[id].destroy();delete charts[id]}}
-function makeBarChart(id,labels,datasets,horizontal=false,stacked=false){
+function makeBarChart(id,labels,datasets,horizontal,stacked){
+  horizontal=horizontal||false;stacked=stacked||false;
   destroyChart(id);
   const ctx=document.getElementById(id);if(!ctx)return;
   charts[id]=new Chart(ctx.getContext('2d'),{type:'bar',data:{labels,datasets},options:{indexAxis:horizontal?'y':'x',responsive:true,maintainAspectRatio:false,
@@ -273,70 +275,67 @@ function makeLineChart(id,labels,datasets){
 function render(){
   const co=DATA[current];if(!co)return;
   ['chartReceita','chartResultado','chartDespesas','chartCanais'].forEach(destroyChart);
-  const allMonths=co.months||[];
-  const months=allMonths.filter((_,i)=>selectedMonths.has(i));
-  if(months.length===0)return;
+  const months=(co.months||[]).filter((_,i)=>selectedMonths.has(i));
+  if(!months.length)return;
   const color=co.color;
   const totRR=months.reduce((s,m)=>s+m.rReal,0),totRP=months.reduce((s,m)=>s+m.rPrev,0);
   const totDR=months.reduce((s,m)=>s+m.dReal,0),totDP=months.reduce((s,m)=>s+m.dPrev,0);
   const totResR=months.reduce((s,m)=>s+m.resReal,0),totResP=months.reduce((s,m)=>s+m.resPrev,0);
   const dRec=pct(totRR,totRP),dDesp=pct(totDR,totDP),dRes=pct(totResR,totResP);
-  document.getElementById('kpis').innerHTML=`
-    <div class="kpi"><div class="kpi-label">Receita Realizada</div><div class="kpi-value pos">${fmt(totRR)}</div><div class="kpi-delta ${dRec>=0?'pos':'neg'}">${dRec>=0?'▲':'▼'} ${Math.abs(dRec).toFixed(1)}% vs previsto</div></div>
-    <div class="kpi"><div class="kpi-label">Despesas Realizadas</div><div class="kpi-value ${totDR>totDP?'neg':'neutral'}">${fmt(totDR)}</div><div class="kpi-delta ${dDesp<=0?'pos':'neg'}">${dDesp>=0?'▲':'▼'} ${Math.abs(dDesp).toFixed(1)}% vs previsto</div></div>
-    <div class="kpi"><div class="kpi-label">Resultado Realizado</div><div class="kpi-value ${totResR>=0?'pos':'neg'}">${fmt(totResR)}</div><div class="kpi-delta ${dRes>=0?'pos':'neg'}">${dRes>=0?'▲':'▼'} ${Math.abs(dRes).toFixed(1)}% vs previsto</div></div>
-    <div class="kpi"><div class="kpi-label">Receita Prevista</div><div class="kpi-value dim">${fmt(totRP)}</div></div>
-    <div class="kpi"><div class="kpi-label">Resultado Previsto</div><div class="kpi-value dim">${fmt(totResP)}</div></div>`;
+  document.getElementById('kpis').innerHTML=
+    '<div class="kpi"><div class="kpi-label">Receita Realizada</div><div class="kpi-value pos">'+fmt(totRR)+'</div><div class="kpi-delta '+(dRec>=0?'pos':'neg')+'">'+(dRec>=0?'▲':'▼')+' '+Math.abs(dRec).toFixed(1)+'% vs previsto</div></div>'+
+    '<div class="kpi"><div class="kpi-label">Despesas Realizadas</div><div class="kpi-value '+(totDR>totDP?'neg':'neutral')+'">'+fmt(totDR)+'</div><div class="kpi-delta '+(dDesp<=0?'pos':'neg')+'">'+(dDesp>=0?'▲':'▼')+' '+Math.abs(dDesp).toFixed(1)+'% vs previsto</div></div>'+
+    '<div class="kpi"><div class="kpi-label">Resultado Realizado</div><div class="kpi-value '+(totResR>=0?'pos':'neg')+'">'+fmt(totResR)+'</div><div class="kpi-delta '+(dRes>=0?'pos':'neg')+'">'+(dRes>=0?'▲':'▼')+' '+Math.abs(dRes).toFixed(1)+'% vs previsto</div></div>'+
+    '<div class="kpi"><div class="kpi-label">Receita Prevista</div><div class="kpi-value dim">'+fmt(totRP)+'</div></div>'+
+    '<div class="kpi"><div class="kpi-label">Resultado Previsto</div><div class="kpi-value dim">'+fmt(totResP)+'</div></div>';
   const meses=months.map(m=>m.mes);
   makeBarChart('chartReceita',meses,[{label:'Previsto',data:months.map(m=>m.rPrev),backgroundColor:'rgba(255,255,255,.1)',borderRadius:4},{label:'Realizado',data:months.map(m=>m.rReal),backgroundColor:color,borderRadius:4}]);
   makeBarChart('chartResultado',meses,[{label:'Previsto',data:months.map(m=>m.resPrev),backgroundColor:'rgba(255,255,255,.1)',borderRadius:4},{label:'Realizado',data:months.map(m=>m.resReal),backgroundColor:months.map(m=>m.resReal>=0?color:'#FF6B6B'),borderRadius:4}]);
-  const cats={'Matéria Prima':['dMateriaPrev','dMateriaReal'],'Taxas Plataforma':['dTaxasPrev','dTaxasReal'],'Cancelamentos':['dCancelPrev','dCancelReal'],'Impostos':['dImpostosPrev','dImpostosReal'],'Pessoal':['dPessoalPrev','dPessoalReal'],'Marketing':['dMarketingPrev','dMarketingReal'],'Financiamentos':['dFinancPrev','dFinancReal']};
+  const cats={'Materia Prima':['dMateriaPrev','dMateriaReal'],'Taxas Plataforma':['dTaxasPrev','dTaxasReal'],'Cancelamentos':['dCancelPrev','dCancelReal'],'Impostos':['dImpostosPrev','dImpostosReal'],'Pessoal':['dPessoalPrev','dPessoalReal'],'Marketing':['dMarketingPrev','dMarketingReal'],'Financiamentos':['dFinancPrev','dFinancReal']};
   const desp=Object.entries(cats).map(([cat,[fp,fr]])=>({cat,prev:months.reduce((s,m)=>s+(m[fp]||0),0),real:months.reduce((s,m)=>s+(m[fr]||0),0)})).filter(d=>d.prev>0||d.real>0);
   makeBarChart('chartDespesas',desp.map(d=>d.cat),[{label:'Previsto',data:desp.map(d=>d.prev),backgroundColor:'rgba(255,255,255,.1)',borderRadius:4},{label:'Realizado',data:desp.map(d=>d.real),backgroundColor:co.accent,borderRadius:4}],true);
   const cmap={};months.forEach(m=>{if(!m.canais)return;for(const[cn,cv]of Object.entries(m.canais)){if(!cmap[cn])cmap[cn]={prev:0,real:0};cmap[cn].prev+=cv.prev||0;cmap[cn].real+=cv.real||0}});
   const canais=Object.entries(cmap).map(([canal,v])=>({canal,...v})).filter(c=>c.prev>0||c.real>0);
   makeBarChart('chartCanais',canais.map(c=>c.canal),[{label:'Previsto',data:canais.map(c=>c.prev),backgroundColor:'rgba(255,255,255,.1)',borderRadius:4},{label:'Realizado',data:canais.map(c=>c.real),backgroundColor:color,borderRadius:4}]);
-  const cols=['Mês','Rec. Prevista','Rec. Realizada','Δ Receita','Desp. Prev.','Desp. Real.','Δ Despesas','Res. Previsto','Res. Realizado'];
-  let html='<thead><tr>'+cols.map(c=>`<th>${c}</th>`).join('')+'</tr></thead><tbody>';
-  let[srp,srr,sdp,sdr,srrp,srrr]=[0,0,0,0,0,0];
+  let html='<thead><tr><th>Mes</th><th>Rec. Prevista</th><th>Rec. Realizada</th><th>Delta Receita</th><th>Desp. Prev.</th><th>Desp. Real.</th><th>Delta Despesas</th><th>Res. Previsto</th><th>Res. Realizado</th></tr></thead><tbody>';
+  let srp=0,srr=0,sdp=0,sdr=0,srrp=0,srrr=0;
   months.forEach(m=>{srp+=m.rPrev;srr+=m.rReal;sdp+=m.dPrev;sdr+=m.dReal;srrp+=m.resPrev;srrr+=m.resReal;const dr=pct(m.rReal,m.rPrev),dd=pct(m.dReal,m.dPrev);
-    html+=`<tr><td>${m.mes}/26</td><td class="dim">${fmt(m.rPrev)}</td><td class="neutral">${fmt(m.rReal)}</td><td class="${dr>=0?'pos':'neg'}">${fmtP(dr)}</td><td class="dim">${fmt(m.dPrev)}</td><td class="neutral">${fmt(m.dReal)}</td><td class="${dd<=0?'pos':'neg'}">${fmtP(dd)}</td><td class="dim">${fmt(m.resPrev)}</td><td class="${m.resReal>=0?'pos':'neg'}">${fmt(m.resReal)}</td></tr>`;
+    html+='<tr><td>'+m.mes+'/26</td><td class="dim">'+fmt(m.rPrev)+'</td><td class="neutral">'+fmt(m.rReal)+'</td><td class="'+(dr>=0?'pos':'neg')+'">'+fmtP(dr)+'</td><td class="dim">'+fmt(m.dPrev)+'</td><td class="neutral">'+fmt(m.dReal)+'</td><td class="'+(dd<=0?'pos':'neg')+'">'+fmtP(dd)+'</td><td class="dim">'+fmt(m.resPrev)+'</td><td class="'+(m.resReal>=0?'pos':'neg')+'">'+fmt(m.resReal)+'</td></tr>';
   });
   const tdr=pct(srr,srp),tdd=pct(sdr,sdp);
-  html+=`<tr class="total-row"><td>TOTAL</td><td class="dim">${fmt(srp)}</td><td class="neutral">${fmt(srr)}</td><td class="${tdr>=0?'pos':'neg'}">${fmtP(tdr)}</td><td class="dim">${fmt(sdp)}</td><td class="neutral">${fmt(sdr)}</td><td class="${tdd<=0?'pos':'neg'}">${fmtP(tdd)}</td><td class="dim">${fmt(srrp)}</td><td class="${srrr>=0?'pos':'neg'}">${fmt(srrr)}</td></tr></tbody>`;
+  html+='<tr class="total-row"><td>TOTAL</td><td class="dim">'+fmt(srp)+'</td><td class="neutral">'+fmt(srr)+'</td><td class="'+(tdr>=0?'pos':'neg')+'">'+fmtP(tdr)+'</td><td class="dim">'+fmt(sdp)+'</td><td class="neutral">'+fmt(sdr)+'</td><td class="'+(tdd<=0?'pos':'neg')+'">'+fmtP(tdd)+'</td><td class="dim">'+fmt(srrp)+'</td><td class="'+(srrr>=0?'pos':'neg')+'">'+fmt(srrr)+'</td></tr></tbody>';
   document.getElementById('tbl').innerHTML=html;
   renderMargemGer(months,'ger-margem-grid','ger-insights');
 }
 
 const DRE_COR={'VIP':'#00C9A7','VIDAL':'#6C63FF','GRUPO':'#F5A623'};
 const DRE_LINHAS=[
-  {campo:'recBruta',   label:'Receita Bruta de Vendas',              tipo:'normal', secao:'RECEITA'},
-  {campo:'devol',      label:'(-) Devoluções e Cancelamentos',        tipo:'deducao'},
-  {campo:'impostos',   label:'(-) Impostos sobre Vendas',             tipo:'deducao'},
-  {campo:'recLiq',     label:'= Receita Líquida',                     tipo:'resultado'},
-  {campo:'cmv',        label:'(-) Custo de Mercadoria Vendida (CMV)', tipo:'deducao', secao:'CUSTOS'},
-  {campo:'lucroBruto', label:'= Lucro Bruto',                         tipo:'resultado'},
-  {campo:'dPessoal',   label:'(-) Despesas de Pessoal',               tipo:'deducao', secao:'DESPESAS OPERACIONAIS'},
-  {campo:'dMarketing', label:'(-) Despesas de Marketing',             tipo:'deducao'},
-  {campo:'dTaxas',     label:'(-) Taxas de Plataforma',               tipo:'deducao'},
-  {campo:'dFinanc',    label:'(-) Despesas Financeiras',              tipo:'deducao'},
-  {campo:'dOutras',    label:'(-) Outras Despesas Operacionais',      tipo:'deducao'},
-  {campo:'ebitda',     label:'= EBITDA',                              tipo:'resultado'},
-  {campo:'deprec',     label:'(-) Depreciação / Amortização',         tipo:'deducao', secao:'RESULTADO FINAL'},
-  {campo:'ebit',       label:'= EBIT',                                tipo:'resultado'},
-  {campo:'lucroLiq',   label:'= Lucro Líquido',                       tipo:'lucro'},
+  {campo:'recBruta',label:'Receita Bruta de Vendas',tipo:'normal',secao:'RECEITA'},
+  {campo:'devol',label:'(-) Devolucoes e Cancelamentos',tipo:'deducao'},
+  {campo:'impostos',label:'(-) Impostos sobre Vendas',tipo:'deducao'},
+  {campo:'recLiq',label:'= Receita Liquida',tipo:'resultado'},
+  {campo:'cmv',label:'(-) Custo de Mercadoria Vendida (CMV)',tipo:'deducao',secao:'CUSTOS'},
+  {campo:'lucroBruto',label:'= Lucro Bruto',tipo:'resultado'},
+  {campo:'dPessoal',label:'(-) Despesas de Pessoal',tipo:'deducao',secao:'DESPESAS OPERACIONAIS'},
+  {campo:'dMarketing',label:'(-) Despesas de Marketing',tipo:'deducao'},
+  {campo:'dTaxas',label:'(-) Taxas de Plataforma',tipo:'deducao'},
+  {campo:'dFinanc',label:'(-) Despesas Financeiras',tipo:'deducao'},
+  {campo:'dOutras',label:'(-) Outras Despesas Operacionais',tipo:'deducao'},
+  {campo:'ebitda',label:'= EBITDA',tipo:'resultado'},
+  {campo:'deprec',label:'(-) Depreciacao / Amortizacao',tipo:'deducao',secao:'RESULTADO FINAL'},
+  {campo:'ebit',label:'= EBIT',tipo:'resultado'},
+  {campo:'lucroLiq',label:'= Lucro Liquido',tipo:'lucro'},
 ];
 
 function setDreEmp(key){
   if(!DRE)return; dreCurrent=key;
   document.querySelectorAll('#page-dre .tab').forEach((t,i)=>{t.className='tab';if(['VIP','VIDAL','GRUPO'][i]===key)t.classList.add('active-'+key.toLowerCase())});
-  const meses=DRE[key]||[];
-  dreSelected=new Set(meses.map((_,i)=>i));
+  dreSelected=new Set((DRE[key]||[]).map((_,i)=>i));
   buildDreFilter(); renderDre();
 }
 function buildDreFilter(){
   const meses=DRE[dreCurrent]||[];
-  document.getElementById('dre-mes-btns').innerHTML=meses.map((m,i)=>`<button class="mes-btn ${dreSelected.has(i)?'ativo-dre':''}" onclick="toggleDreMonth(${i})">${m.mes}</button>`).join('');
+  document.getElementById('dre-mes-btns').innerHTML=meses.map((m,i)=>'<button class="mes-btn '+(dreSelected.has(i)?'ativo-dre':'')+'" onclick="toggleDreMonth('+i+')">'+m.mes+'</button>').join('');
 }
 function toggleDreMonth(i){if(dreSelected.has(i)){if(dreSelected.size===1)return;dreSelected.delete(i)}else dreSelected.add(i);buildDreFilter();renderDre()}
 function dreSelectAll(){dreSelected=new Set((DRE[dreCurrent]||[]).map((_,i)=>i));buildDreFilter();renderDre()}
@@ -346,45 +345,78 @@ function renderDre(){
   if(!DRE)return;
   ['chartDreReceita','chartDreLucro'].forEach(destroyChart);
   const meses=(DRE[dreCurrent]||[]).filter((_,i)=>dreSelected.has(i));
-  if(meses.length===0)return;
+  if(!meses.length)return;
   const cor=DRE_COR[dreCurrent]||'#a78bfa';
   const labels=meses.map(m=>m.mes);
   const tot={};
-  DRE_LINHAS.forEach(l=>{tot[l.campo]=meses.reduce((s,m)=>s+(m[l.campo]||0),0);});
-  const margBruta=tot.recLiq>0?(tot.lucroBruto/tot.recLiq*100):0;
-  const margLiq=tot.recLiq>0?(tot.lucroLiq/tot.recLiq*100):0;
-  const margEbitda=tot.recLiq>0?(tot.ebitda/tot.recLiq*100):0;
-  document.getElementById('dre-kpis').innerHTML=`
-    <div class="kpi kpi-dre"><div class="kpi-label">Receita Líquida</div><div class="kpi-value purple">${fmt(tot.recLiq)}</div><div class="kpi-delta dim">Acumulado período</div></div>
-    <div class="kpi kpi-dre"><div class="kpi-label">Lucro Bruto</div><div class="kpi-value ${tot.lucroBruto>=0?'pos':'neg'}">${fmt(tot.lucroBruto)}</div><div class="kpi-delta dim">Margem ${margBruta.toFixed(1)}%</div></div>
-    <div class="kpi kpi-dre"><div class="kpi-label">EBITDA</div><div class="kpi-value ${tot.ebitda>=0?'pos':'neg'}">${fmt(tot.ebitda)}</div><div class="kpi-delta dim">Margem ${margEbitda.toFixed(1)}%</div></div>
-    <div class="kpi kpi-dre"><div class="kpi-label">Lucro Líquido</div><div class="kpi-value ${tot.lucroLiq>=0?'pos':'neg'}">${fmt(tot.lucroLiq)}</div><div class="kpi-delta dim">Margem ${margLiq.toFixed(1)}%</div></div>`;
+  DRE_LINHAS.forEach(l=>{tot[l.campo]=meses.reduce((s,m)=>s+(m[l.campo]||0),0)});
+  const mB=tot.recLiq>0?(tot.lucroBruto/tot.recLiq*100):0;
+  const mL=tot.recLiq>0?(tot.lucroLiq/tot.recLiq*100):0;
+  const mE=tot.recLiq>0?(tot.ebitda/tot.recLiq*100):0;
+  document.getElementById('dre-kpis').innerHTML=
+    '<div class="kpi kpi-dre"><div class="kpi-label">Receita Liquida</div><div class="kpi-value purple">'+fmt(tot.recLiq)+'</div><div class="kpi-delta dim">Acumulado periodo</div></div>'+
+    '<div class="kpi kpi-dre"><div class="kpi-label">Lucro Bruto</div><div class="kpi-value '+(tot.lucroBruto>=0?'pos':'neg')+'">'+fmt(tot.lucroBruto)+'</div><div class="kpi-delta dim">Margem '+mB.toFixed(1)+'%</div></div>'+
+    '<div class="kpi kpi-dre"><div class="kpi-label">EBITDA</div><div class="kpi-value '+(tot.ebitda>=0?'pos':'neg')+'">'+fmt(tot.ebitda)+'</div><div class="kpi-delta dim">Margem '+mE.toFixed(1)+'%</div></div>'+
+    '<div class="kpi kpi-dre"><div class="kpi-label">Lucro Liquido</div><div class="kpi-value '+(tot.lucroLiq>=0?'pos':'neg')+'">'+fmt(tot.lucroLiq)+'</div><div class="kpi-delta dim">Margem '+mL.toFixed(1)+'%</div></div>';
   makeLineChart('chartDreReceita',labels,[
-    {label:'Receita Líquida',data:meses.map(m=>m.recLiq),borderColor:cor,backgroundColor:cor+'26',fill:true,tension:.3,pointRadius:4},
-    {label:'Lucro Bruto',data:meses.map(m=>m.lucroBruto),borderColor:'#38bdf8',backgroundColor:'transparent',tension:.3,pointRadius:4},
+    {label:'Receita Liquida',data:meses.map(m=>m.recLiq),borderColor:cor,backgroundColor:cor+'26',fill:true,tension:.3,pointRadius:4},
+    {label:'Lucro Bruto',data:meses.map(m=>m.lucroBruto),borderColor:'#38bdf8',backgroundColor:'transparent',tension:.3,pointRadius:4}
   ]);
   makeLineChart('chartDreLucro',labels,[
     {label:'EBITDA',data:meses.map(m=>m.ebitda),borderColor:'#F5A623',backgroundColor:'rgba(245,166,35,.15)',fill:true,tension:.3,pointRadius:4},
-    {label:'Lucro Líquido',data:meses.map(m=>m.lucroLiq),borderColor:cor,backgroundColor:'transparent',tension:.3,pointRadius:4},
+    {label:'Lucro Liquido',data:meses.map(m=>m.lucroLiq),borderColor:cor,backgroundColor:'transparent',tension:.3,pointRadius:4}
   ]);
-  const colMeses=meses.map(m=>m.mes+'/26');
-  let html='<thead><tr><th>Descrição</th>'+colMeses.map(m=>`<th>${m}</th>`).join('')+'<th>TOTAL</th></tr></thead><tbody>';
-  DRE_LINHAS.forEach(linha=>{
-    if(linha.secao){const span=colMeses.length+2;html+=`<tr class="dre-section"><td colspan="${span}">${linha.secao}</td></tr>`;}
-    const vals=meses.map(m=>m[linha.campo]||0);
+  const cols=meses.map(m=>m.mes+'/26');
+  let html='<thead><tr><th>Descricao</th>'+cols.map(m=>'<th>'+m+'</th>').join('')+'<th>TOTAL</th></tr></thead><tbody>';
+  DRE_LINHAS.forEach(l=>{
+    if(l.secao)html+='<tr class="dre-section"><td colspan="'+(cols.length+2)+'">'+l.secao+'</td></tr>';
+    const vals=meses.map(m=>m[l.campo]||0);
     const total=vals.reduce((s,v)=>s+v,0);
-    let rowCls='',valCls='neutral';
-    if(linha.tipo==='resultado'){rowCls='dre-result';valCls='purple';}
-    else if(linha.tipo==='lucro'){rowCls='dre-result';valCls=total>=0?'pos':'neg';}
-    else if(linha.tipo==='deducao'){valCls='dim';}
-    html+=`<tr class="${rowCls}"><td>${linha.label}</td>`;
-    vals.forEach(v=>{let vc=valCls;if(linha.tipo==='resultado'||linha.tipo==='lucro')vc=v>=0?'pos':'neg';html+=`<td class="${vc}">${fmtM(v)}</td>`;});
-    let tc=valCls;if(linha.tipo==='resultado'||linha.tipo==='lucro')tc=total>=0?'pos':'neg';
-    html+=`<td class="${tc}">${fmtM(total)}</td></tr>`;
+    let rc='',vc='neutral';
+    if(l.tipo==='resultado'){rc='dre-result';vc='purple';}
+    else if(l.tipo==='lucro'){rc='dre-result';vc=total>=0?'pos':'neg';}
+    else if(l.tipo==='deducao'){vc='dim';}
+    html+='<tr class="'+rc+'"><td>'+l.label+'</td>';
+    vals.forEach(v=>{let c=vc;if(l.tipo==='resultado'||l.tipo==='lucro')c=v>=0?'pos':'neg';html+='<td class="'+c+'">'+fmtM(v)+'</td>'});
+    let tc=vc;if(l.tipo==='resultado'||l.tipo==='lucro')tc=total>=0?'pos':'neg';
+    html+='<td class="'+tc+'">'+fmtM(total)+'</td></tr>';
   });
-  html+='</tbody>';
-  document.getElementById('dre-tbl').innerHTML=html;
+  document.getElementById('dre-tbl').innerHTML=html+'</tbody>';
   renderMargemDre(meses,'dre-margem-grid','dre-insights');
+}
+
+function renderCustos(){
+  if(!CUSTOS||!CUSTOS.fixo)return;
+  const c=CUSTOS;
+  const totalGeral=c.total_fixo+c.total_variavel;
+  const pF=totalGeral>0?(c.total_fixo/totalGeral*100):0;
+  const pV=totalGeral>0?(c.total_variavel/totalGeral*100):0;
+  document.getElementById('custos-kpis').innerHTML=
+    '<div class="kpi kpi-dre"><div class="kpi-label">Total Custos Fixos</div><div class="kpi-value warn">'+fmt(c.total_fixo)+'</div><div class="kpi-delta dim">'+pF.toFixed(1)+'% do total</div></div>'+
+    '<div class="kpi kpi-apagar"><div class="kpi-label">Total Custos Variaveis</div><div class="kpi-value neg">'+fmt(c.total_variavel)+'</div><div class="kpi-delta dim">'+pV.toFixed(1)+'% do total</div></div>'+
+    '<div class="kpi"><div class="kpi-label">Total Geral de Custos</div><div class="kpi-value neutral">'+fmt(totalGeral)+'</div><div class="kpi-delta dim">'+(c.fixo.length+c.variavel.length)+' itens no total</div></div>';
+  const cores=['#00C9A7','#6C63FF','#F5A623','#FF6B6B','#38bdf8','#a78bfa','#f472b6','#34d399','#fb923c','#60a5fa'];
+  ['chartCustosFixo','chartCustosVar'].forEach(destroyChart);
+  const ctxF=document.getElementById('chartCustosFixo');
+  if(ctxF&&c.fixo.length){
+    charts['chartCustosFixo']=new Chart(ctxF.getContext('2d'),{type:'doughnut',
+      data:{labels:c.fixo.map(i=>i.origem),datasets:[{data:c.fixo.map(i=>i.valor),backgroundColor:cores,borderWidth:2,borderColor:'#0d0d1a'}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#888',font:{size:11},boxWidth:12}},tooltip:{callbacks:{label:i=>i.label+': '+fmt(i.raw)}}}}});
+  }
+  const ctxV=document.getElementById('chartCustosVar');
+  if(ctxV&&c.variavel.length){
+    charts['chartCustosVar']=new Chart(ctxV.getContext('2d'),{type:'doughnut',
+      data:{labels:c.variavel.map(i=>i.origem),datasets:[{data:c.variavel.map(i=>i.valor),backgroundColor:cores,borderWidth:2,borderColor:'#0d0d1a'}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#888',font:{size:11},boxWidth:12}},tooltip:{callbacks:{label:i=>i.label+': '+fmt(i.raw)}}}}});
+  }
+  let hF='<thead><tr><th>Origem</th><th>Valor</th><th>Percentual</th></tr></thead><tbody>';
+  c.fixo.forEach(i=>{const p=c.total_fixo>0?(i.valor/c.total_fixo*100):0;hF+='<tr><td>'+i.origem+'</td><td class="warn">'+fmt(i.valor)+'</td><td class="dim">'+p.toFixed(1)+'%</td></tr>'});
+  hF+='<tr class="total-row"><td>TOTAL FIXO</td><td class="warn">'+fmt(c.total_fixo)+'</td><td class="dim">100%</td></tr></tbody>';
+  document.getElementById('tbl-custos-fixo').innerHTML=hF;
+  let hV='<thead><tr><th>Origem</th><th>Valor</th><th>Percentual</th></tr></thead><tbody>';
+  c.variavel.forEach(i=>{const p=c.total_variavel>0?(i.valor/c.total_variavel*100):0;hV+='<tr><td>'+i.origem+'</td><td class="neg">'+fmt(i.valor)+'</td><td class="dim">'+p.toFixed(1)+'%</td></tr>'});
+  hV+='<tr class="total-row"><td>TOTAL VARIAVEL</td><td class="neg">'+fmt(c.total_variavel)+'</td><td class="dim">100%</td></tr></tbody>';
+  document.getElementById('tbl-custos-var').innerHTML=hV;
 }
 
 function setFinEmp(key){
@@ -394,28 +426,26 @@ function setFinEmp(key){
   buildFinFilter(); renderFin();
 }
 function buildFinFilter(){
-  document.getElementById('fin-mes-btns').innerHTML=FINANCEIRO.map((m,i)=>`<button class="mes-btn ${finSelected.has(i)?'ativo-fin':''}" onclick="toggleFinMonth(${i})">${m.mes}</button>`).join('');
+  document.getElementById('fin-mes-btns').innerHTML=FINANCEIRO.map((m,i)=>'<button class="mes-btn '+(finSelected.has(i)?'ativo-fin':'')+'" onclick="toggleFinMonth('+i+')">'+m.mes+'</button>').join('');
 }
 function toggleFinMonth(i){if(finSelected.has(i)){if(finSelected.size===1)return;finSelected.delete(i)}else finSelected.add(i);buildFinFilter();renderFin()}
 function finSelectAll(){finSelected=new Set(FINANCEIRO.map((_,i)=>i));buildFinFilter();renderFin()}
 function finClear(){finSelected=new Set([FINANCEIRO.length-1]);buildFinFilter();renderFin()}
 
 function renderFin(){
-  if(!FINANCEIRO||FINANCEIRO.length===0)return;
+  if(!FINANCEIRO||!FINANCEIRO.length)return;
   ['chartPagas','chartAPagar'].forEach(destroyChart);
   const rows=FINANCEIRO.filter((_,i)=>finSelected.has(i));
-  if(rows.length===0)return;
-  const emp=finCurrent;
+  if(!rows.length)return;
+  const emp=finCurrent,pfx=emp==='GRUPO'?'grupo':emp.toLowerCase();
   const meses=rows.map(m=>m.mes);
-  const pfx=emp==='GRUPO'?'grupo':emp.toLowerCase();
-  const totalPago=rows.reduce((s,m)=>s+(m['pagas_'+pfx]||0),0);
-  const totalAPagar=rows.reduce((s,m)=>s+(m['pagar_'+pfx]||0),0);
-  const totalGeral=totalPago+totalAPagar;
-  document.getElementById('fin-kpis').innerHTML=`
-    <div class="kpi kpi-pago"><div class="kpi-label">✅ Total Pago · ${emp==='GRUPO'?'Grupo':emp}</div><div class="kpi-value pos">${fmt(totalPago)}</div><div class="kpi-delta dim">Contas pagas no período</div></div>
-    <div class="kpi kpi-apagar"><div class="kpi-label">🔴 Total a Pagar · ${emp==='GRUPO'?'Grupo':emp}</div><div class="kpi-value neg">${fmt(totalAPagar)}</div><div class="kpi-delta dim">Contas em aberto no período</div></div>
-    <div class="kpi"><div class="kpi-label">📊 Total Geral · ${emp==='GRUPO'?'Grupo':emp}</div><div class="kpi-value warn">${fmt(totalGeral)}</div><div class="kpi-delta dim">Pagas + A pagar</div></div>
-    <div class="kpi"><div class="kpi-label">Meses Selecionados</div><div class="kpi-value neutral">${rows.length}</div><div class="kpi-delta dim">${rows.map(m=>m.mes).join(', ')}</div></div>`;
+  const tP=rows.reduce((s,m)=>s+(m['pagas_'+pfx]||0),0);
+  const tA=rows.reduce((s,m)=>s+(m['pagar_'+pfx]||0),0);
+  document.getElementById('fin-kpis').innerHTML=
+    '<div class="kpi kpi-pago"><div class="kpi-label">Total Pago</div><div class="kpi-value pos">'+fmt(tP)+'</div><div class="kpi-delta dim">Contas pagas no periodo</div></div>'+
+    '<div class="kpi kpi-apagar"><div class="kpi-label">Total a Pagar</div><div class="kpi-value neg">'+fmt(tA)+'</div><div class="kpi-delta dim">Contas em aberto</div></div>'+
+    '<div class="kpi"><div class="kpi-label">Total Geral</div><div class="kpi-value warn">'+fmt(tP+tA)+'</div><div class="kpi-delta dim">Pagas + A pagar</div></div>'+
+    '<div class="kpi"><div class="kpi-label">Meses</div><div class="kpi-value neutral">'+rows.length+'</div><div class="kpi-delta dim">'+rows.map(m=>m.mes).join(', ')+'</div></div>';
   if(emp==='GRUPO'){
     makeBarChart('chartPagas',meses,[{label:'VIP Pago',data:rows.map(m=>m.pagas_vip),backgroundColor:'#00C9A7',borderRadius:3},{label:'VIDAL Pago',data:rows.map(m=>m.pagas_vidal),backgroundColor:'#6C63FF',borderRadius:3}],false,true);
     makeBarChart('chartAPagar',meses,[{label:'VIP a Pagar',data:rows.map(m=>m.pagar_vip),backgroundColor:'rgba(0,201,167,.5)',borderRadius:3},{label:'VIDAL a Pagar',data:rows.map(m=>m.pagar_vidal),backgroundColor:'rgba(108,99,255,.5)',borderRadius:3}],false,true);
@@ -426,128 +456,70 @@ function renderFin(){
   }
   let html;
   if(emp==='GRUPO'){
-    html='<thead><tr><th>Mês</th><th class="th-pago">Pago VIP</th><th class="th-pago">Pago VIDAL</th><th class="th-pago">Total Pago</th><th class="th-apagar">A Pagar VIP</th><th class="th-apagar">A Pagar VIDAL</th><th class="th-apagar">Total A Pagar</th><th>Total Geral</th></tr></thead><tbody>';
-    let[spv,spvid,sapv,sapvid]=[0,0,0,0];
+    html='<thead><tr><th>Mes</th><th class="th-pago">Pago VIP</th><th class="th-pago">Pago VIDAL</th><th class="th-pago">Total Pago</th><th class="th-apagar">A Pagar VIP</th><th class="th-apagar">A Pagar VIDAL</th><th class="th-apagar">Total A Pagar</th><th>Total Geral</th></tr></thead><tbody>';
+    let spv=0,spvid=0,sapv=0,sapvid=0;
     rows.forEach(m=>{spv+=m.pagas_vip||0;spvid+=m.pagas_vidal||0;sapv+=m.pagar_vip||0;sapvid+=m.pagar_vidal||0;
       const tp=(m.pagas_vip||0)+(m.pagas_vidal||0),ta=(m.pagar_vip||0)+(m.pagar_vidal||0);
-      html+=`<tr><td>${m.mes}/26</td><td class="${m.pagas_vip>0?'pos':'dim'}">${fmt(m.pagas_vip||0)}</td><td class="${m.pagas_vidal>0?'pos':'dim'}">${fmt(m.pagas_vidal||0)}</td><td class="pos">${fmt(tp)}</td><td class="${m.pagar_vip>0?'neg':'dim'}">${fmt(m.pagar_vip||0)}</td><td class="${m.pagar_vidal>0?'neg':'dim'}">${fmt(m.pagar_vidal||0)}</td><td class="neg">${fmt(ta)}</td><td class="warn">${fmt(tp+ta)}</td></tr>`;
+      html+='<tr><td>'+m.mes+'</td><td class="'+(m.pagas_vip>0?'pos':'dim')+'">'+fmt(m.pagas_vip||0)+'</td><td class="'+(m.pagas_vidal>0?'pos':'dim')+'">'+fmt(m.pagas_vidal||0)+'</td><td class="pos">'+fmt(tp)+'</td><td class="'+(m.pagar_vip>0?'neg':'dim')+'">'+fmt(m.pagar_vip||0)+'</td><td class="'+(m.pagar_vidal>0?'neg':'dim')+'">'+fmt(m.pagar_vidal||0)+'</td><td class="neg">'+fmt(ta)+'</td><td class="warn">'+fmt(tp+ta)+'</td></tr>';
     });
-    const tp=spv+spvid,ta=sapv+sapvid;
-    html+=`<tr class="total-row"><td>TOTAL</td><td class="pos">${fmt(spv)}</td><td class="pos">${fmt(spvid)}</td><td class="pos">${fmt(tp)}</td><td class="neg">${fmt(sapv)}</td><td class="neg">${fmt(sapvid)}</td><td class="neg">${fmt(ta)}</td><td class="warn">${fmt(tp+ta)}</td></tr></tbody>`;
+    html+='<tr class="total-row"><td>TOTAL</td><td class="pos">'+fmt(spv)+'</td><td class="pos">'+fmt(spvid)+'</td><td class="pos">'+fmt(spv+spvid)+'</td><td class="neg">'+fmt(sapv)+'</td><td class="neg">'+fmt(sapvid)+'</td><td class="neg">'+fmt(sapv+sapvid)+'</td><td class="warn">'+fmt(spv+spvid+sapv+sapvid)+'</td></tr></tbody>';
   } else {
-    html='<thead><tr><th>Mês</th><th class="th-pago">Contas Pagas</th><th class="th-apagar">Contas a Pagar</th><th>Total</th></tr></thead><tbody>';
-    let[sp,sa]=[0,0];
-    rows.forEach(m=>{const pago=m['pagas_'+pfx]||0,apagar=m['pagar_'+pfx]||0;sp+=pago;sa+=apagar;
-      html+=`<tr><td>${m.mes}/26</td><td class="${pago>0?'pos':'dim'}">${fmt(pago)}</td><td class="${apagar>0?'neg':'dim'}">${fmt(apagar)}</td><td class="warn">${fmt(pago+apagar)}</td></tr>`;
+    html='<thead><tr><th>Mes</th><th class="th-pago">Contas Pagas</th><th class="th-apagar">Contas a Pagar</th><th>Total</th></tr></thead><tbody>';
+    let sp=0,sa=0;
+    rows.forEach(m=>{const pago=m['pagas_'+pfx]||0,ap=m['pagar_'+pfx]||0;sp+=pago;sa+=ap;
+      html+='<tr><td>'+m.mes+'</td><td class="'+(pago>0?'pos':'dim')+'">'+fmt(pago)+'</td><td class="'+(ap>0?'neg':'dim')+'">'+fmt(ap)+'</td><td class="warn">'+fmt(pago+ap)+'</td></tr>';
     });
-    html+=`<tr class="total-row"><td>TOTAL</td><td class="pos">${fmt(sp)}</td><td class="neg">${fmt(sa)}</td><td class="warn">${fmt(sp+sa)}</td></tr></tbody>`;
+    html+='<tr class="total-row"><td>TOTAL</td><td class="pos">'+fmt(sp)+'</td><td class="neg">'+fmt(sa)+'</td><td class="warn">'+fmt(sp+sa)+'</td></tr></tbody>';
   }
   document.getElementById('fin-tbl').innerHTML=html;
 }
 
 function margCard(mes,val,delta){
   const dCls=delta===null?'dim':delta>=0?'pos':'neg';
-  const dTxt=delta===null?'primeiro mês':fmtPP(delta)+' vs mês ant.';
+  const dTxt=delta===null?'primeiro mes':fmtPP(delta)+' vs mes ant.';
   const vCls=val>=15?'pos':val>=8?'warn':'neg';
-  return `<div class="margem-card"><div class="margem-card-mes">${mes}</div><div class="margem-card-val ${vCls}">${val.toFixed(1)}%</div><div class="margem-card-delta ${dCls}">${dTxt}</div></div>`;
+  return '<div class="margem-card"><div class="margem-card-mes">'+mes+'</div><div class="margem-card-val '+vCls+'">'+val.toFixed(1)+'%</div><div class="margem-card-delta '+dCls+'">'+dTxt+'</div></div>';
 }
-
-function gerarInsights(margens,nomeMargem){
+function gerarInsights(margens,nome){
   const items=[];
   if(margens.length>=2){
-    const first=margens[0].val,last=margens[margens.length-1].val,diff=last-first;
-    if(diff>=2) items.push({cls:'ok',icon:'✅',txt:`${nomeMargem} subiu ${fmtPP(diff)} de ${margens[0].mes} a ${margens[margens.length-1].mes} — tendência positiva.`});
-    else if(diff<=-2) items.push({cls:'bad',icon:'⚠️',txt:`${nomeMargem} caiu ${fmtPP(Math.abs(diff))} de ${margens[0].mes} a ${margens[margens.length-1].mes} — atenção.`});
-    else items.push({cls:'warn',icon:'➡️',txt:`${nomeMargem} estável no período: variação de ${fmtPP(Math.abs(diff))}.`});
+    const diff=margens[margens.length-1].val-margens[0].val;
+    if(diff>=2)items.push({cls:'ok',icon:'OK',txt:nome+' subiu '+fmtPP(diff)+' de '+margens[0].mes+' a '+margens[margens.length-1].mes});
+    else if(diff<=-2)items.push({cls:'bad',icon:'ATENCAO',txt:nome+' caiu '+fmtPP(Math.abs(diff))+' de '+margens[0].mes+' a '+margens[margens.length-1].mes});
+    else items.push({cls:'warn',icon:'ESTAVEL',txt:nome+' estavel no periodo: '+fmtPP(Math.abs(diff))});
   }
   if(margens.length>=2){
     const melhor=margens.reduce((a,b)=>a.val>b.val?a:b);
     const pior=margens.reduce((a,b)=>a.val<b.val?a:b);
-    items.push({cls:'ok',icon:'🏆',txt:`Melhor mês: ${melhor.mes} com ${nomeMargem} de ${melhor.val.toFixed(1)}%.`});
-    if(pior.mes!==melhor.mes) items.push({cls:pior.val<5?'bad':'warn',icon:pior.val<5?'🔴':'⚠️',txt:`Pior mês: ${pior.mes} com ${nomeMargem} de ${pior.val.toFixed(1)}%.`});
+    items.push({cls:'ok',icon:'TOP',txt:'Melhor mes: '+melhor.mes+' com '+nome+' de '+melhor.val.toFixed(1)+'%'});
+    if(pior.mes!==melhor.mes)items.push({cls:pior.val<5?'bad':'warn',icon:'BAIXO',txt:'Pior mes: '+pior.mes+' com '+nome+' de '+pior.val.toFixed(1)+'%'});
   }
   if(margens.length>=2){
-    const ult=margens[margens.length-1],ant=margens[margens.length-2],diff=ult.val-ant.val;
-    if(Math.abs(diff)>=1){
-      const cls=diff>=0?'ok':'bad',icon=diff>=0?'📈':'📉';
-      items.push({cls,icon,txt:`${ult.mes}: ${nomeMargem} ${diff>=0?'subiu':'caiu'} ${fmtPP(Math.abs(diff))} vs ${ant.mes}.`});
-    }
+    const ult=margens[margens.length-1],ant=margens[margens.length-2],d=ult.val-ant.val;
+    if(Math.abs(d)>=1)items.push({cls:d>=0?'ok':'bad',icon:d>=0?'SUBIU':'CAIU',txt:ult.mes+': '+nome+' '+(d>=0?'subiu':'caiu')+' '+fmtPP(Math.abs(d))+' vs '+ant.mes});
   }
   return items;
 }
-
-function renderInsights(insightsList,containerId){
-  const el=document.getElementById(containerId);if(!el)return;
-  if(!insightsList.length){el.innerHTML='<div class="dim" style="font-size:13px;padding:8px">Selecione mais de um mês para ver insights.</div>';return;}
-  el.innerHTML=insightsList.map(i=>`<div class="insight-item ${i.cls}"><span class="insight-icon">${i.icon}</span><span class="insight-text">${i.txt}</span></div>`).join('');
+function renderInsights(list,id){
+  const el=document.getElementById(id);if(!el)return;
+  if(!list.length){el.innerHTML='<div class="dim" style="font-size:13px;padding:8px">Selecione mais de um mes para ver insights.</div>';return;}
+  el.innerHTML=list.map(i=>'<div class="insight-item '+i.cls+'"><span class="insight-icon">'+i.icon+'</span><span class="insight-text">'+i.txt+'</span></div>').join('');
 }
-
 function renderMargemGer(months,gridId,insightId){
   const grid=document.getElementById(gridId);if(!grid)return;
   const margens=months.map(m=>({mes:m.mes,val:m.rReal>0?(m.resReal/m.rReal*100):0}));
   grid.innerHTML=margens.map((m,i)=>margCard(m.mes,m.val,i>0?m.val-margens[i-1].val:null)).join('');
   renderInsights(gerarInsights(margens,'Margem de Resultado'),insightId);
 }
-
 function renderMargemDre(meses,gridId,insightId){
   const grid=document.getElementById(gridId);if(!grid)return;
   const margens=meses.map(m=>({mes:m.mes,val:m.recLiq>0?(m.ebitda/m.recLiq*100):0}));
   grid.innerHTML=margens.map((m,i)=>margCard(m.mes,m.val,i>0?m.val-margens[i-1].val:null)).join('');
   const margensLiq=meses.map(m=>({mes:m.mes,val:m.recLiq>0?(m.lucroLiq/m.recLiq*100):0}));
-  renderInsights([...gerarInsights(margens,'Margem EBITDA'),...gerarInsights(margensLiq,'Margem Líquida')],insightId);
+  renderInsights(gerarInsights(margens,'Margem EBITDA').concat(gerarInsights(margensLiq,'Margem Liquida')),insightId);
 }
 
 loadData();
-
-function renderCustos(){
-  if(!window.CUSTOS)return;
-  const c=window.CUSTOS;
-  const totalGeral=c.total_fixo+c.total_variavel;
-  const pFixo=totalGeral>0?(c.total_fixo/totalGeral*100):0;
-  const pVar=totalGeral>0?(c.total_variavel/totalGeral*100):0;
-  const k1='<div class="kpi kpi-dre"><div class="kpi-label">Total Custos Fixos</div><div class="kpi-value warn">'+fmt(c.total_fixo)+'</div><div class="kpi-delta dim">'+pFixo.toFixed(1)+'% do total</div></div>';
-  const k2='<div class="kpi kpi-apagar"><div class="kpi-label">Total Custos Variáveis</div><div class="kpi-value neg">'+fmt(c.total_variavel)+'</div><div class="kpi-delta dim">'+pVar.toFixed(1)+'% do total</div></div>';
-  const k3='<div class="kpi"><div class="kpi-label">Total Geral de Custos</div><div class="kpi-value neutral">'+fmt(totalGeral)+'</div><div class="kpi-delta dim">'+(c.fixo.length+c.variavel.length)+' itens no total</div></div>';
-  document.getElementById('custos-kpis').innerHTML=k1+k2+k3;
-  const cores=['#00C9A7','#6C63FF','#F5A623','#FF6B6B','#38bdf8','#a78bfa','#f472b6','#34d399','#fb923c','#60a5fa'];
-  ['chartCustosFixo','chartCustosVar'].forEach(function(id){if(charts[id]){charts[id].destroy();delete charts[id]}});
-  const ctxF=document.getElementById('chartCustosFixo');
-  if(ctxF&&c.fixo.length){charts['chartCustosFixo']=new Chart(ctxF.getContext('2d'),{type:'doughnut',data:{labels:c.fixo.map(function(i){return i.origem}),datasets:[{data:c.fixo.map(function(i){return i.valor}),backgroundColor:cores,borderWidth:2,borderColor:'#0d0d1a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#888',font:{size:11},boxWidth:12}},tooltip:{callbacks:{label:function(i){return i.label+': '+fmt(i.raw)}}}}}});}
-  const ctxV=document.getElementById('chartCustosVar');
-  if(ctxV&&c.variavel.length){charts['chartCustosVar']=new Chart(ctxV.getContext('2d'),{type:'doughnut',data:{labels:c.variavel.map(function(i){return i.origem}),datasets:[{data:c.variavel.map(function(i){return i.valor}),backgroundColor:cores,borderWidth:2,borderColor:'#0d0d1a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#888',font:{size:11},boxWidth:12}},tooltip:{callbacks:{label:function(i){return i.label+': '+fmt(i.raw)}}}}}});}
-  var htmlF='<thead><tr><th>Origem</th><th>Valor</th><th>% do Fixo</th></tr></thead><tbody>';
-  c.fixo.forEach(function(i){var p=c.total_fixo>0?(i.valor/c.total_fixo*100):0;htmlF+='<tr><td>'+i.origem+'</td><td class="warn">'+fmt(i.valor)+'</td><td class="dim">'+p.toFixed(1)+'%</td></tr>';});
-  htmlF+='<tr class="total-row"><td>TOTAL FIXO</td><td class="warn">'+fmt(c.total_fixo)+'</td><td class="dim">100%</td></tr></tbody>';
-  document.getElementById('tbl-custos-fixo').innerHTML=htmlF;
-  var htmlV='<thead><tr><th>Origem</th><th>Valor</th><th>% do Variável</th></tr></thead><tbody>';
-  c.variavel.forEach(function(i){var p=c.total_variavel>0?(i.valor/c.total_variavel*100):0;htmlV+='<tr><td>'+i.origem+'</td><td class="neg">'+fmt(i.valor)+'</td><td class="dim">'+p.toFixed(1)+'%</td></tr>';});
-  htmlV+='<tr class="total-row"><td>TOTAL VARIÁVEL</td><td class="neg">'+fmt(c.total_variavel)+'</td><td class="dim">100%</td></tr></tbody>';
-  document.getElementById('tbl-custos-var').innerHTML=htmlV;
-}});
-  const ctxF=document.getElementById('chartCustosFixo');
-  if(ctxF&&c.fixo.length){
-    charts['chartCustosFixo']=new Chart(ctxF.getContext('2d'),{type:'doughnut',data:{labels:c.fixo.map(i=>i.origem),datasets:[{data:c.fixo.map(i=>i.valor),backgroundColor:cores,borderWidth:2,borderColor:'#0d0d1a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#888',font:{size:11},boxWidth:12}},tooltip:{callbacks:{label:i=>i.label+': '+fmt(i.raw)}}}}});
-  }
-  const ctxV=document.getElementById('chartCustosVar');
-  if(ctxV&&c.variavel.length){
-    charts['chartCustosVar']=new Chart(ctxV.getContext('2d'),{type:'doughnut',data:{labels:c.variavel.map(i=>i.origem),datasets:[{data:c.variavel.map(i=>i.valor),backgroundColor:cores,borderWidth:2,borderColor:'#0d0d1a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#888',font:{size:11},boxWidth:12}},tooltip:{callbacks:{label:i=>i.label+': '+fmt(i.raw)}}}}});
-  }
-  let htmlF='<thead><tr><th>Origem</th><th>Valor</th><th>% do Fixo</th></tr></thead><tbody>';
-  c.fixo.forEach(i=>{const p=c.total_fixo>0?(i.valor/c.total_fixo*100):0;htmlF+=<tr><td></td><td class='warn'></td><td class='dim'>%</td></tr>;});
-  htmlF+=<tr class='total-row'><td>TOTAL FIXO</td><td class='warn'></td><td class='dim'>100%</td></tr></tbody>;
-  document.getElementById('tbl-custos-fixo').innerHTML=htmlF;
-  let htmlV='<thead><tr><th>Origem</th><th>Valor</th><th>% do Variável</th></tr></thead><tbody>';
-  c.variavel.forEach(i=>{const p=c.total_variavel>0?(i.valor/c.total_variavel*100):0;htmlV+=<tr><td></td><td class='neg'></td><td class='dim'>%</td></tr>;});
-  htmlV+=<tr class='total-row'><td>TOTAL VARIÁVEL</td><td class='neg'></td><td class='dim'>100%</td></tr></tbody>;
-  document.getElementById('tbl-custos-var').innerHTML=htmlV;
-}
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
