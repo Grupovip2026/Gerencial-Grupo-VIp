@@ -239,19 +239,21 @@ def parse_custos(wb):
     ws = wb[aba]
     rows = list(ws.iter_rows(values_only=True))
     fixo, variavel = [], []
-    print('  [Custos DEBUG] primeiras linhas:')
-    for dbr in rows[3:7]: print('   ', list(dbr[:10]))
     for row in rows[4:]:
-        origem_f = str(row[2]).strip() if row[2] else None
-        valor_f = row[3]
-        if origem_f and origem_f.upper() not in ('ORIGEM', 'ORIGEM ') and valor_f:
-            v = float(valor_f) if valor_f else 0
-            if v != 0: fixo.append({'origem': origem_f, 'valor': v})
-        origem_v = str(row[7]).strip() if len(row) > 7 and row[7] else None
-        valor_v = row[8] if len(row) > 8 else None
-        if origem_v and origem_v.upper() not in ('ORIGEM', 'ORIGEM ') and valor_v:
-            v = float(valor_v) if valor_v else 0
-            if v != 0: variavel.append({'origem': origem_v, 'valor': v})
+        origem_f = str(row[1]).strip() if len(row) > 1 and row[1] else None
+        valor_f = row[2] if len(row) > 2 else None
+        if origem_f and origem_f.upper().strip() not in ('ORIGEM', 'VALOR ESTIMADO') and valor_f:
+            try:
+                v = float(valor_f)
+                if v != 0: fixo.append({'origem': origem_f, 'valor': v})
+            except: pass
+        origem_v = str(row[5]).strip() if len(row) > 5 and row[5] else None
+        valor_v = row[6] if len(row) > 6 else None
+        if origem_v and origem_v.upper().strip() not in ('ORIGEM', 'VALOR ESTIMADO') and valor_v:
+            try:
+                v = float(valor_v)
+                if v != 0: variavel.append({'origem': origem_v, 'valor': v})
+            except: pass
     total_fixo = sum(i['valor'] for i in fixo)
     total_variavel = sum(i['valor'] for i in variavel)
     print(f'  [Custos] fixo: {len(fixo)} itens | variavel: {len(variavel)} itens')
@@ -300,6 +302,8 @@ def build_json():
     print(f"OK {OUT_PATH} gerado ({OUT_PATH.stat().st_size} bytes)")
 
 if __name__ == "__main__": build_json()
+
+
 
 
 
