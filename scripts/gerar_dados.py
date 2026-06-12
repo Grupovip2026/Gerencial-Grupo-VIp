@@ -140,8 +140,7 @@ def parse_divida_fornecedores(wb):
                     "pagar_vip": 0.0, "pagar_vidal": 0.0,
                 }
             valor = safe(v_val)
-            if valor != 0:
-                result[order][bloco] += valor
+            result[order][bloco] += valor
     lista = []
     for m in sorted(result.values(), key=lambda x: x["order"]):
         m["pagas_grupo"] = m["pagas_vip"] + m["pagas_vidal"]
@@ -245,12 +244,12 @@ def parse_custos(wb):
         valor_f = row[3]
         if origem_f and origem_f.upper() not in ('ORIGEM', 'ORIGEM ') and valor_f:
             v = float(valor_f) if valor_f else 0
-            if v > 0: fixo.append({'origem': origem_f, 'valor': v})
+            if v != 0: fixo.append({'origem': origem_f, 'valor': v})
         origem_v = str(row[7]).strip() if len(row) > 7 and row[7] else None
         valor_v = row[8] if len(row) > 8 else None
         if origem_v and origem_v.upper() not in ('ORIGEM', 'ORIGEM ') and valor_v:
             v = float(valor_v) if valor_v else 0
-            if v > 0: variavel.append({'origem': origem_v, 'valor': v})
+            if v != 0: variavel.append({'origem': origem_v, 'valor': v})
     total_fixo = sum(i['valor'] for i in fixo)
     total_variavel = sum(i['valor'] for i in variavel)
     print(f'  [Custos] fixo: {len(fixo)} itens | variavel: {len(variavel)} itens')
@@ -299,6 +298,9 @@ def build_json():
     print(f"OK {OUT_PATH} gerado ({OUT_PATH.stat().st_size} bytes)")
 
 if __name__ == "__main__": build_json()
+
+
+
 
 
 
