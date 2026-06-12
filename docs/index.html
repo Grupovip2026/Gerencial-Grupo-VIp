@@ -505,12 +505,25 @@ function renderCustos(){
   const totalGeral=c.total_fixo+c.total_variavel;
   const pFixo=totalGeral>0?(c.total_fixo/totalGeral*100):0;
   const pVar=totalGeral>0?(c.total_variavel/totalGeral*100):0;
-  document.getElementById('custos-kpis').innerHTML=
-    <div class='kpi kpi-dre'><div class='kpi-label'>Total Custos Fixos</div><div class='kpi-value warn'></div><div class='kpi-delta dim'>% do total</div></div>
-    <div class='kpi kpi-apagar'><div class='kpi-label'>Total Custos Variáveis</div><div class='kpi-value neg'></div><div class='kpi-delta dim'>% do total</div></div>
-    <div class='kpi'><div class='kpi-label'>Total Geral de Custos</div><div class='kpi-value neutral'></div><div class='kpi-delta dim'> itens no total</div></div>;
+  const k1='<div class="kpi kpi-dre"><div class="kpi-label">Total Custos Fixos</div><div class="kpi-value warn">'+fmt(c.total_fixo)+'</div><div class="kpi-delta dim">'+pFixo.toFixed(1)+'% do total</div></div>';
+  const k2='<div class="kpi kpi-apagar"><div class="kpi-label">Total Custos Variáveis</div><div class="kpi-value neg">'+fmt(c.total_variavel)+'</div><div class="kpi-delta dim">'+pVar.toFixed(1)+'% do total</div></div>';
+  const k3='<div class="kpi"><div class="kpi-label">Total Geral de Custos</div><div class="kpi-value neutral">'+fmt(totalGeral)+'</div><div class="kpi-delta dim">'+(c.fixo.length+c.variavel.length)+' itens no total</div></div>';
+  document.getElementById('custos-kpis').innerHTML=k1+k2+k3;
   const cores=['#00C9A7','#6C63FF','#F5A623','#FF6B6B','#38bdf8','#a78bfa','#f472b6','#34d399','#fb923c','#60a5fa'];
-  ['chartCustosFixo','chartCustosVar'].forEach(id=>{if(charts[id]){charts[id].destroy();delete charts[id]}});
+  ['chartCustosFixo','chartCustosVar'].forEach(function(id){if(charts[id]){charts[id].destroy();delete charts[id]}});
+  const ctxF=document.getElementById('chartCustosFixo');
+  if(ctxF&&c.fixo.length){charts['chartCustosFixo']=new Chart(ctxF.getContext('2d'),{type:'doughnut',data:{labels:c.fixo.map(function(i){return i.origem}),datasets:[{data:c.fixo.map(function(i){return i.valor}),backgroundColor:cores,borderWidth:2,borderColor:'#0d0d1a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#888',font:{size:11},boxWidth:12}},tooltip:{callbacks:{label:function(i){return i.label+': '+fmt(i.raw)}}}}}});}
+  const ctxV=document.getElementById('chartCustosVar');
+  if(ctxV&&c.variavel.length){charts['chartCustosVar']=new Chart(ctxV.getContext('2d'),{type:'doughnut',data:{labels:c.variavel.map(function(i){return i.origem}),datasets:[{data:c.variavel.map(function(i){return i.valor}),backgroundColor:cores,borderWidth:2,borderColor:'#0d0d1a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#888',font:{size:11},boxWidth:12}},tooltip:{callbacks:{label:function(i){return i.label+': '+fmt(i.raw)}}}}}});}
+  var htmlF='<thead><tr><th>Origem</th><th>Valor</th><th>% do Fixo</th></tr></thead><tbody>';
+  c.fixo.forEach(function(i){var p=c.total_fixo>0?(i.valor/c.total_fixo*100):0;htmlF+='<tr><td>'+i.origem+'</td><td class="warn">'+fmt(i.valor)+'</td><td class="dim">'+p.toFixed(1)+'%</td></tr>';});
+  htmlF+='<tr class="total-row"><td>TOTAL FIXO</td><td class="warn">'+fmt(c.total_fixo)+'</td><td class="dim">100%</td></tr></tbody>';
+  document.getElementById('tbl-custos-fixo').innerHTML=htmlF;
+  var htmlV='<thead><tr><th>Origem</th><th>Valor</th><th>% do Variável</th></tr></thead><tbody>';
+  c.variavel.forEach(function(i){var p=c.total_variavel>0?(i.valor/c.total_variavel*100):0;htmlV+='<tr><td>'+i.origem+'</td><td class="neg">'+fmt(i.valor)+'</td><td class="dim">'+p.toFixed(1)+'%</td></tr>';});
+  htmlV+='<tr class="total-row"><td>TOTAL VARIÁVEL</td><td class="neg">'+fmt(c.total_variavel)+'</td><td class="dim">100%</td></tr></tbody>';
+  document.getElementById('tbl-custos-var').innerHTML=htmlV;
+}});
   const ctxF=document.getElementById('chartCustosFixo');
   if(ctxF&&c.fixo.length){
     charts['chartCustosFixo']=new Chart(ctxF.getContext('2d'),{type:'doughnut',data:{labels:c.fixo.map(i=>i.origem),datasets:[{data:c.fixo.map(i=>i.valor),backgroundColor:cores,borderWidth:2,borderColor:'#0d0d1a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#888',font:{size:11},boxWidth:12}},tooltip:{callbacks:{label:i=>i.label+': '+fmt(i.raw)}}}}});
@@ -531,6 +544,8 @@ function renderCustos(){
 </script>
 </body>
 </html>
+
+
 
 
 
