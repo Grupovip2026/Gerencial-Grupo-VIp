@@ -239,6 +239,8 @@ def parse_custos(wb):
     ws = wb[aba]
     rows = list(ws.iter_rows(values_only=True))
     fixo, variavel = [], []
+    print('  [Custos DEBUG] primeiras linhas:')
+    for dbr in rows[3:7]: print('   ', list(dbr[:10]))
     for row in rows[4:]:
         origem_f = str(row[2]).strip() if row[2] else None
         valor_f = row[3]
@@ -298,6 +300,7 @@ def build_json():
     print(f"OK {OUT_PATH} gerado ({OUT_PATH.stat().st_size} bytes)")
 
 if __name__ == "__main__": build_json()
+
 
 
 
