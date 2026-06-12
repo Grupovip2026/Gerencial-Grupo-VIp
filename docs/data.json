@@ -1,5 +1,5 @@
 {
-  "gerado_em": "12/06/2026 18:21",
+  "gerado_em": "12/06/2026 18:29",
   "fonte": "Resultado_Gerencial_2026.xlsx",
   "empresas": {
     "VIP": {
@@ -1631,18 +1631,18 @@
       },
       {
         "origem": "Impostos",
-        "valor": 40000.0
+        "valor": 56000.0
       },
       {
         "origem": "Taxas das plataformas",
-        "valor": 110000.0
+        "valor": 155000.0
       },
       {
         "origem": "Cancelamentos e reembolsos",
-        "valor": 35000.0
+        "valor": 55000.0
       }
     ],
     "total_fixo": 39264.65,
-    "total_variavel": 593000.0
+    "total_variavel": 674000.0
   }
 }
