@@ -13,6 +13,7 @@ XLSX_PATH = Path("Resultado_Gerencial_2026.xlsx")
 OUT_PATH  = Path("docs/data.json")
 MESES_NOMES = {1:"Jan",2:"Fev",3:"Mar",4:"Abr",5:"Mai",6:"Jun",7:"Jul",8:"Ago",9:"Set",10:"Out",11:"Nov",12:"Dez"}
 MESES_PARSE = {"jan":1,"fev":2,"mar":3,"abr":4,"mai":5,"jun":6,"jul":7,"ago":8,"set":9,"out":10,"nov":11,"dez":12}
+MESES_PT = {1:"JANEIRO",2:"FEVEREIRO",3:"MARCO",4:"ABRIL",5:"MAIO",6:"JUNHO",7:"JULHO",8:"AGOSTO",9:"SETEMBRO",10:"OUTUBRO",11:"NOVEMBRO",12:"DEZEMBRO"}
 
 def safe(v):
     if v is None: return 0.0
@@ -104,7 +105,7 @@ def parse_aba(ws):
 def parse_divida_fornecedores(wb):
     aba_nome = next((s for s in wb.sheetnames if 'fornecedores' in s.lower()), None)
     if not aba_nome:
-        print("  [Divida Fornecedores] aba NAO encontrada! Abas:", wb.sheetnames)
+        print("  [Divida Fornecedores] aba NAO encontrada!")
         return []
     print(f"  [Divida Fornecedores] lendo aba '{aba_nome}'...")
     ws = wb[aba_nome]
@@ -140,7 +141,8 @@ def parse_divida_fornecedores(wb):
                     "pagar_vip": 0.0, "pagar_vidal": 0.0,
                 }
             valor = safe(v_val)
-            result[order][bloco] += valor
+            if valor != 0:
+                result[order][bloco] += valor
     lista = []
     for m in sorted(result.values(), key=lambda x: x["order"]):
         m["pagas_grupo"] = m["pagas_vip"] + m["pagas_vidal"]
@@ -173,7 +175,6 @@ def parse_dre(wb):
     CAMPOS = ["recBruta","devol","impostos","recLiq","cmv","lucroBruto",
               "dPessoal","dMarketing","dTaxas","dFinanc","dOutras",
               "ebitda","deprec","ebit","lucroLiq"]
-
     def ler_aba(ws):
         rows = list(ws.iter_rows(values_only=True))
         date_row = rows[3] if len(rows) > 3 else []
@@ -207,8 +208,6 @@ def parse_dre(wb):
                     continue
             i += 1
         return sorted(meses.values(), key=lambda x: x["order"])
-
-    print('  [DRE] abas disponiveis:', wb.sheetnames)
     resultado = {}
     for emp, aba_nome in [("VIP", "DRE - VIP"), ("VIDAL", "DRE - VIDAL")]:
         real = next((s for s in wb.sheetnames if s.strip() == aba_nome), None)
@@ -259,6 +258,83 @@ def parse_custos(wb):
     print(f'  [Custos] fixo: {len(fixo)} itens | variavel: {len(variavel)} itens')
     return {'fixo': fixo, 'variavel': variavel, 'total_fixo': total_fixo, 'total_variavel': total_variavel}
 
+def parse_fluxo_caixa(wb):
+    def parse_aba_fluxo(ws):
+        rows = list(ws.iter_rows(values_only=True))
+        meses = {}
+        mes_atual = None
+        saldo_inicial_set = False
+        ultimo_saldo = 0
+        for row in rows:
+            b = row[1] if len(row) > 1 else None
+            if isinstance(b, str) and b.strip() and b.strip().upper() not in ('DATA','TOTAL'):
+                b_norm = b.upper().replace('C','C').replace('A','A')
+                for num, nome_pt in MESES_PT.items():
+                    if nome_pt in b_norm or MESES_NOMES[num].upper() in b_norm:
+                        ano = 2025 if '25' in b else 2026
+                        mes_atual = {
+                            'mes': MESES_NOMES[num], 'mes_num': num, 'ano': ano,
+                            'order': ano*100+num,
+                            'entradas': 0.0, 'resgates': 0.0, 'aportes': 0.0,
+                            'despesas': 0.0, 'aplicacoes': 0.0, 'shareholder': 0.0,
+                            'saldo_inicial': 0.0, 'saldo_final': 0.0
+                        }
+                        saldo_inicial_set = False
+                        ultimo_saldo = 0
+                        break
+                continue
+            if mes_atual is None: continue
+            if isinstance(b, str) and b.strip().upper() == 'DATA': continue
+            if len(row) > 2 and isinstance(row[2], str): continue
+            if b is None and not saldo_inicial_set:
+                v = row[8] if len(row) > 8 else None
+                if v is not None and not isinstance(v, str):
+                    mes_atual['saldo_inicial'] = safe(v)
+                    saldo_inicial_set = True
+                continue
+            if isinstance(b, str) and 'TOTAL' in b.upper():
+                mes_atual['entradas']    = safe(row[2] if len(row)>2 else None)
+                mes_atual['resgates']    = safe(row[3] if len(row)>3 else None)
+                mes_atual['aportes']     = safe(row[4] if len(row)>4 else None)
+                mes_atual['despesas']    = safe(row[5] if len(row)>5 else None)
+                mes_atual['aplicacoes']  = safe(row[6] if len(row)>6 else None)
+                mes_atual['shareholder'] = safe(row[7] if len(row)>7 else None)
+                mes_atual['saldo_final'] = ultimo_saldo
+                meses[mes_atual['order']] = mes_atual
+                mes_atual = None
+                continue
+            if isinstance(b, (datetime, date)):
+                v = row[8] if len(row) > 8 else None
+                if v is not None and not isinstance(v, str):
+                    ultimo_saldo = safe(v)
+        return sorted(meses.values(), key=lambda x: x['order'])
+
+    resultado = {}
+    for emp, aba_nome in [('VIP','Fluxo De caixa - VIP'),('VIDAL','Fluxo De caixa - VIDAL')]:
+        real = next((s for s in wb.sheetnames if s.strip() == aba_nome), None)
+        if not real:
+            print(f'  [Fluxo] aba {aba_nome} NAO encontrada!')
+            resultado[emp] = []
+            continue
+        meses = parse_aba_fluxo(wb[real])
+        resultado[emp] = [m for m in meses if m['saldo_final'] != 0 or m['despesas'] != 0 or m['entradas'] != 0]
+        print(f'  [Fluxo] {emp}: {len(resultado[emp])} meses')
+    grupo = {}
+    for emp in ['VIP','VIDAL']:
+        for m in resultado.get(emp, []):
+            k = m['order']
+            if k not in grupo:
+                grupo[k] = {
+                    'mes': m['mes'], 'mes_num': m['mes_num'], 'ano': m['ano'], 'order': k,
+                    'entradas': 0.0, 'resgates': 0.0, 'aportes': 0.0, 'despesas': 0.0,
+                    'aplicacoes': 0.0, 'shareholder': 0.0, 'saldo_inicial': 0.0, 'saldo_final': 0.0
+                }
+            for f in ['entradas','resgates','aportes','despesas','aplicacoes','shareholder','saldo_final']:
+                grupo[k][f] += m.get(f, 0.0)
+    resultado['GRUPO'] = sorted(grupo.values(), key=lambda x: x['order'])
+    print(f'  [Fluxo] GRUPO: {len(resultado["GRUPO"])} meses consolidados')
+    return resultado
+
 def build_json():
     if not XLSX_PATH.exists(): print(f"ERRO: {XLSX_PATH} nao encontrado."); sys.exit(1)
     wb = load_workbook(XLSX_PATH, read_only=True, data_only=True)
@@ -295,21 +371,11 @@ def build_json():
     print(f"  Financeiro: {len(financeiro)} meses")
     dre = parse_dre(wb)
     custos = parse_custos(wb)
+    fluxo = parse_fluxo_caixa(wb)
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     out = {"gerado_em":datetime.now().strftime("%d/%m/%Y %H:%M"),"fonte":XLSX_PATH.name,
-           "empresas":data,"financeiro":financeiro,"dre":dre,"custos":custos}
+           "empresas":data,"financeiro":financeiro,"dre":dre,"custos":custos,"fluxo":fluxo}
     with open(OUT_PATH,"w",encoding="utf-8") as f: json.dump(out,f,ensure_ascii=False,indent=2)
     print(f"OK {OUT_PATH} gerado ({OUT_PATH.stat().st_size} bytes)")
 
 if __name__ == "__main__": build_json()
-
-
-
-
-
-
-
-
-
-
-
