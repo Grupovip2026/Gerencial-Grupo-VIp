@@ -254,8 +254,7 @@ var DATA=null,FINANCEIRO=null,DRE=null,CUSTOS=null,FLUXO=null,charts={};
 var current='VIP',selectedMonths=new Set();
 var finCurrent='GRUPO',finSelected=new Set();
 var dreCurrent='VIP',dreSelected=new Set();
-var fluxoCurrent='VIP',fluxoSelected=new Set(),fluxoView='mes',fluxoDiaMes=null,fluxoDiasSelecionados=null,fluxoDiaIntervalo={d
-
+var fluxoCurrent='VIP',fluxoSelected=new Set(),fluxoView='mes',fluxoDiaMes=null,fluxoDiasSelecionados=null,fluxoDiaIntervalo={de:1,ate:31};
 async function loadData(){
   try{
     const res=await fetch('data.json?v='+Date.now());
@@ -655,3 +654,5 @@ loadData();
 </script>
 </body>
 </html>
+
+
