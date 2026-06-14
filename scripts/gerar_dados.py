@@ -262,13 +262,14 @@ def parse_fluxo_caixa(wb):
     def parse_aba_fluxo(ws):
         rows = list(ws.iter_rows(values_only=True))
         meses = {}
+        dias = []
         mes_atual = None
         saldo_inicial_set = False
-        ultimo_saldo = 0
         for row in rows:
             b = row[1] if len(row) > 1 else None
+            # Detecta cabecalho de mes
             if isinstance(b, str) and b.strip() and b.strip().upper() not in ('DATA','TOTAL'):
-                b_norm = b.upper().replace('C','C').replace('A','A')
+                b_norm = b.upper().replace('Ç','C').replace('Ã','A').replace('É','E').replace('Á','A')
                 for num, nome_pt in MESES_PT.items():
                     if nome_pt in b_norm or MESES_NOMES[num].upper() in b_norm:
                         ano = 2025 if '25' in b else 2026
@@ -280,18 +281,19 @@ def parse_fluxo_caixa(wb):
                             'saldo_inicial': 0.0, 'saldo_final': 0.0
                         }
                         saldo_inicial_set = False
-                        ultimo_saldo = 0
                         break
                 continue
             if mes_atual is None: continue
             if isinstance(b, str) and b.strip().upper() == 'DATA': continue
             if len(row) > 2 and isinstance(row[2], str): continue
+            # Linha saldo inicial
             if b is None and not saldo_inicial_set:
                 v = row[8] if len(row) > 8 else None
                 if v is not None and not isinstance(v, str):
                     mes_atual['saldo_inicial'] = safe(v)
                     saldo_inicial_set = True
                 continue
+            # Linha TOTAL
             if isinstance(b, str) and 'TOTAL' in b.upper():
                 mes_atual['entradas']    = safe(row[2] if len(row)>2 else None)
                 mes_atual['resgates']    = safe(row[3] if len(row)>3 else None)
@@ -299,40 +301,79 @@ def parse_fluxo_caixa(wb):
                 mes_atual['despesas']    = safe(row[5] if len(row)>5 else None)
                 mes_atual['aplicacoes']  = safe(row[6] if len(row)>6 else None)
                 mes_atual['shareholder'] = safe(row[7] if len(row)>7 else None)
-                mes_atual['saldo_final'] = ultimo_saldo
                 meses[mes_atual['order']] = mes_atual
                 mes_atual = None
                 continue
+            # Linha diaria
             if isinstance(b, (datetime, date)):
-                v = row[8] if len(row) > 8 else None
-                if v is not None and not isinstance(v, str):
-                    ultimo_saldo = safe(v)
-        return sorted(meses.values(), key=lambda x: x['order'])
+                saldo = safe(row[8] if len(row) > 8 else None)
+                if mes_atual:
+                    mes_atual['saldo_final'] = saldo
+                dia_str = b.strftime('%d/%m') if isinstance(b, (datetime, date)) else str(b)
+                mes_num = b.month if isinstance(b, datetime) else b.month
+                mes_nome = MESES_NOMES.get(mes_num, '')
+                ano = b.year if isinstance(b, datetime) else b.year
+                dias.append({
+                    'data': dia_str,
+                    'dia': b.day if isinstance(b, (datetime, date)) else 0,
+                    'mes': mes_nome,
+                    'mes_num': mes_num,
+                    'ano': ano,
+                    'order_mes': ano*100+mes_num,
+                    'order': ano*10000+mes_num*100+(b.day if isinstance(b, (datetime, date)) else 0),
+                    'entradas': safe(row[2] if len(row)>2 else None),
+                    'resgates': safe(row[3] if len(row)>3 else None),
+                    'aportes': safe(row[4] if len(row)>4 else None),
+                    'despesas': safe(row[5] if len(row)>5 else None),
+                    'aplicacoes': safe(row[6] if len(row)>6 else None),
+                    'shareholder': safe(row[7] if len(row)>7 else None),
+                    'saldo': saldo,
+                })
+        meses_lista = sorted(meses.values(), key=lambda x: x['order'])
+        dias_lista = sorted(dias, key=lambda x: x['order'])
+        # Filtra apenas dias com dados reais
+        dias_lista = [d for d in dias_lista if d['saldo'] != 0 or d['despesas'] != 0 or d['entradas'] != 0]
+        return meses_lista, dias_lista
 
     resultado = {}
     for emp, aba_nome in [('VIP','Fluxo De caixa - VIP'),('VIDAL','Fluxo De caixa - VIDAL')]:
         real = next((s for s in wb.sheetnames if s.strip() == aba_nome), None)
         if not real:
             print(f'  [Fluxo] aba {aba_nome} NAO encontrada!')
-            resultado[emp] = []
+            resultado[emp] = {'meses': [], 'dias': []}
             continue
-        meses = parse_aba_fluxo(wb[real])
-        resultado[emp] = [m for m in meses if m['saldo_final'] != 0 or m['despesas'] != 0 or m['entradas'] != 0]
-        print(f'  [Fluxo] {emp}: {len(resultado[emp])} meses')
-    grupo = {}
+        meses, dias = parse_aba_fluxo(wb[real])
+        meses = [m for m in meses if m['saldo_final'] != 0 or m['despesas'] != 0 or m['entradas'] != 0]
+        resultado[emp] = {'meses': meses, 'dias': dias}
+        print(f'  [Fluxo] {emp}: {len(meses)} meses, {len(dias)} dias')
+
+    # Consolida GRUPO
+    grupo_meses = {}
+    grupo_dias = {}
     for emp in ['VIP','VIDAL']:
-        for m in resultado.get(emp, []):
+        for m in resultado.get(emp, {}).get('meses', []):
             k = m['order']
-            if k not in grupo:
-                grupo[k] = {
-                    'mes': m['mes'], 'mes_num': m['mes_num'], 'ano': m['ano'], 'order': k,
-                    'entradas': 0.0, 'resgates': 0.0, 'aportes': 0.0, 'despesas': 0.0,
-                    'aplicacoes': 0.0, 'shareholder': 0.0, 'saldo_inicial': 0.0, 'saldo_final': 0.0
-                }
+            if k not in grupo_meses:
+                grupo_meses[k] = {'mes':m['mes'],'mes_num':m['mes_num'],'ano':m['ano'],'order':k,
+                    'entradas':0.0,'resgates':0.0,'aportes':0.0,'despesas':0.0,
+                    'aplicacoes':0.0,'shareholder':0.0,'saldo_inicial':0.0,'saldo_final':0.0}
             for f in ['entradas','resgates','aportes','despesas','aplicacoes','shareholder','saldo_final']:
-                grupo[k][f] += m.get(f, 0.0)
-    resultado['GRUPO'] = sorted(grupo.values(), key=lambda x: x['order'])
-    print(f'  [Fluxo] GRUPO: {len(resultado["GRUPO"])} meses consolidados')
+                grupo_meses[k][f] += m.get(f, 0.0)
+        for d in resultado.get(emp, {}).get('dias', []):
+            k = d['order']
+            if k not in grupo_dias:
+                grupo_dias[k] = {'data':d['data'],'dia':d['dia'],'mes':d['mes'],'mes_num':d['mes_num'],
+                    'ano':d['ano'],'order_mes':d['order_mes'],'order':k,
+                    'entradas':0.0,'resgates':0.0,'aportes':0.0,'despesas':0.0,
+                    'aplicacoes':0.0,'shareholder':0.0,'saldo':0.0}
+            for f in ['entradas','resgates','aportes','despesas','aplicacoes','shareholder','saldo']:
+                grupo_dias[k][f] += d.get(f, 0.0)
+
+    resultado['GRUPO'] = {
+        'meses': sorted(grupo_meses.values(), key=lambda x: x['order']),
+        'dias': sorted(grupo_dias.values(), key=lambda x: x['order'])
+    }
+    print(f'  [Fluxo] GRUPO: {len(resultado["GRUPO"]["meses"])} meses, {len(resultado["GRUPO"]["dias"])} dias consolidados')
     return resultado
 
 def build_json():
