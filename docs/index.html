@@ -35,6 +35,7 @@ h1{font-size:26px;font-weight:700;color:#fff}
 .mes-btn.ativo-grupo{border-color:#F5A623;background:rgba(245,166,35,.15);color:#F5A623;font-weight:600}
 .mes-btn.ativo-fin{border-color:#38bdf8;background:rgba(56,189,248,.15);color:#38bdf8;font-weight:600}
 .mes-btn.ativo-dre{border-color:#a78bfa;background:rgba(167,139,250,.15);color:#a78bfa;font-weight:600}
+.mes-btn.ativo-fluxo{border-color:#34d399;background:rgba(52,211,153,.15);color:#34d399;font-weight:600}
 .filter-actions{margin-left:auto;display:flex;gap:6px}
 .filter-action{font-size:11px;color:#555;background:none;border:1px solid rgba(255,255,255,.07);border-radius:5px;padding:4px 10px;cursor:pointer;font-family:'Inter',sans-serif}
 .filter-action:hover{color:#aaa}
@@ -46,10 +47,12 @@ h1{font-size:26px;font-weight:700;color:#fff}
 .kpi.kpi-pago{border-color:rgba(0,201,167,.25);background:rgba(0,201,167,.05)}
 .kpi.kpi-apagar{border-color:rgba(255,107,107,.25);background:rgba(255,107,107,.05)}
 .kpi.kpi-dre{border-color:rgba(167,139,250,.25);background:rgba(167,139,250,.05)}
+.kpi.kpi-fluxo{border-color:rgba(52,211,153,.25);background:rgba(52,211,153,.05)}
 .charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
 .chart-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:20px 16px}
 .chart-title{font-size:12px;color:#aaa;margin-bottom:14px;font-weight:600;letter-spacing:.8px;text-transform:uppercase}
 .chart-wrap{position:relative;height:220px}
+.chart-wrap-tall{position:relative;height:280px}
 .table-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:20px;overflow-x:auto;margin-bottom:16px}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th{padding:8px 12px;text-align:right;color:#666;font-weight:500;font-size:11px;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;border-bottom:1px solid rgba(255,255,255,.08)}
@@ -65,7 +68,7 @@ th.th-apagar{color:#FF6B6B}
 .footer{text-align:right;font-size:11px;color:#444;margin-top:8px}
 .loading{text-align:center;padding:60px;color:#555;font-size:14px}
 .error{text-align:center;padding:40px;color:#FF6B6B;font-size:13px;background:rgba(255,107,107,.05);border-radius:12px;margin:20px 0}
-.pos{color:#00C9A7}.neg{color:#FF6B6B}.neutral{color:#f0f0f0}.dim{color:#777}.sky{color:#38bdf8}.warn{color:#F5A623}.purple{color:#a78bfa}
+.pos{color:#00C9A7}.neg{color:#FF6B6B}.neutral{color:#f0f0f0}.dim{color:#777}.sky{color:#38bdf8}.warn{color:#F5A623}.purple{color:#a78bfa}.green{color:#34d399}
 .analise-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:20px;margin-bottom:16px}
 .analise-box .chart-title{margin-bottom:16px}
 .margem-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:20px}
@@ -90,6 +93,7 @@ th.th-apagar{color:#FF6B6B}
 <div class="nav-tabs">
   <button class="nav-tab active" onclick="setPage('gerencial')">📊 Gerencial</button>
   <button class="nav-tab" onclick="setPage('dre')">📋 DRE</button>
+  <button class="nav-tab" onclick="setPage('fluxo')">💵 Fluxo de Caixa</button>
   <button class="nav-tab" onclick="setPage('custos')">💰 Custos</button>
   <button class="nav-tab" onclick="setPage('financeiro')">🧾 Dívidas Fornecedores</button>
 </div>
@@ -158,6 +162,30 @@ th.th-apagar{color:#FF6B6B}
     <div id="dre-insights" class="insight-lista"></div>
   </div>
 </div>
+<div id="page-fluxo" class="page">
+  <div class="tabs" style="margin-bottom:16px">
+    <button class="tab active-vip" onclick="setFluxoEmp('VIP')">VIP MX</button>
+    <button class="tab" onclick="setFluxoEmp('VIDAL')">VIDAL</button>
+    <button class="tab" onclick="setFluxoEmp('GRUPO')">Grupo VIP</button>
+  </div>
+  <div class="filter-bar">
+    <span class="filter-label">Filtrar meses:</span>
+    <div id="fluxo-mes-btns" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+    <div class="filter-actions">
+      <button class="filter-action" onclick="fluxoSelectAll()">Todos</button>
+      <button class="filter-action" onclick="fluxoClear()">Limpar</button>
+    </div>
+  </div>
+  <div id="fluxo-kpis" class="kpis"><div class="loading">Carregando...</div></div>
+  <div class="charts-row">
+    <div class="chart-box"><div class="chart-title">Saldo · Evolução Mês a Mês</div><div class="chart-wrap"><canvas id="chartFluxoSaldo"></canvas></div></div>
+    <div class="chart-box"><div class="chart-title">Entradas vs Despesas · Mês a Mês</div><div class="chart-wrap"><canvas id="chartFluxoEntradasDespesas"></canvas></div></div>
+  </div>
+  <div class="table-box">
+    <div class="chart-title">Resumo Mensal · Fluxo de Caixa</div>
+    <table id="fluxo-tbl"><tbody><tr><td class="loading">Carregando...</td></tr></tbody></table>
+  </div>
+</div>
 <div id="page-custos" class="page">
   <div id="custos-kpis" class="kpis"><div class="loading">Carregando...</div></div>
   <div class="charts-row">
@@ -206,17 +234,18 @@ const fmtM=v=>v===0?'—':fmt(v);
 const pct=(r,p)=>p?(((r-p)/Math.abs(p))*100):0;
 const fmtP=v=>(v>=0?'+':'')+v.toFixed(1)+'%';
 const fmtPP=v=>(v>=0?'+':'')+v.toFixed(1)+'pp';
-var DATA=null,FINANCEIRO=null,DRE=null,CUSTOS=null,charts={};
+var DATA=null,FINANCEIRO=null,DRE=null,CUSTOS=null,FLUXO=null,charts={};
 var current='VIP',selectedMonths=new Set();
 var finCurrent='GRUPO',finSelected=new Set();
 var dreCurrent='VIP',dreSelected=new Set();
+var fluxoCurrent='VIP',fluxoSelected=new Set();
 
 async function loadData(){
   try{
     const res=await fetch('data.json?v='+Date.now());
     if(!res.ok)throw new Error('HTTP '+res.status);
     const json=await res.json();
-    DATA=json.empresas; FINANCEIRO=json.financeiro||[]; DRE=json.dre||{}; CUSTOS=json.custos||{};
+    DATA=json.empresas; FINANCEIRO=json.financeiro||[]; DRE=json.dre||{}; CUSTOS=json.custos||{}; FLUXO=json.fluxo||{};
     document.getElementById('badge-update').textContent='Atualizado '+json.gerado_em;
     const ma=(DATA.GRUPO?.months||[]).filter(m=>m.rReal>0).map(m=>m.mes);
     if(ma.length)document.getElementById('period').textContent=ma[0]+' – '+ma[ma.length-1]+' 2026 · Previsto vs Realizado';
@@ -226,16 +255,19 @@ async function loadData(){
     setFinEmp('GRUPO');
     dreSelected=new Set((DRE['VIP']||[]).map((_,i)=>i));
     setDreEmp('VIP');
+    fluxoSelected=new Set((FLUXO['VIP']||[]).map((_,i)=>i));
+    setFluxoEmp('VIP');
   }catch(e){
     document.getElementById('kpis').innerHTML='<div class="error">Nao foi possivel carregar data.json.<br><small>'+e.message+'</small></div>';
   }
 }
 
 function setPage(p){
-  document.querySelectorAll('.nav-tab').forEach((t,i)=>{t.classList.toggle('active',['gerencial','dre','custos','financeiro'][i]===p)});
+  document.querySelectorAll('.nav-tab').forEach((t,i)=>{t.classList.toggle('active',['gerencial','dre','fluxo','custos','financeiro'][i]===p)});
   document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
   document.getElementById('page-'+p).classList.add('active');
   if(p==='custos')renderCustos();
+  if(p==='fluxo')renderFluxo();
 }
 
 function setCompany(key){
@@ -297,7 +329,7 @@ function render(){
   const cmap={};months.forEach(m=>{if(!m.canais)return;for(const[cn,cv]of Object.entries(m.canais)){if(!cmap[cn])cmap[cn]={prev:0,real:0};cmap[cn].prev+=cv.prev||0;cmap[cn].real+=cv.real||0}});
   const canais=Object.entries(cmap).map(([canal,v])=>({canal,...v})).filter(c=>c.prev>0||c.real>0);
   makeBarChart('chartCanais',canais.map(c=>c.canal),[{label:'Previsto',data:canais.map(c=>c.prev),backgroundColor:'rgba(255,255,255,.1)',borderRadius:4},{label:'Realizado',data:canais.map(c=>c.real),backgroundColor:color,borderRadius:4}]);
-  let html='<thead><tr><th>Mes</th><th>Rec. Prevista</th><th>Rec. Realizada</th><th>Delta Receita</th><th>Desp. Prev.</th><th>Desp. Real.</th><th>Delta Despesas</th><th>Res. Previsto</th><th>Res. Realizado</th></tr></thead><tbody>';
+  let html='<thead><tr><th>Mes</th><th>Rec. Prevista</th><th>Rec. Realizada</th><th>Delta Rec.</th><th>Desp. Prev.</th><th>Desp. Real.</th><th>Delta Desp.</th><th>Res. Previsto</th><th>Res. Realizado</th></tr></thead><tbody>';
   let srp=0,srr=0,sdp=0,sdr=0,srrp=0,srrr=0;
   months.forEach(m=>{srp+=m.rPrev;srr+=m.rReal;sdp+=m.dPrev;sdr+=m.dReal;srrp+=m.resPrev;srrr+=m.resReal;const dr=pct(m.rReal,m.rPrev),dd=pct(m.dReal,m.dPrev);
     html+='<tr><td>'+m.mes+'/26</td><td class="dim">'+fmt(m.rPrev)+'</td><td class="neutral">'+fmt(m.rReal)+'</td><td class="'+(dr>=0?'pos':'neg')+'">'+fmtP(dr)+'</td><td class="dim">'+fmt(m.dPrev)+'</td><td class="neutral">'+fmt(m.dReal)+'</td><td class="'+(dd<=0?'pos':'neg')+'">'+fmtP(dd)+'</td><td class="dim">'+fmt(m.resPrev)+'</td><td class="'+(m.resReal>=0?'pos':'neg')+'">'+fmt(m.resReal)+'</td></tr>';
@@ -314,13 +346,13 @@ const DRE_LINHAS=[
   {campo:'devol',label:'(-) Devolucoes e Cancelamentos',tipo:'deducao'},
   {campo:'impostos',label:'(-) Impostos sobre Vendas',tipo:'deducao'},
   {campo:'recLiq',label:'= Receita Liquida',tipo:'resultado'},
-  {campo:'cmv',label:'(-) Custo de Mercadoria Vendida (CMV)',tipo:'deducao',secao:'CUSTOS'},
+  {campo:'cmv',label:'(-) CMV',tipo:'deducao',secao:'CUSTOS'},
   {campo:'lucroBruto',label:'= Lucro Bruto',tipo:'resultado'},
   {campo:'dPessoal',label:'(-) Despesas de Pessoal',tipo:'deducao',secao:'DESPESAS OPERACIONAIS'},
   {campo:'dMarketing',label:'(-) Despesas de Marketing',tipo:'deducao'},
   {campo:'dTaxas',label:'(-) Taxas de Plataforma',tipo:'deducao'},
   {campo:'dFinanc',label:'(-) Despesas Financeiras',tipo:'deducao'},
-  {campo:'dOutras',label:'(-) Outras Despesas Operacionais',tipo:'deducao'},
+  {campo:'dOutras',label:'(-) Outras Despesas',tipo:'deducao'},
   {campo:'ebitda',label:'= EBITDA',tipo:'resultado'},
   {campo:'deprec',label:'(-) Depreciacao / Amortizacao',tipo:'deducao',secao:'RESULTADO FINAL'},
   {campo:'ebit',label:'= EBIT',tipo:'resultado'},
@@ -385,6 +417,62 @@ function renderDre(){
   renderMargemDre(meses,'dre-margem-grid','dre-insights');
 }
 
+const FLUXO_COR={'VIP':'#00C9A7','VIDAL':'#6C63FF','GRUPO':'#F5A623'};
+function setFluxoEmp(key){
+  if(!FLUXO)return; fluxoCurrent=key;
+  document.querySelectorAll('#page-fluxo .tab').forEach((t,i)=>{t.className='tab';if(['VIP','VIDAL','GRUPO'][i]===key)t.classList.add('active-'+key.toLowerCase())});
+  fluxoSelected=new Set((FLUXO[key]||[]).map((_,i)=>i));
+  buildFluxoFilter(); renderFluxo();
+}
+function buildFluxoFilter(){
+  const meses=FLUXO[fluxoCurrent]||[];
+  document.getElementById('fluxo-mes-btns').innerHTML=meses.map((m,i)=>'<button class="mes-btn '+(fluxoSelected.has(i)?'ativo-fluxo':'')+'" onclick="toggleFluxoMonth('+i+')">'+m.mes+'</button>').join('');
+}
+function toggleFluxoMonth(i){if(fluxoSelected.has(i)){if(fluxoSelected.size===1)return;fluxoSelected.delete(i)}else fluxoSelected.add(i);buildFluxoFilter();renderFluxo()}
+function fluxoSelectAll(){fluxoSelected=new Set((FLUXO[fluxoCurrent]||[]).map((_,i)=>i));buildFluxoFilter();renderFluxo()}
+function fluxoClear(){fluxoSelected=new Set([((FLUXO[fluxoCurrent]||[]).length||1)-1]);buildFluxoFilter();renderFluxo()}
+
+function renderFluxo(){
+  if(!FLUXO)return;
+  ['chartFluxoSaldo','chartFluxoEntradasDespesas'].forEach(destroyChart);
+  const meses=(FLUXO[fluxoCurrent]||[]).filter((_,i)=>fluxoSelected.has(i));
+  if(!meses.length)return;
+  const cor=FLUXO_COR[fluxoCurrent]||'#34d399';
+  const labels=meses.map(m=>m.mes);
+  const totEntradas=meses.reduce((s,m)=>s+(m.entradas||0),0);
+  const totDespesas=meses.reduce((s,m)=>s+(m.despesas||0),0);
+  const saldoFinal=meses[meses.length-1]?.saldo_final||0;
+  const saldoInicial=meses[0]?.saldo_inicial||0;
+  document.getElementById('fluxo-kpis').innerHTML=
+    '<div class="kpi kpi-fluxo"><div class="kpi-label">Saldo Inicial</div><div class="kpi-value '+(saldoInicial>=0?'green':'neg')+'">'+fmt(saldoInicial)+'</div><div class="kpi-delta dim">Inicio do periodo</div></div>'+
+    '<div class="kpi kpi-pago"><div class="kpi-label">Total Entradas</div><div class="kpi-value pos">'+fmt(totEntradas)+'</div><div class="kpi-delta dim">Acumulado periodo</div></div>'+
+    '<div class="kpi kpi-apagar"><div class="kpi-label">Total Despesas</div><div class="kpi-value neg">'+fmt(Math.abs(totDespesas))+'</div><div class="kpi-delta dim">Acumulado periodo</div></div>'+
+    '<div class="kpi kpi-fluxo"><div class="kpi-label">Saldo Final</div><div class="kpi-value '+(saldoFinal>=0?'green':'neg')+'">'+fmt(saldoFinal)+'</div><div class="kpi-delta dim">Fim do periodo</div></div>';
+  makeLineChart('chartFluxoSaldo',labels,[
+    {label:'Saldo do Mes',data:meses.map(m=>m.saldo_final),borderColor:cor,backgroundColor:cor+'26',fill:true,tension:.3,pointRadius:4}
+  ]);
+  makeBarChart('chartFluxoEntradasDespesas',labels,[
+    {label:'Entradas',data:meses.map(m=>m.entradas||0),backgroundColor:'#00C9A7',borderRadius:4},
+    {label:'Despesas',data:meses.map(m=>Math.abs(m.despesas||0)),backgroundColor:'#FF6B6B',borderRadius:4}
+  ]);
+  let html='<thead><tr><th>Mes</th><th>Saldo Inicial</th><th>Entradas</th><th>Despesas</th><th>Aportes</th><th>Saldo Final</th></tr></thead><tbody>';
+  meses.forEach(m=>{
+    html+='<tr>'+
+      '<td>'+m.mes+'/26</td>'+
+      '<td class="'+(m.saldo_inicial>=0?'green':'neg')+'">'+fmt(m.saldo_inicial)+'</td>'+
+      '<td class="pos">'+fmtM(m.entradas||0)+'</td>'+
+      '<td class="neg">'+fmtM(Math.abs(m.despesas||0))+'</td>'+
+      '<td class="sky">'+fmtM(m.aportes||0)+'</td>'+
+      '<td class="'+(m.saldo_final>=0?'green':'neg')+'">'+fmt(m.saldo_final)+'</td>'+
+    '</tr>';
+  });
+  const sTotE=meses.reduce((s,m)=>s+(m.entradas||0),0);
+  const sTotD=meses.reduce((s,m)=>s+Math.abs(m.despesas||0),0);
+  const sTotA=meses.reduce((s,m)=>s+(m.aportes||0),0);
+  html+='<tr class="total-row"><td>TOTAL</td><td class="dim">—</td><td class="pos">'+fmt(sTotE)+'</td><td class="neg">'+fmt(sTotD)+'</td><td class="sky">'+fmt(sTotA)+'</td><td class="'+(saldoFinal>=0?'green':'neg')+'">'+fmt(saldoFinal)+'</td></tr></tbody>';
+  document.getElementById('fluxo-tbl').innerHTML=html;
+}
+
 function renderCustos(){
   if(!CUSTOS||!CUSTOS.fixo)return;
   const c=CUSTOS;
@@ -398,17 +486,9 @@ function renderCustos(){
   const cores=['#00C9A7','#6C63FF','#F5A623','#FF6B6B','#38bdf8','#a78bfa','#f472b6','#34d399','#fb923c','#60a5fa'];
   ['chartCustosFixo','chartCustosVar'].forEach(destroyChart);
   const ctxF=document.getElementById('chartCustosFixo');
-  if(ctxF&&c.fixo.length){
-    charts['chartCustosFixo']=new Chart(ctxF.getContext('2d'),{type:'doughnut',
-      data:{labels:c.fixo.map(i=>i.origem),datasets:[{data:c.fixo.map(i=>i.valor),backgroundColor:cores,borderWidth:2,borderColor:'#0d0d1a'}]},
-      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#888',font:{size:11},boxWidth:12}},tooltip:{callbacks:{label:i=>i.label+': '+fmt(i.raw)}}}}});
-  }
+  if(ctxF&&c.fixo.length){charts['chartCustosFixo']=new Chart(ctxF.getContext('2d'),{type:'doughnut',data:{labels:c.fixo.map(i=>i.origem),datasets:[{data:c.fixo.map(i=>i.valor),backgroundColor:cores,borderWidth:2,borderColor:'#0d0d1a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#888',font:{size:11},boxWidth:12}},tooltip:{callbacks:{label:i=>i.label+': '+fmt(i.raw)}}}}});}
   const ctxV=document.getElementById('chartCustosVar');
-  if(ctxV&&c.variavel.length){
-    charts['chartCustosVar']=new Chart(ctxV.getContext('2d'),{type:'doughnut',
-      data:{labels:c.variavel.map(i=>i.origem),datasets:[{data:c.variavel.map(i=>i.valor),backgroundColor:cores,borderWidth:2,borderColor:'#0d0d1a'}]},
-      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#888',font:{size:11},boxWidth:12}},tooltip:{callbacks:{label:i=>i.label+': '+fmt(i.raw)}}}}});
-  }
+  if(ctxV&&c.variavel.length){charts['chartCustosVar']=new Chart(ctxV.getContext('2d'),{type:'doughnut',data:{labels:c.variavel.map(i=>i.origem),datasets:[{data:c.variavel.map(i=>i.valor),backgroundColor:cores,borderWidth:2,borderColor:'#0d0d1a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#888',font:{size:11},boxWidth:12}},tooltip:{callbacks:{label:i=>i.label+': '+fmt(i.raw)}}}}});}
   let hF='<thead><tr><th>Origem</th><th>Valor</th><th>Percentual</th></tr></thead><tbody>';
   c.fixo.forEach(i=>{const p=c.total_fixo>0?(i.valor/c.total_fixo*100):0;hF+='<tr><td>'+i.origem+'</td><td class="warn">'+fmt(i.valor)+'</td><td class="dim">'+p.toFixed(1)+'%</td></tr>'});
   hF+='<tr class="total-row"><td>TOTAL FIXO</td><td class="warn">'+fmt(c.total_fixo)+'</td><td class="dim">100%</td></tr></tbody>';
@@ -487,8 +567,6 @@ function gerarInsights(margens,nome){
     if(diff>=2)items.push({cls:'ok',icon:'OK',txt:nome+' subiu '+fmtPP(diff)+' de '+margens[0].mes+' a '+margens[margens.length-1].mes});
     else if(diff<=-2)items.push({cls:'bad',icon:'ATENCAO',txt:nome+' caiu '+fmtPP(Math.abs(diff))+' de '+margens[0].mes+' a '+margens[margens.length-1].mes});
     else items.push({cls:'warn',icon:'ESTAVEL',txt:nome+' estavel no periodo: '+fmtPP(Math.abs(diff))});
-  }
-  if(margens.length>=2){
     const melhor=margens.reduce((a,b)=>a.val>b.val?a:b);
     const pior=margens.reduce((a,b)=>a.val<b.val?a:b);
     items.push({cls:'ok',icon:'TOP',txt:'Melhor mes: '+melhor.mes+' com '+nome+' de '+melhor.val.toFixed(1)+'%'});
