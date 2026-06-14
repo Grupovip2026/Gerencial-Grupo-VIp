@@ -458,8 +458,7 @@ function buildFluxoFilter(){
 function toggleFluxoMonth(i){if(fluxoSelected.has(i)){if(fluxoSelected.size===1)return;fluxoSelected.delete(i)}else fluxoSelected.add(i);buildFluxoFilter();renderFluxo()}
 function fluxoSelectAll(){fluxoSelected=new Set(((FLUXO[fluxoCurrent]||{}).meses||[]).map((_,i)=>i));buildFluxoFilter();renderFluxo()}
 function fluxoClear(){const n=((FLUXO[fluxoCurrent]||{}).meses||[]).length;fluxoSelected=new Set([n>0?n-1:0]);buildFluxoFilter();renderFluxo()}
-function selectFluxoDiaMes(mesNum){fluxoDiaMes=mesNum;fluxoDiasSelecionados=null;fluxoDiaIntervalo={de:1,ate:31};buildFluxoFilt
-
+function selectFluxoDiaMes(mesNum){fluxoDiaMes=mesNum;fluxoDiasSelecionados=null;fluxoDiaIntervalo={de:1,ate:31};buildFluxoFilter();renderFluxo();buildFluxoDiasFilter()}
 function setFluxoView(v){
   fluxoView=v;
   document.getElementById('btn-view-mes').classList.toggle('active',v==='mes');
@@ -654,5 +653,9 @@ loadData();
 </script>
 </body>
 </html>
+
+
+
+
 
 
