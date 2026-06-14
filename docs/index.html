@@ -454,7 +454,7 @@ function setFluxoView(v){
   document.getElementById('btn-view-dia').classList.toggle('active',v==='dia');
   document.getElementById('fluxo-charts-mes').style.display=v==='mes'?'':'none';
   document.getElementById('fluxo-charts-dia').style.display=v==='dia'?'':'none';
-  document.getElementById('fluxo-filtro-dias').style.display=v==='dia'?'':'none';
+  document.getElementById('fluxo-filtro-dias').style.display=v==='dia'?'block':'none';
   if(v==='dia' && fluxoDiaMes===null){
     var meses=FLUXO[fluxoCurrent]&&FLUXO[fluxoCurrent].meses?FLUXO[fluxoCurrent].meses:[];
     if(meses.length>0)fluxoDiaMes=meses[0].mes_num;
