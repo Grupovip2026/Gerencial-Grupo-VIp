@@ -100,11 +100,11 @@ input[type=number]{-moz-appearance:textfield}input[type=number]::-webkit-inner-s
 <h1>Dashboard Financeiro <span class="badge-update" id="badge-update">carregando...</span></h1>
 <div class="period" id="period">Carregando dados...</div>
 <div class="nav-tabs">
-  <button class="nav-tab active" onclick="setPage('gerencial')">Gerencial</button>
-  <button class="nav-tab" onclick="setPage('dre')">DRE</button>
-  <button class="nav-tab" onclick="setPage('fluxo')">Fluxo de Caixa</button>
-  <button class="nav-tab" onclick="setPage('custos')">Custos</button>
-  <button class="nav-tab" onclick="setPage('financeiro')">Dividas Fornecedores</button>
+  <button class="nav-tab active" onclick="setPage('gerencial')">📊 Gerencial</button>
+  <button class="nav-tab" onclick="setPage('dre')">📋 DRE</button>
+  <button class="nav-tab" onclick="setPage('fluxo')">💵 Fluxo de Caixa</button>
+  <button class="nav-tab" onclick="setPage('custos')">💰 Custos</button>
+  <button class="nav-tab" onclick="setPage('financeiro')">🧾 Dívidas Fornecedores</button>
 </div>
 <div id="page-gerencial" class="page active">
   <div class="tabs">
@@ -166,8 +166,8 @@ input[type=number]{-moz-appearance:textfield}input[type=number]::-webkit-inner-s
     <button class="tab" onclick="setFluxoEmp('GRUPO')">Grupo VIP</button>
   </div>
   <div class="view-toggle">
-    <button class="view-btn active" id="btn-view-mes" onclick="setFluxoView('mes')">Visao Mensal</button>
-    <button class="view-btn" id="btn-view-dia" onclick="setFluxoView('dia')">Visao Diaria</button>
+    <button class="view-btn active" id="btn-view-mes" onclick="setFluxoView('mes')">📅 Visão Mensal</button>
+    <button class="view-btn" id="btn-view-dia" onclick="setFluxoView('dia')">📆 Visão Diária</button>
   </div>
   <div class="filter-bar">
     <span class="filter-label" id="fluxo-filter-label">Filtrar meses:</span>
@@ -685,3 +685,4 @@ loadData();
 </script>
 </body>
 </html>
+
