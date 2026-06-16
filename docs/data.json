@@ -1,5 +1,5 @@
 {
-  "gerado_em": "15/06/2026 19:58",
+  "gerado_em": "16/06/2026 19:13",
   "fonte": "Resultado_Gerencial_2026.xlsx",
   "empresas": {
     "VIP": {
@@ -162,6 +162,46 @@
               "real": 0
             }
           }
+        },
+        {
+          "mes": "Mai",
+          "ano": 2026,
+          "mes_num": 5,
+          "order": 202605,
+          "rPrev": 293150.0,
+          "rReal": 415605.02999999997,
+          "dPrev": 186047.12,
+          "dReal": 460806.14,
+          "resPrev": 107102.88,
+          "resReal": -45201.110000000044,
+          "dPessoalPrev": 7045.74,
+          "dPessoalReal": 0.0,
+          "dMateriaPrev": 48922.88,
+          "dMateriaReal": 319945.38,
+          "dImpostosPrev": 25500.0,
+          "dImpostosReal": 0.0,
+          "dTaxasPrev": 76219.0,
+          "dTaxasReal": 94505.92000000001,
+          "dCancelPrev": 14657.5,
+          "dCancelReal": 36483.87,
+          "dMarketingPrev": 3250.0,
+          "dMarketingReal": 500.0,
+          "dFinancPrev": 6602.0,
+          "dFinancReal": 6602.0,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 286000.0,
+              "real": 390663.79
+            },
+            "Shopee": {
+              "prev": 3300.0,
+              "real": 24941.24
+            },
+            "Amazon": {
+              "prev": 3850.0,
+              "real": 0
+            }
+          }
         }
       ]
     },
@@ -298,9 +338,9 @@
           "rPrev": 227700.0,
           "rReal": 251047.64,
           "dPrev": 194013.91,
-          "dReal": 135846.61,
+          "dReal": 135346.61,
           "resPrev": 33686.09,
-          "resReal": 115201.03000000003,
+          "resReal": 115701.03000000003,
           "dPessoalPrev": 18276.91,
           "dPessoalReal": 18276.91,
           "dMateriaPrev": 98000.0,
@@ -312,7 +352,7 @@
           "dCancelPrev": 8635.0,
           "dCancelReal": 22130.3,
           "dMarketingPrev": 0.0,
-          "dMarketingReal": 500.0,
+          "dMarketingReal": 0.0,
           "dFinancPrev": 0.0,
           "dFinancReal": 0.0,
           "canais": {
@@ -327,6 +367,46 @@
             "Loja Fisica": {
               "prev": 55000.0,
               "real": 58148.23
+            }
+          }
+        },
+        {
+          "mes": "Mai",
+          "ano": 2026,
+          "mes_num": 5,
+          "order": 202605,
+          "rPrev": 227700.0,
+          "rReal": 71996.93,
+          "dPrev": 194657.7,
+          "dReal": 9010.39,
+          "resPrev": 33042.29999999999,
+          "resReal": 62986.53999999999,
+          "dPessoalPrev": 19009.31,
+          "dPessoalReal": 0.0,
+          "dMateriaPrev": 98000.0,
+          "dMateriaReal": 0.0,
+          "dImpostosPrev": 15500.0,
+          "dImpostosReal": 0.0,
+          "dTaxasPrev": 44902.0,
+          "dTaxasReal": 0.0,
+          "dCancelPrev": 8635.0,
+          "dCancelReal": 0.0,
+          "dMarketingPrev": 0.0,
+          "dMarketingReal": 649.0,
+          "dFinancPrev": 0.0,
+          "dFinancReal": 0.0,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 170500.0,
+              "real": 0
+            },
+            "Shopee": {
+              "prev": 2200.0,
+              "real": 31525.22
+            },
+            "Loja Fisica": {
+              "prev": 55000.0,
+              "real": 40471.71
             }
           }
         }
@@ -588,9 +668,9 @@
           "rPrev": 524763.0,
           "rReal": 800878.97,
           "dPrev": 423487.75,
-          "dReal": 546772.7,
+          "dReal": 546272.7,
           "resPrev": 101275.25,
-          "resReal": 254106.27000000002,
+          "resReal": 254606.27000000002,
           "dPessoalPrev": 25322.65,
           "dPessoalReal": 26861.95,
           "dMateriaPrev": 189175.7,
@@ -602,7 +682,7 @@
           "dCancelPrev": 23488.15,
           "dCancelReal": 71356.3,
           "dMarketingPrev": 3250.0,
-          "dMarketingReal": 500.0,
+          "dMarketingReal": 0.0,
           "dFinancPrev": 6602.0,
           "dFinancReal": 6602.0,
           "canais": {
@@ -621,6 +701,50 @@
             "Loja Fisica": {
               "prev": 55000.0,
               "real": 58148.23
+            }
+          }
+        },
+        {
+          "mes": "Mai",
+          "ano": 2026,
+          "mes_num": 5,
+          "order": 202605,
+          "rPrev": 520850.0,
+          "rReal": 487601.95999999996,
+          "dPrev": 380704.82,
+          "dReal": 469816.53,
+          "resPrev": 140145.18,
+          "resReal": 17785.42999999995,
+          "dPessoalPrev": 26055.050000000003,
+          "dPessoalReal": 0.0,
+          "dMateriaPrev": 146922.88,
+          "dMateriaReal": 319945.38,
+          "dImpostosPrev": 41000.0,
+          "dImpostosReal": 0.0,
+          "dTaxasPrev": 121121.0,
+          "dTaxasReal": 94505.92000000001,
+          "dCancelPrev": 23292.5,
+          "dCancelReal": 36483.87,
+          "dMarketingPrev": 3250.0,
+          "dMarketingReal": 1149.0,
+          "dFinancPrev": 6602.0,
+          "dFinancReal": 6602.0,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 456500.0,
+              "real": 390663.79
+            },
+            "Shopee": {
+              "prev": 5500.0,
+              "real": 56466.46000000001
+            },
+            "Amazon": {
+              "prev": 3850.0,
+              "real": 0
+            },
+            "Loja Fisica": {
+              "prev": 55000.0,
+              "real": 40471.71
             }
           }
         }
@@ -695,28 +819,28 @@
       "order": 202605,
       "pagas_vip": 319945.38,
       "pagas_vidal": 52752.71,
-      "pagar_vip": 0.0,
+      "pagar_vip": 2106.22,
       "pagar_vidal": 0.0,
       "pagas_grupo": 372698.09,
-      "pagar_grupo": 0.0,
-      "total_vip": 319945.38,
+      "pagar_grupo": 2106.22,
+      "total_vip": 322051.6,
       "total_vidal": 52752.71,
-      "total_grupo": 372698.09
+      "total_grupo": 374804.31
     },
     {
       "mes": "Jun",
       "mes_num": 6,
       "ano": 2026,
       "order": 202606,
-      "pagas_vip": 71959.33,
-      "pagas_vidal": 4702.05,
-      "pagar_vip": 242737.6,
-      "pagar_vidal": 34120.22,
-      "pagas_grupo": 76661.38,
-      "pagar_grupo": 276857.82,
-      "total_vip": 314696.93,
+      "pagas_vip": 130413.67,
+      "pagas_vidal": 18754.78,
+      "pagar_vip": 188334.68,
+      "pagar_vidal": 20067.49,
+      "pagas_grupo": 149168.45,
+      "pagar_grupo": 208402.16999999998,
+      "total_vip": 318748.35,
       "total_vidal": 38822.270000000004,
-      "total_grupo": 353519.2
+      "total_grupo": 357570.62
     },
     {
       "mes": "Jul",
@@ -725,13 +849,13 @@
       "order": 202607,
       "pagas_vip": 0.0,
       "pagas_vidal": 0.0,
-      "pagar_vip": 279660.9,
+      "pagar_vip": 284685.8,
       "pagar_vidal": 26388.28,
       "pagas_grupo": 0.0,
-      "pagar_grupo": 306049.18000000005,
-      "total_vip": 279660.9,
+      "pagar_grupo": 311074.07999999996,
+      "total_vip": 284685.8,
       "total_vidal": 26388.28,
-      "total_grupo": 306049.18000000005
+      "total_grupo": 311074.07999999996
     },
     {
       "mes": "Ago",
@@ -740,13 +864,13 @@
       "order": 202608,
       "pagas_vip": 0.0,
       "pagas_vidal": 0.0,
-      "pagar_vip": 193891.55,
+      "pagar_vip": 196173.87,
       "pagar_vidal": 0.0,
       "pagas_grupo": 0.0,
-      "pagar_grupo": 193891.55,
-      "total_vip": 193891.55,
+      "pagar_grupo": 196173.87,
+      "total_vip": 196173.87,
       "total_vidal": 0.0,
-      "total_grupo": 193891.55
+      "total_grupo": 196173.87
     },
     {
       "mes": "Set",
@@ -1182,7 +1306,7 @@
       },
       {
         "origem": "Materia prima",
-        "valor": 400000.0
+        "valor": 370000.0
       },
       {
         "origem": "Marketing",
@@ -1202,81 +1326,11 @@
       }
     ],
     "total_fixo": 39264.65,
-    "total_variavel": 674000.0
+    "total_variavel": 644000.0
   },
   "fluxo": {
     "VIP": {
       "meses": [
-        {
-          "mes": "Jan",
-          "mes_num": 1,
-          "ano": 2026,
-          "order": 202601,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo_inicial": 350000.0,
-          "saldo_final": 350000.0
-        },
-        {
-          "mes": "Fev",
-          "mes_num": 2,
-          "ano": 2026,
-          "order": 202602,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -215027.70999999996,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo_inicial": 200000.0,
-          "saldo_final": -15027.71000000003
-        },
-        {
-          "mes": "Mar",
-          "mes_num": 3,
-          "ano": 2026,
-          "order": 202603,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -93054.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo_inicial": -15027.71000000003,
-          "saldo_final": -108081.71000000002
-        },
-        {
-          "mes": "Abr",
-          "mes_num": 4,
-          "ano": 2026,
-          "order": 202604,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -93304.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo_inicial": -108081.71000000002,
-          "saldo_final": -201385.71000000002
-        },
-        {
-          "mes": "Mai",
-          "mes_num": 5,
-          "ano": 2026,
-          "order": 202605,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -93304.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo_inicial": -201385.71000000002,
-          "saldo_final": -294689.71
-        },
         {
           "mes": "Jun",
           "mes_num": 6,
@@ -1285,2638 +1339,14 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -93304.0,
+          "despesas": -186276.69999999998,
           "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo_inicial": -294689.71,
-          "saldo_final": -387993.71
+          "shareholder": 208610.05,
+          "saldo_inicial": 0.0,
+          "saldo_final": 22333.349999999984
         }
       ],
       "dias": [
-        {
-          "data": "01/01",
-          "dia": 1,
-          "mes": "Jan",
-          "mes_num": 1,
-          "ano": 2026,
-          "order_mes": 202601,
-          "order": 20260101,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 350000.0
-        },
-        {
-          "data": "02/01",
-          "dia": 2,
-          "mes": "Jan",
-          "mes_num": 1,
-          "ano": 2026,
-          "order_mes": 202601,
-          "order": 20260102,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 350000.0
-        },
-        {
-          "data": "03/01",
-          "dia": 3,
-          "mes": "Jan",
-          "mes_num": 1,
-          "ano": 2026,
-          "order_mes": 202601,
-          "order": 20260103,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 350000.0
-        },
-        {
-          "data": "04/01",
-          "dia": 4,
-          "mes": "Jan",
-          "mes_num": 1,
-          "ano": 2026,
-          "order_mes": 202601,
-          "order": 20260104,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 350000.0
-        },
-        {
-          "data": "05/01",
-          "dia": 5,
-          "mes": "Jan",
-          "mes_num": 1,
-          "ano": 2026,
-          "order_mes": 202601,
-          "order": 20260105,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 350000.0
-        },
-        {
-          "data": "06/01",
-          "dia": 6,
-          "mes": "Jan",
-          "mes_num": 1,
-          "ano": 2026,
-          "order_mes": 202601,
-          "order": 20260106,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 350000.0
-        },
-        {
-          "data": "07/01",
-          "dia": 7,
-          "mes": "Jan",
-          "mes_num": 1,
-          "ano": 2026,
-          "order_mes": 202601,
-          "order": 20260107,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 350000.0
-        },
-        {
-          "data": "08/01",
-          "dia": 8,
-          "mes": "Jan",
-          "mes_num": 1,
-          "ano": 2026,
-          "order_mes": 202601,
-          "order": 20260108,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 350000.0
-        },
-        {
-          "data": "09/01",
-          "dia": 9,
-          "mes": "Jan",
-          "mes_num": 1,
-          "ano": 2026,
-          "order_mes": 202601,
-          "order": 20260109,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 350000.0
-        },
-        {
-          "data": "10/01",
-          "dia": 10,
-          "mes": "Jan",
-          "mes_num": 1,
-          "ano": 2026,
-          "order_mes": 202601,
-          "order": 20260110,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 350000.0
-        },
-        {
-          "data": "11/01",
-          "dia": 11,
-          "mes": "Jan",
-          "mes_num": 1,
-          "ano": 2026,
-          "order_mes": 202601,
-          "order": 20260111,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 350000.0
-        },
-        {
-          "data": "12/01",
-          "dia": 12,
-          "mes": "Jan",
-          "mes_num": 1,
-          "ano": 2026,
-          "order_mes": 202601,
-          "order": 20260112,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 350000.0
-        },
-        {
-          "data": "13/01",
-          "dia": 13,
-          "mes": "Jan",
-          "mes_num": 1,
-          "ano": 2026,
-          "order_mes": 202601,
-          "order": 20260113,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 350000.0
-        },
-        {
-          "data": "14/01",
-          "dia": 14,
-          "mes": "Jan",
-          "mes_num": 1,
-          "ano": 2026,
-          "order_mes": 202601,
-          "order": 20260114,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 350000.0
-        },
-        {
-          "data": "15/01",
-          "dia": 15,
-          "mes": "Jan",
-          "mes_num": 1,
-          "ano": 2026,
-          "order_mes": 202601,
-          "order": 20260115,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 350000.0
-        },
-        {
-          "data": "16/01",
-          "dia": 16,
-          "mes": "Jan",
-          "mes_num": 1,
-          "ano": 2026,
-          "order_mes": 202601,
-          "order": 20260116,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 350000.0
-        },
-        {
-          "data": "17/01",
-          "dia": 17,
-          "mes": "Jan",
-          "mes_num": 1,
-          "ano": 2026,
-          "order_mes": 202601,
-          "order": 20260117,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 350000.0
-        },
-        {
-          "data": "18/01",
-          "dia": 18,
-          "mes": "Jan",
-          "mes_num": 1,
-          "ano": 2026,
-          "order_mes": 202601,
-          "order": 20260118,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 350000.0
-        },
-        {
-          "data": "19/01",
-          "dia": 19,
-          "mes": "Jan",
-          "mes_num": 1,
-          "ano": 2026,
-          "order_mes": 202601,
-          "order": 20260119,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 350000.0
-        },
-        {
-          "data": "20/01",
-          "dia": 20,
-          "mes": "Jan",
-          "mes_num": 1,
-          "ano": 2026,
-          "order_mes": 202601,
-          "order": 20260120,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 350000.0
-        },
-        {
-          "data": "21/01",
-          "dia": 21,
-          "mes": "Jan",
-          "mes_num": 1,
-          "ano": 2026,
-          "order_mes": 202601,
-          "order": 20260121,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 350000.0
-        },
-        {
-          "data": "22/01",
-          "dia": 22,
-          "mes": "Jan",
-          "mes_num": 1,
-          "ano": 2026,
-          "order_mes": 202601,
-          "order": 20260122,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 350000.0
-        },
-        {
-          "data": "23/01",
-          "dia": 23,
-          "mes": "Jan",
-          "mes_num": 1,
-          "ano": 2026,
-          "order_mes": 202601,
-          "order": 20260123,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 350000.0
-        },
-        {
-          "data": "24/01",
-          "dia": 24,
-          "mes": "Jan",
-          "mes_num": 1,
-          "ano": 2026,
-          "order_mes": 202601,
-          "order": 20260124,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 350000.0
-        },
-        {
-          "data": "25/01",
-          "dia": 25,
-          "mes": "Jan",
-          "mes_num": 1,
-          "ano": 2026,
-          "order_mes": 202601,
-          "order": 20260125,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 350000.0
-        },
-        {
-          "data": "26/01",
-          "dia": 26,
-          "mes": "Jan",
-          "mes_num": 1,
-          "ano": 2026,
-          "order_mes": 202601,
-          "order": 20260126,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 350000.0
-        },
-        {
-          "data": "27/01",
-          "dia": 27,
-          "mes": "Jan",
-          "mes_num": 1,
-          "ano": 2026,
-          "order_mes": 202601,
-          "order": 20260127,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 350000.0
-        },
-        {
-          "data": "28/01",
-          "dia": 28,
-          "mes": "Jan",
-          "mes_num": 1,
-          "ano": 2026,
-          "order_mes": 202601,
-          "order": 20260128,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 350000.0
-        },
-        {
-          "data": "29/01",
-          "dia": 29,
-          "mes": "Jan",
-          "mes_num": 1,
-          "ano": 2026,
-          "order_mes": 202601,
-          "order": 20260129,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 350000.0
-        },
-        {
-          "data": "30/01",
-          "dia": 30,
-          "mes": "Jan",
-          "mes_num": 1,
-          "ano": 2026,
-          "order_mes": 202601,
-          "order": 20260130,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 350000.0
-        },
-        {
-          "data": "31/01",
-          "dia": 31,
-          "mes": "Jan",
-          "mes_num": 1,
-          "ano": 2026,
-          "order_mes": 202601,
-          "order": 20260131,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 350000.0
-        },
-        {
-          "data": "01/02",
-          "dia": 1,
-          "mes": "Fev",
-          "mes_num": 2,
-          "ano": 2026,
-          "order_mes": 202602,
-          "order": 20260201,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 200000.0
-        },
-        {
-          "data": "02/02",
-          "dia": 2,
-          "mes": "Fev",
-          "mes_num": 2,
-          "ano": 2026,
-          "order_mes": 202602,
-          "order": 20260202,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 200000.0
-        },
-        {
-          "data": "03/02",
-          "dia": 3,
-          "mes": "Fev",
-          "mes_num": 2,
-          "ano": 2026,
-          "order_mes": 202602,
-          "order": 20260203,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 200000.0
-        },
-        {
-          "data": "04/02",
-          "dia": 4,
-          "mes": "Fev",
-          "mes_num": 2,
-          "ano": 2026,
-          "order_mes": 202602,
-          "order": 20260204,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 200000.0
-        },
-        {
-          "data": "05/02",
-          "dia": 5,
-          "mes": "Fev",
-          "mes_num": 2,
-          "ano": 2026,
-          "order_mes": 202602,
-          "order": 20260205,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 200000.0
-        },
-        {
-          "data": "06/02",
-          "dia": 6,
-          "mes": "Fev",
-          "mes_num": 2,
-          "ano": 2026,
-          "order_mes": 202602,
-          "order": 20260206,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 200000.0
-        },
-        {
-          "data": "07/02",
-          "dia": 7,
-          "mes": "Fev",
-          "mes_num": 2,
-          "ano": 2026,
-          "order_mes": 202602,
-          "order": 20260207,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -10062.67,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 189937.33
-        },
-        {
-          "data": "08/02",
-          "dia": 8,
-          "mes": "Fev",
-          "mes_num": 2,
-          "ano": 2026,
-          "order_mes": 202602,
-          "order": 20260208,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -377.95,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 189559.37999999998
-        },
-        {
-          "data": "09/02",
-          "dia": 9,
-          "mes": "Fev",
-          "mes_num": 2,
-          "ano": 2026,
-          "order_mes": 202602,
-          "order": 20260209,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -7572.81,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 181986.56999999998
-        },
-        {
-          "data": "10/02",
-          "dia": 10,
-          "mes": "Fev",
-          "mes_num": 2,
-          "ano": 2026,
-          "order_mes": 202602,
-          "order": 20260210,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -11377.46,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 170609.11
-        },
-        {
-          "data": "11/02",
-          "dia": 11,
-          "mes": "Fev",
-          "mes_num": 2,
-          "ano": 2026,
-          "order_mes": 202602,
-          "order": 20260211,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -5179.26,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 165429.84999999998
-        },
-        {
-          "data": "12/02",
-          "dia": 12,
-          "mes": "Fev",
-          "mes_num": 2,
-          "ano": 2026,
-          "order_mes": 202602,
-          "order": 20260212,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -13917.42,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 151512.42999999996
-        },
-        {
-          "data": "13/02",
-          "dia": 13,
-          "mes": "Fev",
-          "mes_num": 2,
-          "ano": 2026,
-          "order_mes": 202602,
-          "order": 20260213,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -4017.88,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 147494.54999999996
-        },
-        {
-          "data": "14/02",
-          "dia": 14,
-          "mes": "Fev",
-          "mes_num": 2,
-          "ano": 2026,
-          "order_mes": 202602,
-          "order": 20260214,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -7101.4,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 140393.14999999997
-        },
-        {
-          "data": "15/02",
-          "dia": 15,
-          "mes": "Fev",
-          "mes_num": 2,
-          "ano": 2026,
-          "order_mes": 202602,
-          "order": 20260215,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -10386.88,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 130006.26999999996
-        },
-        {
-          "data": "16/02",
-          "dia": 16,
-          "mes": "Fev",
-          "mes_num": 2,
-          "ano": 2026,
-          "order_mes": 202602,
-          "order": 20260216,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -22997.37,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 107008.89999999997
-        },
-        {
-          "data": "17/02",
-          "dia": 17,
-          "mes": "Fev",
-          "mes_num": 2,
-          "ano": 2026,
-          "order_mes": 202602,
-          "order": 20260217,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -12144.28,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 94864.61999999997
-        },
-        {
-          "data": "18/02",
-          "dia": 18,
-          "mes": "Fev",
-          "mes_num": 2,
-          "ano": 2026,
-          "order_mes": 202602,
-          "order": 20260218,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 94864.61999999997
-        },
-        {
-          "data": "19/02",
-          "dia": 19,
-          "mes": "Fev",
-          "mes_num": 2,
-          "ano": 2026,
-          "order_mes": 202602,
-          "order": 20260219,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -3905.48,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 90959.13999999997
-        },
-        {
-          "data": "20/02",
-          "dia": 20,
-          "mes": "Fev",
-          "mes_num": 2,
-          "ano": 2026,
-          "order_mes": 202602,
-          "order": 20260220,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -50454.05,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 40505.08999999997
-        },
-        {
-          "data": "21/02",
-          "dia": 21,
-          "mes": "Fev",
-          "mes_num": 2,
-          "ano": 2026,
-          "order_mes": 202602,
-          "order": 20260221,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -2198.11,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 38306.97999999997
-        },
-        {
-          "data": "22/02",
-          "dia": 22,
-          "mes": "Fev",
-          "mes_num": 2,
-          "ano": 2026,
-          "order_mes": 202602,
-          "order": 20260222,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -3304.59,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 35002.38999999997
-        },
-        {
-          "data": "23/02",
-          "dia": 23,
-          "mes": "Fev",
-          "mes_num": 2,
-          "ano": 2026,
-          "order_mes": 202602,
-          "order": 20260223,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -3678.01,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 31324.37999999997
-        },
-        {
-          "data": "24/02",
-          "dia": 24,
-          "mes": "Fev",
-          "mes_num": 2,
-          "ano": 2026,
-          "order_mes": 202602,
-          "order": 20260224,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -14281.68,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 17042.699999999968
-        },
-        {
-          "data": "25/02",
-          "dia": 25,
-          "mes": "Fev",
-          "mes_num": 2,
-          "ano": 2026,
-          "order_mes": 202602,
-          "order": 20260225,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -7000.53,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 10042.16999999997
-        },
-        {
-          "data": "26/02",
-          "dia": 26,
-          "mes": "Fev",
-          "mes_num": 2,
-          "ano": 2026,
-          "order_mes": 202602,
-          "order": 20260226,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -8416.88,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": 1625.28999999997
-        },
-        {
-          "data": "27/02",
-          "dia": 27,
-          "mes": "Fev",
-          "mes_num": 2,
-          "ano": 2026,
-          "order_mes": 202602,
-          "order": 20260227,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -10024.51,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -8399.22000000003
-        },
-        {
-          "data": "28/02",
-          "dia": 28,
-          "mes": "Fev",
-          "mes_num": 2,
-          "ano": 2026,
-          "order_mes": 202602,
-          "order": 20260228,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -6628.49,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -15027.71000000003
-        },
-        {
-          "data": "01/03",
-          "dia": 1,
-          "mes": "Mar",
-          "mes_num": 3,
-          "ano": 2026,
-          "order_mes": 202603,
-          "order": 20260301,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -15027.71000000003
-        },
-        {
-          "data": "02/03",
-          "dia": 2,
-          "mes": "Mar",
-          "mes_num": 3,
-          "ano": 2026,
-          "order_mes": 202603,
-          "order": 20260302,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -15027.71000000003
-        },
-        {
-          "data": "03/03",
-          "dia": 3,
-          "mes": "Mar",
-          "mes_num": 3,
-          "ano": 2026,
-          "order_mes": 202603,
-          "order": 20260303,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -15027.71000000003
-        },
-        {
-          "data": "04/03",
-          "dia": 4,
-          "mes": "Mar",
-          "mes_num": 3,
-          "ano": 2026,
-          "order_mes": 202603,
-          "order": 20260304,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -15027.71000000003
-        },
-        {
-          "data": "05/03",
-          "dia": 5,
-          "mes": "Mar",
-          "mes_num": 3,
-          "ano": 2026,
-          "order_mes": 202603,
-          "order": 20260305,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -31779.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -46806.71000000003
-        },
-        {
-          "data": "06/03",
-          "dia": 6,
-          "mes": "Mar",
-          "mes_num": 3,
-          "ano": 2026,
-          "order_mes": 202603,
-          "order": 20260306,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -46806.71000000003
-        },
-        {
-          "data": "07/03",
-          "dia": 7,
-          "mes": "Mar",
-          "mes_num": 3,
-          "ano": 2026,
-          "order_mes": 202603,
-          "order": 20260307,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -46806.71000000003
-        },
-        {
-          "data": "08/03",
-          "dia": 8,
-          "mes": "Mar",
-          "mes_num": 3,
-          "ano": 2026,
-          "order_mes": 202603,
-          "order": 20260308,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -46806.71000000003
-        },
-        {
-          "data": "09/03",
-          "dia": 9,
-          "mes": "Mar",
-          "mes_num": 3,
-          "ano": 2026,
-          "order_mes": 202603,
-          "order": 20260309,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -46806.71000000003
-        },
-        {
-          "data": "10/03",
-          "dia": 10,
-          "mes": "Mar",
-          "mes_num": 3,
-          "ano": 2026,
-          "order_mes": 202603,
-          "order": 20260310,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -11250.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -58056.71000000003
-        },
-        {
-          "data": "11/03",
-          "dia": 11,
-          "mes": "Mar",
-          "mes_num": 3,
-          "ano": 2026,
-          "order_mes": 202603,
-          "order": 20260311,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -58056.71000000003
-        },
-        {
-          "data": "12/03",
-          "dia": 12,
-          "mes": "Mar",
-          "mes_num": 3,
-          "ano": 2026,
-          "order_mes": 202603,
-          "order": 20260312,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -58056.71000000003
-        },
-        {
-          "data": "13/03",
-          "dia": 13,
-          "mes": "Mar",
-          "mes_num": 3,
-          "ano": 2026,
-          "order_mes": 202603,
-          "order": 20260313,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -6602.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -64658.71000000003
-        },
-        {
-          "data": "14/03",
-          "dia": 14,
-          "mes": "Mar",
-          "mes_num": 3,
-          "ano": 2026,
-          "order_mes": 202603,
-          "order": 20260314,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -64658.71000000003
-        },
-        {
-          "data": "15/03",
-          "dia": 15,
-          "mes": "Mar",
-          "mes_num": 3,
-          "ano": 2026,
-          "order_mes": 202603,
-          "order": 20260315,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -64658.71000000003
-        },
-        {
-          "data": "16/03",
-          "dia": 16,
-          "mes": "Mar",
-          "mes_num": 3,
-          "ano": 2026,
-          "order_mes": 202603,
-          "order": 20260316,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -64658.71000000003
-        },
-        {
-          "data": "17/03",
-          "dia": 17,
-          "mes": "Mar",
-          "mes_num": 3,
-          "ano": 2026,
-          "order_mes": 202603,
-          "order": 20260317,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -64658.71000000003
-        },
-        {
-          "data": "18/03",
-          "dia": 18,
-          "mes": "Mar",
-          "mes_num": 3,
-          "ano": 2026,
-          "order_mes": 202603,
-          "order": 20260318,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -64658.71000000003
-        },
-        {
-          "data": "19/03",
-          "dia": 19,
-          "mes": "Mar",
-          "mes_num": 3,
-          "ano": 2026,
-          "order_mes": 202603,
-          "order": 20260319,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -64658.71000000003
-        },
-        {
-          "data": "20/03",
-          "dia": 20,
-          "mes": "Mar",
-          "mes_num": 3,
-          "ano": 2026,
-          "order_mes": 202603,
-          "order": 20260320,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -42423.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -107081.71000000002
-        },
-        {
-          "data": "21/03",
-          "dia": 21,
-          "mes": "Mar",
-          "mes_num": 3,
-          "ano": 2026,
-          "order_mes": 202603,
-          "order": 20260321,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -107081.71000000002
-        },
-        {
-          "data": "22/03",
-          "dia": 22,
-          "mes": "Mar",
-          "mes_num": 3,
-          "ano": 2026,
-          "order_mes": 202603,
-          "order": 20260322,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -107081.71000000002
-        },
-        {
-          "data": "23/03",
-          "dia": 23,
-          "mes": "Mar",
-          "mes_num": 3,
-          "ano": 2026,
-          "order_mes": 202603,
-          "order": 20260323,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -107081.71000000002
-        },
-        {
-          "data": "24/03",
-          "dia": 24,
-          "mes": "Mar",
-          "mes_num": 3,
-          "ano": 2026,
-          "order_mes": 202603,
-          "order": 20260324,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -107081.71000000002
-        },
-        {
-          "data": "25/03",
-          "dia": 25,
-          "mes": "Mar",
-          "mes_num": 3,
-          "ano": 2026,
-          "order_mes": 202603,
-          "order": 20260325,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -107081.71000000002
-        },
-        {
-          "data": "26/03",
-          "dia": 26,
-          "mes": "Mar",
-          "mes_num": 3,
-          "ano": 2026,
-          "order_mes": 202603,
-          "order": 20260326,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -107081.71000000002
-        },
-        {
-          "data": "27/03",
-          "dia": 27,
-          "mes": "Mar",
-          "mes_num": 3,
-          "ano": 2026,
-          "order_mes": 202603,
-          "order": 20260327,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -107081.71000000002
-        },
-        {
-          "data": "28/03",
-          "dia": 28,
-          "mes": "Mar",
-          "mes_num": 3,
-          "ano": 2026,
-          "order_mes": 202603,
-          "order": 20260328,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -107081.71000000002
-        },
-        {
-          "data": "29/03",
-          "dia": 29,
-          "mes": "Mar",
-          "mes_num": 3,
-          "ano": 2026,
-          "order_mes": 202603,
-          "order": 20260329,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -107081.71000000002
-        },
-        {
-          "data": "30/03",
-          "dia": 30,
-          "mes": "Mar",
-          "mes_num": 3,
-          "ano": 2026,
-          "order_mes": 202603,
-          "order": 20260330,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -1000.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -108081.71000000002
-        },
-        {
-          "data": "31/03",
-          "dia": 31,
-          "mes": "Mar",
-          "mes_num": 3,
-          "ano": 2026,
-          "order_mes": 202603,
-          "order": 20260331,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -108081.71000000002
-        },
-        {
-          "data": "01/04",
-          "dia": 1,
-          "mes": "Abr",
-          "mes_num": 4,
-          "ano": 2026,
-          "order_mes": 202604,
-          "order": 20260401,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -108081.71000000002
-        },
-        {
-          "data": "02/04",
-          "dia": 2,
-          "mes": "Abr",
-          "mes_num": 4,
-          "ano": 2026,
-          "order_mes": 202604,
-          "order": 20260402,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -108081.71000000002
-        },
-        {
-          "data": "03/04",
-          "dia": 3,
-          "mes": "Abr",
-          "mes_num": 4,
-          "ano": 2026,
-          "order_mes": 202604,
-          "order": 20260403,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -108081.71000000002
-        },
-        {
-          "data": "04/04",
-          "dia": 4,
-          "mes": "Abr",
-          "mes_num": 4,
-          "ano": 2026,
-          "order_mes": 202604,
-          "order": 20260404,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -108081.71000000002
-        },
-        {
-          "data": "05/04",
-          "dia": 5,
-          "mes": "Abr",
-          "mes_num": 4,
-          "ano": 2026,
-          "order_mes": 202604,
-          "order": 20260405,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -108081.71000000002
-        },
-        {
-          "data": "06/04",
-          "dia": 6,
-          "mes": "Abr",
-          "mes_num": 4,
-          "ano": 2026,
-          "order_mes": 202604,
-          "order": 20260406,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -31779.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -139860.71000000002
-        },
-        {
-          "data": "07/04",
-          "dia": 7,
-          "mes": "Abr",
-          "mes_num": 4,
-          "ano": 2026,
-          "order_mes": 202604,
-          "order": 20260407,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -139860.71000000002
-        },
-        {
-          "data": "08/04",
-          "dia": 8,
-          "mes": "Abr",
-          "mes_num": 4,
-          "ano": 2026,
-          "order_mes": 202604,
-          "order": 20260408,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -139860.71000000002
-        },
-        {
-          "data": "09/04",
-          "dia": 9,
-          "mes": "Abr",
-          "mes_num": 4,
-          "ano": 2026,
-          "order_mes": 202604,
-          "order": 20260409,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -139860.71000000002
-        },
-        {
-          "data": "10/04",
-          "dia": 10,
-          "mes": "Abr",
-          "mes_num": 4,
-          "ano": 2026,
-          "order_mes": 202604,
-          "order": 20260410,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -11500.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -151360.71000000002
-        },
-        {
-          "data": "11/04",
-          "dia": 11,
-          "mes": "Abr",
-          "mes_num": 4,
-          "ano": 2026,
-          "order_mes": 202604,
-          "order": 20260411,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -151360.71000000002
-        },
-        {
-          "data": "12/04",
-          "dia": 12,
-          "mes": "Abr",
-          "mes_num": 4,
-          "ano": 2026,
-          "order_mes": 202604,
-          "order": 20260412,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -151360.71000000002
-        },
-        {
-          "data": "13/04",
-          "dia": 13,
-          "mes": "Abr",
-          "mes_num": 4,
-          "ano": 2026,
-          "order_mes": 202604,
-          "order": 20260413,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -151360.71000000002
-        },
-        {
-          "data": "14/04",
-          "dia": 14,
-          "mes": "Abr",
-          "mes_num": 4,
-          "ano": 2026,
-          "order_mes": 202604,
-          "order": 20260414,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -151360.71000000002
-        },
-        {
-          "data": "15/04",
-          "dia": 15,
-          "mes": "Abr",
-          "mes_num": 4,
-          "ano": 2026,
-          "order_mes": 202604,
-          "order": 20260415,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -6602.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -157962.71000000002
-        },
-        {
-          "data": "16/04",
-          "dia": 16,
-          "mes": "Abr",
-          "mes_num": 4,
-          "ano": 2026,
-          "order_mes": 202604,
-          "order": 20260416,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -157962.71000000002
-        },
-        {
-          "data": "17/04",
-          "dia": 17,
-          "mes": "Abr",
-          "mes_num": 4,
-          "ano": 2026,
-          "order_mes": 202604,
-          "order": 20260417,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -157962.71000000002
-        },
-        {
-          "data": "18/04",
-          "dia": 18,
-          "mes": "Abr",
-          "mes_num": 4,
-          "ano": 2026,
-          "order_mes": 202604,
-          "order": 20260418,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -157962.71000000002
-        },
-        {
-          "data": "19/04",
-          "dia": 19,
-          "mes": "Abr",
-          "mes_num": 4,
-          "ano": 2026,
-          "order_mes": 202604,
-          "order": 20260419,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -157962.71000000002
-        },
-        {
-          "data": "20/04",
-          "dia": 20,
-          "mes": "Abr",
-          "mes_num": 4,
-          "ano": 2026,
-          "order_mes": 202604,
-          "order": 20260420,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -42423.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -200385.71000000002
-        },
-        {
-          "data": "21/04",
-          "dia": 21,
-          "mes": "Abr",
-          "mes_num": 4,
-          "ano": 2026,
-          "order_mes": 202604,
-          "order": 20260421,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -200385.71000000002
-        },
-        {
-          "data": "22/04",
-          "dia": 22,
-          "mes": "Abr",
-          "mes_num": 4,
-          "ano": 2026,
-          "order_mes": 202604,
-          "order": 20260422,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -200385.71000000002
-        },
-        {
-          "data": "23/04",
-          "dia": 23,
-          "mes": "Abr",
-          "mes_num": 4,
-          "ano": 2026,
-          "order_mes": 202604,
-          "order": 20260423,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -200385.71000000002
-        },
-        {
-          "data": "24/04",
-          "dia": 24,
-          "mes": "Abr",
-          "mes_num": 4,
-          "ano": 2026,
-          "order_mes": 202604,
-          "order": 20260424,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -200385.71000000002
-        },
-        {
-          "data": "25/04",
-          "dia": 25,
-          "mes": "Abr",
-          "mes_num": 4,
-          "ano": 2026,
-          "order_mes": 202604,
-          "order": 20260425,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -200385.71000000002
-        },
-        {
-          "data": "26/04",
-          "dia": 26,
-          "mes": "Abr",
-          "mes_num": 4,
-          "ano": 2026,
-          "order_mes": 202604,
-          "order": 20260426,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -200385.71000000002
-        },
-        {
-          "data": "27/04",
-          "dia": 27,
-          "mes": "Abr",
-          "mes_num": 4,
-          "ano": 2026,
-          "order_mes": 202604,
-          "order": 20260427,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -200385.71000000002
-        },
-        {
-          "data": "28/04",
-          "dia": 28,
-          "mes": "Abr",
-          "mes_num": 4,
-          "ano": 2026,
-          "order_mes": 202604,
-          "order": 20260428,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -200385.71000000002
-        },
-        {
-          "data": "29/04",
-          "dia": 29,
-          "mes": "Abr",
-          "mes_num": 4,
-          "ano": 2026,
-          "order_mes": 202604,
-          "order": 20260429,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -200385.71000000002
-        },
-        {
-          "data": "30/04",
-          "dia": 30,
-          "mes": "Abr",
-          "mes_num": 4,
-          "ano": 2026,
-          "order_mes": 202604,
-          "order": 20260430,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -1000.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -201385.71000000002
-        },
-        {
-          "data": "01/05",
-          "dia": 1,
-          "mes": "Mai",
-          "mes_num": 5,
-          "ano": 2026,
-          "order_mes": 202605,
-          "order": 20260501,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -201385.71000000002
-        },
-        {
-          "data": "02/05",
-          "dia": 2,
-          "mes": "Mai",
-          "mes_num": 5,
-          "ano": 2026,
-          "order_mes": 202605,
-          "order": 20260502,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -201385.71000000002
-        },
-        {
-          "data": "03/05",
-          "dia": 3,
-          "mes": "Mai",
-          "mes_num": 5,
-          "ano": 2026,
-          "order_mes": 202605,
-          "order": 20260503,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -201385.71000000002
-        },
-        {
-          "data": "04/05",
-          "dia": 4,
-          "mes": "Mai",
-          "mes_num": 5,
-          "ano": 2026,
-          "order_mes": 202605,
-          "order": 20260504,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -201385.71000000002
-        },
-        {
-          "data": "05/05",
-          "dia": 5,
-          "mes": "Mai",
-          "mes_num": 5,
-          "ano": 2026,
-          "order_mes": 202605,
-          "order": 20260505,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -31779.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -233164.71000000002
-        },
-        {
-          "data": "06/05",
-          "dia": 6,
-          "mes": "Mai",
-          "mes_num": 5,
-          "ano": 2026,
-          "order_mes": 202605,
-          "order": 20260506,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -233164.71000000002
-        },
-        {
-          "data": "07/05",
-          "dia": 7,
-          "mes": "Mai",
-          "mes_num": 5,
-          "ano": 2026,
-          "order_mes": 202605,
-          "order": 20260507,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -233164.71000000002
-        },
-        {
-          "data": "08/05",
-          "dia": 8,
-          "mes": "Mai",
-          "mes_num": 5,
-          "ano": 2026,
-          "order_mes": 202605,
-          "order": 20260508,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -11500.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -244664.71000000002
-        },
-        {
-          "data": "09/05",
-          "dia": 9,
-          "mes": "Mai",
-          "mes_num": 5,
-          "ano": 2026,
-          "order_mes": 202605,
-          "order": 20260509,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -244664.71000000002
-        },
-        {
-          "data": "10/05",
-          "dia": 10,
-          "mes": "Mai",
-          "mes_num": 5,
-          "ano": 2026,
-          "order_mes": 202605,
-          "order": 20260510,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -244664.71000000002
-        },
-        {
-          "data": "11/05",
-          "dia": 11,
-          "mes": "Mai",
-          "mes_num": 5,
-          "ano": 2026,
-          "order_mes": 202605,
-          "order": 20260511,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -244664.71000000002
-        },
-        {
-          "data": "12/05",
-          "dia": 12,
-          "mes": "Mai",
-          "mes_num": 5,
-          "ano": 2026,
-          "order_mes": 202605,
-          "order": 20260512,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -244664.71000000002
-        },
-        {
-          "data": "13/05",
-          "dia": 13,
-          "mes": "Mai",
-          "mes_num": 5,
-          "ano": 2026,
-          "order_mes": 202605,
-          "order": 20260513,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -244664.71000000002
-        },
-        {
-          "data": "14/05",
-          "dia": 14,
-          "mes": "Mai",
-          "mes_num": 5,
-          "ano": 2026,
-          "order_mes": 202605,
-          "order": 20260514,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -244664.71000000002
-        },
-        {
-          "data": "15/05",
-          "dia": 15,
-          "mes": "Mai",
-          "mes_num": 5,
-          "ano": 2026,
-          "order_mes": 202605,
-          "order": 20260515,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -6602.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -251266.71000000002
-        },
-        {
-          "data": "16/05",
-          "dia": 16,
-          "mes": "Mai",
-          "mes_num": 5,
-          "ano": 2026,
-          "order_mes": 202605,
-          "order": 20260516,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -251266.71000000002
-        },
-        {
-          "data": "17/05",
-          "dia": 17,
-          "mes": "Mai",
-          "mes_num": 5,
-          "ano": 2026,
-          "order_mes": 202605,
-          "order": 20260517,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -251266.71000000002
-        },
-        {
-          "data": "18/05",
-          "dia": 18,
-          "mes": "Mai",
-          "mes_num": 5,
-          "ano": 2026,
-          "order_mes": 202605,
-          "order": 20260518,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -251266.71000000002
-        },
-        {
-          "data": "19/05",
-          "dia": 19,
-          "mes": "Mai",
-          "mes_num": 5,
-          "ano": 2026,
-          "order_mes": 202605,
-          "order": 20260519,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -251266.71000000002
-        },
-        {
-          "data": "20/05",
-          "dia": 20,
-          "mes": "Mai",
-          "mes_num": 5,
-          "ano": 2026,
-          "order_mes": 202605,
-          "order": 20260520,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -42423.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -293689.71
-        },
-        {
-          "data": "21/05",
-          "dia": 21,
-          "mes": "Mai",
-          "mes_num": 5,
-          "ano": 2026,
-          "order_mes": 202605,
-          "order": 20260521,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -293689.71
-        },
-        {
-          "data": "22/05",
-          "dia": 22,
-          "mes": "Mai",
-          "mes_num": 5,
-          "ano": 2026,
-          "order_mes": 202605,
-          "order": 20260522,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -293689.71
-        },
-        {
-          "data": "23/05",
-          "dia": 23,
-          "mes": "Mai",
-          "mes_num": 5,
-          "ano": 2026,
-          "order_mes": 202605,
-          "order": 20260523,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -293689.71
-        },
-        {
-          "data": "24/05",
-          "dia": 24,
-          "mes": "Mai",
-          "mes_num": 5,
-          "ano": 2026,
-          "order_mes": 202605,
-          "order": 20260524,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -293689.71
-        },
-        {
-          "data": "25/05",
-          "dia": 25,
-          "mes": "Mai",
-          "mes_num": 5,
-          "ano": 2026,
-          "order_mes": 202605,
-          "order": 20260525,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -293689.71
-        },
-        {
-          "data": "26/05",
-          "dia": 26,
-          "mes": "Mai",
-          "mes_num": 5,
-          "ano": 2026,
-          "order_mes": 202605,
-          "order": 20260526,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -293689.71
-        },
-        {
-          "data": "27/05",
-          "dia": 27,
-          "mes": "Mai",
-          "mes_num": 5,
-          "ano": 2026,
-          "order_mes": 202605,
-          "order": 20260527,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -293689.71
-        },
-        {
-          "data": "28/05",
-          "dia": 28,
-          "mes": "Mai",
-          "mes_num": 5,
-          "ano": 2026,
-          "order_mes": 202605,
-          "order": 20260528,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -293689.71
-        },
-        {
-          "data": "29/05",
-          "dia": 29,
-          "mes": "Mai",
-          "mes_num": 5,
-          "ano": 2026,
-          "order_mes": 202605,
-          "order": 20260529,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -1000.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -294689.71
-        },
-        {
-          "data": "30/05",
-          "dia": 30,
-          "mes": "Mai",
-          "mes_num": 5,
-          "ano": 2026,
-          "order_mes": 202605,
-          "order": 20260530,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -294689.71
-        },
-        {
-          "data": "31/05",
-          "dia": 31,
-          "mes": "Mai",
-          "mes_num": 5,
-          "ano": 2026,
-          "order_mes": 202605,
-          "order": 20260531,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -294689.71
-        },
-        {
-          "data": "01/06",
-          "dia": 1,
-          "mes": "Jun",
-          "mes_num": 6,
-          "ano": 2026,
-          "order_mes": 202606,
-          "order": 20260601,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -294689.71
-        },
-        {
-          "data": "02/06",
-          "dia": 2,
-          "mes": "Jun",
-          "mes_num": 6,
-          "ano": 2026,
-          "order_mes": 202606,
-          "order": 20260602,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -294689.71
-        },
-        {
-          "data": "03/06",
-          "dia": 3,
-          "mes": "Jun",
-          "mes_num": 6,
-          "ano": 2026,
-          "order_mes": 202606,
-          "order": 20260603,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -294689.71
-        },
-        {
-          "data": "04/06",
-          "dia": 4,
-          "mes": "Jun",
-          "mes_num": 6,
-          "ano": 2026,
-          "order_mes": 202606,
-          "order": 20260604,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -294689.71
-        },
-        {
-          "data": "05/06",
-          "dia": 5,
-          "mes": "Jun",
-          "mes_num": 6,
-          "ano": 2026,
-          "order_mes": 202606,
-          "order": 20260605,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -31779.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -326468.71
-        },
-        {
-          "data": "06/06",
-          "dia": 6,
-          "mes": "Jun",
-          "mes_num": 6,
-          "ano": 2026,
-          "order_mes": 202606,
-          "order": 20260606,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -326468.71
-        },
-        {
-          "data": "07/06",
-          "dia": 7,
-          "mes": "Jun",
-          "mes_num": 6,
-          "ano": 2026,
-          "order_mes": 202606,
-          "order": 20260607,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -326468.71
-        },
-        {
-          "data": "08/06",
-          "dia": 8,
-          "mes": "Jun",
-          "mes_num": 6,
-          "ano": 2026,
-          "order_mes": 202606,
-          "order": 20260608,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -326468.71
-        },
-        {
-          "data": "09/06",
-          "dia": 9,
-          "mes": "Jun",
-          "mes_num": 6,
-          "ano": 2026,
-          "order_mes": 202606,
-          "order": 20260609,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -326468.71
-        },
-        {
-          "data": "10/06",
-          "dia": 10,
-          "mes": "Jun",
-          "mes_num": 6,
-          "ano": 2026,
-          "order_mes": 202606,
-          "order": 20260610,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": -11500.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -337968.71
-        },
-        {
-          "data": "11/06",
-          "dia": 11,
-          "mes": "Jun",
-          "mes_num": 6,
-          "ano": 2026,
-          "order_mes": 202606,
-          "order": 20260611,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -337968.71
-        },
-        {
-          "data": "12/06",
-          "dia": 12,
-          "mes": "Jun",
-          "mes_num": 6,
-          "ano": 2026,
-          "order_mes": 202606,
-          "order": 20260612,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -337968.71
-        },
-        {
-          "data": "13/06",
-          "dia": 13,
-          "mes": "Jun",
-          "mes_num": 6,
-          "ano": 2026,
-          "order_mes": 202606,
-          "order": 20260613,
-          "entradas": 0.0,
-          "resgates": 0.0,
-          "aportes": 0.0,
-          "despesas": 0.0,
-          "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -337968.71
-        },
         {
           "data": "14/06",
           "dia": 14,
@@ -3930,8 +1360,8 @@
           "aportes": 0.0,
           "despesas": 0.0,
           "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -337968.71
+          "shareholder": 208610.05,
+          "saldo": 208610.05
         },
         {
           "data": "15/06",
@@ -3944,10 +1374,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -6602.0,
+          "despesas": -27226.84,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -344570.71
+          "saldo": 181383.21
         },
         {
           "data": "16/06",
@@ -3960,10 +1390,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": 0.0,
+          "despesas": -2840.01,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -344570.71
+          "saldo": 178543.19999999998
         },
         {
           "data": "17/06",
@@ -3976,10 +1406,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": 0.0,
+          "despesas": -9695.13,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -344570.71
+          "saldo": 168848.06999999998
         },
         {
           "data": "18/06",
@@ -3992,10 +1422,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": 0.0,
+          "despesas": -22259.68,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -344570.71
+          "saldo": 146588.38999999998
         },
         {
           "data": "19/06",
@@ -4008,10 +1438,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -42423.0,
+          "despesas": -1309.87,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -386993.71
+          "saldo": 145278.52
         },
         {
           "data": "20/06",
@@ -4027,7 +1457,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -386993.71
+          "saldo": 145278.52
         },
         {
           "data": "21/06",
@@ -4043,7 +1473,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -386993.71
+          "saldo": 145278.52
         },
         {
           "data": "22/06",
@@ -4056,10 +1486,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": 0.0,
+          "despesas": -20043.27,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -386993.71
+          "saldo": 125235.24999999999
         },
         {
           "data": "23/06",
@@ -4072,10 +1502,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": 0.0,
+          "despesas": -13608.52,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -386993.71
+          "saldo": 111626.72999999998
         },
         {
           "data": "24/06",
@@ -4088,10 +1518,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": 0.0,
+          "despesas": -18715.95,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -386993.71
+          "saldo": 92910.77999999998
         },
         {
           "data": "25/06",
@@ -4104,10 +1534,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": 0.0,
+          "despesas": -24790.44,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -386993.71
+          "saldo": 68120.33999999998
         },
         {
           "data": "26/06",
@@ -4120,10 +1550,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": 0.0,
+          "despesas": -16341.23,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -386993.71
+          "saldo": 51779.109999999986
         },
         {
           "data": "27/06",
@@ -4136,10 +1566,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": 0.0,
+          "despesas": -25267.77,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -386993.71
+          "saldo": 26511.339999999986
         },
         {
           "data": "28/06",
@@ -4155,7 +1585,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -386993.71
+          "saldo": 26511.339999999986
         },
         {
           "data": "29/06",
@@ -4171,7 +1601,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -386993.71
+          "saldo": 26511.339999999986
         },
         {
           "data": "30/06",
@@ -4184,10 +1614,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -1000.0,
+          "despesas": -4177.99,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -387993.71
+          "saldo": 22333.349999999984
         }
       ]
     },
@@ -7191,7 +4621,7 @@
           "aplicacoes": 0.0,
           "shareholder": 0.0,
           "saldo_inicial": 0.0,
-          "saldo_final": 25266.96000000002
+          "saldo_final": -324733.04
         },
         {
           "mes": "Fev",
@@ -7201,11 +4631,11 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -455166.98,
+          "despesas": -240139.27,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
           "saldo_inicial": 0.0,
-          "saldo_final": -579900.0200000001
+          "saldo_final": -564872.31
         },
         {
           "mes": "Mar",
@@ -7215,11 +4645,11 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -183108.0,
+          "despesas": -90054.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
           "saldo_inicial": 0.0,
-          "saldo_final": -763008.02
+          "saldo_final": -654926.31
         },
         {
           "mes": "Abr",
@@ -7229,11 +4659,11 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -183608.0,
+          "despesas": -90304.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
           "saldo_inicial": 0.0,
-          "saldo_final": -946616.02
+          "saldo_final": -745230.31
         },
         {
           "mes": "Mai",
@@ -7243,11 +4673,11 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -183608.0,
+          "despesas": -90304.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
           "saldo_inicial": 0.0,
-          "saldo_final": -1130224.02
+          "saldo_final": -835534.31
         },
         {
           "mes": "Jun",
@@ -7257,11 +4687,11 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -183608.0,
+          "despesas": -276580.69999999995,
           "aplicacoes": 0.0,
-          "shareholder": 0.0,
+          "shareholder": 208610.05,
           "saldo_inicial": 0.0,
-          "saldo_final": -1313832.02
+          "saldo_final": -903504.9600000001
         }
       ],
       "dias": [
@@ -7279,7 +4709,7 @@
           "despesas": -13355.79,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": 336644.21
+          "saldo": -13355.79
         },
         {
           "data": "02/01",
@@ -7295,7 +4725,7 @@
           "despesas": -7771.32,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": 328872.89
+          "saldo": -21127.11
         },
         {
           "data": "03/01",
@@ -7311,7 +4741,7 @@
           "despesas": -2941.69,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": 325931.2
+          "saldo": -24068.8
         },
         {
           "data": "04/01",
@@ -7327,7 +4757,7 @@
           "despesas": -2103.31,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": 323827.89
+          "saldo": -26172.11
         },
         {
           "data": "05/01",
@@ -7343,7 +4773,7 @@
           "despesas": -32312.7,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": 291515.19
+          "saldo": -58484.81
         },
         {
           "data": "06/01",
@@ -7359,7 +4789,7 @@
           "despesas": -20097.43,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": 271417.76
+          "saldo": -78582.23999999999
         },
         {
           "data": "07/01",
@@ -7375,7 +4805,7 @@
           "despesas": -10346.24,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": 261071.52000000002
+          "saldo": -88928.48
         },
         {
           "data": "08/01",
@@ -7391,7 +4821,7 @@
           "despesas": -13283.89,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": 247787.63
+          "saldo": -102212.37
         },
         {
           "data": "09/01",
@@ -7407,7 +4837,7 @@
           "despesas": -18090.31,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": 229697.32
+          "saldo": -120302.68
         },
         {
           "data": "10/01",
@@ -7423,7 +4853,7 @@
           "despesas": -8358.27,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": 221339.05
+          "saldo": -128660.95
         },
         {
           "data": "11/01",
@@ -7439,7 +4869,7 @@
           "despesas": -7281.7,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": 214057.35
+          "saldo": -135942.65
         },
         {
           "data": "12/01",
@@ -7455,7 +4885,7 @@
           "despesas": -4822.69,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": 209234.66
+          "saldo": -140765.34
         },
         {
           "data": "13/01",
@@ -7471,7 +4901,7 @@
           "despesas": -12056.85,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": 197177.81
+          "saldo": -152822.19
         },
         {
           "data": "14/01",
@@ -7487,7 +4917,7 @@
           "despesas": -1953.24,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": 195224.57
+          "saldo": -154775.43
         },
         {
           "data": "15/01",
@@ -7503,7 +4933,7 @@
           "despesas": -11285.060000000001,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": 183939.51
+          "saldo": -166060.49
         },
         {
           "data": "16/01",
@@ -7519,7 +4949,7 @@
           "despesas": -9768.98,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": 174170.53
+          "saldo": -175829.47
         },
         {
           "data": "17/01",
@@ -7535,7 +4965,7 @@
           "despesas": -7181.73,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": 166988.8
+          "saldo": -183011.2
         },
         {
           "data": "18/01",
@@ -7551,7 +4981,7 @@
           "despesas": -4401.47,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": 162587.33
+          "saldo": -187412.67
         },
         {
           "data": "19/01",
@@ -7567,7 +4997,7 @@
           "despesas": -18370.24,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": 144217.09
+          "saldo": -205782.91
         },
         {
           "data": "20/01",
@@ -7583,7 +5013,7 @@
           "despesas": -49540.18,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": 94676.91
+          "saldo": -255323.09
         },
         {
           "data": "21/01",
@@ -7599,7 +5029,7 @@
           "despesas": -8604.53,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": 86072.38
+          "saldo": -263927.62
         },
         {
           "data": "22/01",
@@ -7615,7 +5045,7 @@
           "despesas": -3392.47,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": 82679.91000000003
+          "saldo": -267320.08999999997
         },
         {
           "data": "23/01",
@@ -7631,7 +5061,7 @@
           "despesas": -5848.52,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": 76831.39000000001
+          "saldo": -273168.61
         },
         {
           "data": "24/01",
@@ -7647,7 +5077,7 @@
           "despesas": -3958.05,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": 72873.34000000003
+          "saldo": -277126.66
         },
         {
           "data": "25/01",
@@ -7663,7 +5093,7 @@
           "despesas": -6206.49,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": 66666.85000000003
+          "saldo": -283333.14999999997
         },
         {
           "data": "26/01",
@@ -7679,7 +5109,7 @@
           "despesas": -10448.97,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": 56217.88000000006
+          "saldo": -293782.11999999994
         },
         {
           "data": "27/01",
@@ -7695,7 +5125,7 @@
           "despesas": -4945.06,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": 51272.820000000065
+          "saldo": -298727.17999999993
         },
         {
           "data": "28/01",
@@ -7711,7 +5141,7 @@
           "despesas": -5272.06,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": 46000.76000000007
+          "saldo": -303999.23999999993
         },
         {
           "data": "29/01",
@@ -7727,7 +5157,7 @@
           "despesas": -5055.84,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": 40944.92000000004
+          "saldo": -309055.07999999996
         },
         {
           "data": "30/01",
@@ -7743,7 +5173,7 @@
           "despesas": -5915.13,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": 35029.79000000004
+          "saldo": -314970.20999999996
         },
         {
           "data": "31/01",
@@ -7759,7 +5189,7 @@
           "despesas": -9762.83,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": 25266.96000000002
+          "saldo": -324733.04
         },
         {
           "data": "01/02",
@@ -7775,7 +5205,7 @@
           "despesas": -5910.39,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -130643.43
+          "saldo": -330643.43
         },
         {
           "data": "02/02",
@@ -7791,7 +5221,7 @@
           "despesas": -2117.35,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -132760.77999999997
+          "saldo": -332760.77999999997
         },
         {
           "data": "03/02",
@@ -7807,7 +5237,7 @@
           "despesas": -6317.81,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -139078.58999999997
+          "saldo": -339078.58999999997
         },
         {
           "data": "04/02",
@@ -7823,7 +5253,7 @@
           "despesas": -3723.9,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -142802.49
+          "saldo": -342802.49
         },
         {
           "data": "05/02",
@@ -7839,7 +5269,7 @@
           "despesas": -40820.38,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -183622.87
+          "saldo": -383622.87
         },
         {
           "data": "06/02",
@@ -7855,7 +5285,7 @@
           "despesas": -5104.66,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -188727.52999999997
+          "saldo": -388727.52999999997
         },
         {
           "data": "07/02",
@@ -7868,10 +5298,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -20125.34,
+          "despesas": -10062.67,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -208852.86999999997
+          "saldo": -398790.19999999995
         },
         {
           "data": "08/02",
@@ -7884,10 +5314,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -755.9,
+          "despesas": -377.95,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -209608.77
+          "saldo": -399168.14999999997
         },
         {
           "data": "09/02",
@@ -7900,10 +5330,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -14442.150000000001,
+          "despesas": -6869.34,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -224050.92
+          "saldo": -406037.49
         },
         {
           "data": "10/02",
@@ -7916,10 +5346,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -28081.86,
+          "despesas": -16704.4,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -252132.78000000003
+          "saldo": -422741.89
         },
         {
           "data": "11/02",
@@ -7932,10 +5362,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -9995.45,
+          "despesas": -4816.19,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -262128.23000000004
+          "saldo": -427558.08
         },
         {
           "data": "12/02",
@@ -7948,10 +5378,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -18717.82,
+          "despesas": -4800.4,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -280846.05000000005
+          "saldo": -432358.48000000004
         },
         {
           "data": "13/02",
@@ -7964,10 +5394,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -11871.33,
+          "despesas": -7853.45,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -292717.3800000001
+          "saldo": -440211.93000000005
         },
         {
           "data": "14/02",
@@ -7980,10 +5410,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -10689.99,
+          "despesas": -3588.59,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -303407.3700000001
+          "saldo": -443800.5200000001
         },
         {
           "data": "15/02",
@@ -7996,10 +5426,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -20155.85,
+          "despesas": -9768.97,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -323563.2200000001
+          "saldo": -453569.49000000005
         },
         {
           "data": "16/02",
@@ -8012,10 +5442,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -42603.35,
+          "despesas": -19605.98,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -366166.57000000007
+          "saldo": -473175.47000000003
         },
         {
           "data": "17/02",
@@ -8028,10 +5458,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -19128.670000000002,
+          "despesas": -6984.39,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -385295.2400000001
+          "saldo": -480159.86000000004
         },
         {
           "data": "18/02",
@@ -8047,7 +5477,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -385295.2400000001
+          "saldo": -480159.86000000004
         },
         {
           "data": "19/02",
@@ -8060,10 +5490,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -7810.96,
+          "despesas": -3905.48,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -393106.20000000007
+          "saldo": -484065.34
         },
         {
           "data": "20/02",
@@ -8076,10 +5506,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -97962.15,
+          "despesas": -47508.1,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -491068.3500000001
+          "saldo": -531573.4400000001
         },
         {
           "data": "21/02",
@@ -8092,10 +5522,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -3589.5200000000004,
+          "despesas": -1391.41,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -494657.8700000001
+          "saldo": -532964.8500000001
         },
         {
           "data": "22/02",
@@ -8108,10 +5538,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -6609.18,
+          "despesas": -3304.59,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -501267.0500000001
+          "saldo": -536269.4400000001
         },
         {
           "data": "23/02",
@@ -8124,10 +5554,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -6652.55,
+          "despesas": -2974.54,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -507919.60000000015
+          "saldo": -539243.9800000001
         },
         {
           "data": "24/02",
@@ -8140,10 +5570,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -20884.98,
+          "despesas": -6603.3,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -528804.5800000002
+          "saldo": -545847.2800000001
         },
         {
           "data": "25/02",
@@ -8156,10 +5586,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -14001.06,
+          "despesas": -7000.53,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -542805.6400000002
+          "saldo": -552847.8100000002
         },
         {
           "data": "26/02",
@@ -8172,10 +5602,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -11581.97,
+          "despesas": -3165.09,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -554387.6100000002
+          "saldo": -556012.9000000001
         },
         {
           "data": "27/02",
@@ -8188,10 +5618,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -14530.59,
+          "despesas": -4506.08,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -568918.2000000002
+          "saldo": -560518.9800000001
         },
         {
           "data": "28/02",
@@ -8204,10 +5634,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -10981.82,
+          "despesas": -4353.33,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -579900.0200000001
+          "saldo": -564872.31
         },
         {
           "data": "01/03",
@@ -8223,7 +5653,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -579900.0200000001
+          "saldo": -564872.31
         },
         {
           "data": "02/03",
@@ -8239,7 +5669,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -579900.0200000001
+          "saldo": -564872.31
         },
         {
           "data": "03/03",
@@ -8255,7 +5685,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -579900.0200000001
+          "saldo": -564872.31
         },
         {
           "data": "04/03",
@@ -8271,7 +5701,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -579900.0200000001
+          "saldo": -564872.31
         },
         {
           "data": "05/03",
@@ -8284,10 +5714,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -60558.0,
+          "despesas": -28779.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -640458.0200000001
+          "saldo": -593651.31
         },
         {
           "data": "06/03",
@@ -8303,7 +5733,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -640458.0200000001
+          "saldo": -593651.31
         },
         {
           "data": "07/03",
@@ -8319,7 +5749,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -640458.0200000001
+          "saldo": -593651.31
         },
         {
           "data": "08/03",
@@ -8335,7 +5765,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -640458.0200000001
+          "saldo": -593651.31
         },
         {
           "data": "09/03",
@@ -8351,7 +5781,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -640458.0200000001
+          "saldo": -593651.31
         },
         {
           "data": "10/03",
@@ -8364,10 +5794,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -22500.0,
+          "despesas": -11250.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -662958.0200000001
+          "saldo": -604901.31
         },
         {
           "data": "11/03",
@@ -8383,7 +5813,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -662958.0200000001
+          "saldo": -604901.31
         },
         {
           "data": "12/03",
@@ -8399,7 +5829,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -662958.0200000001
+          "saldo": -604901.31
         },
         {
           "data": "13/03",
@@ -8412,10 +5842,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -13204.0,
+          "despesas": -6602.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -676162.0200000001
+          "saldo": -611503.31
         },
         {
           "data": "14/03",
@@ -8431,7 +5861,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -676162.0200000001
+          "saldo": -611503.31
         },
         {
           "data": "15/03",
@@ -8447,7 +5877,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -676162.0200000001
+          "saldo": -611503.31
         },
         {
           "data": "16/03",
@@ -8463,7 +5893,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -676162.0200000001
+          "saldo": -611503.31
         },
         {
           "data": "17/03",
@@ -8479,7 +5909,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -676162.0200000001
+          "saldo": -611503.31
         },
         {
           "data": "18/03",
@@ -8495,7 +5925,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -676162.0200000001
+          "saldo": -611503.31
         },
         {
           "data": "19/03",
@@ -8511,7 +5941,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -676162.0200000001
+          "saldo": -611503.31
         },
         {
           "data": "20/03",
@@ -8524,10 +5954,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -84846.0,
+          "despesas": -42423.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -761008.02
+          "saldo": -653926.31
         },
         {
           "data": "21/03",
@@ -8543,7 +5973,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -761008.02
+          "saldo": -653926.31
         },
         {
           "data": "22/03",
@@ -8559,7 +5989,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -761008.02
+          "saldo": -653926.31
         },
         {
           "data": "23/03",
@@ -8575,7 +6005,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -761008.02
+          "saldo": -653926.31
         },
         {
           "data": "24/03",
@@ -8591,7 +6021,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -761008.02
+          "saldo": -653926.31
         },
         {
           "data": "25/03",
@@ -8607,7 +6037,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -761008.02
+          "saldo": -653926.31
         },
         {
           "data": "26/03",
@@ -8623,7 +6053,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -761008.02
+          "saldo": -653926.31
         },
         {
           "data": "27/03",
@@ -8639,7 +6069,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -761008.02
+          "saldo": -653926.31
         },
         {
           "data": "28/03",
@@ -8655,7 +6085,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -761008.02
+          "saldo": -653926.31
         },
         {
           "data": "29/03",
@@ -8671,7 +6101,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -761008.02
+          "saldo": -653926.31
         },
         {
           "data": "30/03",
@@ -8684,10 +6114,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -2000.0,
+          "despesas": -1000.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -763008.02
+          "saldo": -654926.31
         },
         {
           "data": "31/03",
@@ -8703,7 +6133,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -763008.02
+          "saldo": -654926.31
         },
         {
           "data": "01/04",
@@ -8719,7 +6149,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -763008.02
+          "saldo": -654926.31
         },
         {
           "data": "02/04",
@@ -8735,7 +6165,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -763008.02
+          "saldo": -654926.31
         },
         {
           "data": "03/04",
@@ -8751,7 +6181,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -763008.02
+          "saldo": -654926.31
         },
         {
           "data": "04/04",
@@ -8767,7 +6197,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -763008.02
+          "saldo": -654926.31
         },
         {
           "data": "05/04",
@@ -8783,7 +6213,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -763008.02
+          "saldo": -654926.31
         },
         {
           "data": "06/04",
@@ -8796,10 +6226,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -60558.0,
+          "despesas": -28779.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -823566.02
+          "saldo": -683705.31
         },
         {
           "data": "07/04",
@@ -8815,7 +6245,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -823566.02
+          "saldo": -683705.31
         },
         {
           "data": "08/04",
@@ -8831,7 +6261,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -823566.02
+          "saldo": -683705.31
         },
         {
           "data": "09/04",
@@ -8847,7 +6277,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -823566.02
+          "saldo": -683705.31
         },
         {
           "data": "10/04",
@@ -8860,10 +6290,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -23000.0,
+          "despesas": -11500.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -846566.02
+          "saldo": -695205.31
         },
         {
           "data": "11/04",
@@ -8879,7 +6309,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -846566.02
+          "saldo": -695205.31
         },
         {
           "data": "12/04",
@@ -8895,7 +6325,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -846566.02
+          "saldo": -695205.31
         },
         {
           "data": "13/04",
@@ -8911,7 +6341,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -846566.02
+          "saldo": -695205.31
         },
         {
           "data": "14/04",
@@ -8927,7 +6357,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -846566.02
+          "saldo": -695205.31
         },
         {
           "data": "15/04",
@@ -8940,10 +6370,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -13204.0,
+          "despesas": -6602.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -859770.02
+          "saldo": -701807.31
         },
         {
           "data": "16/04",
@@ -8959,7 +6389,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -859770.02
+          "saldo": -701807.31
         },
         {
           "data": "17/04",
@@ -8975,7 +6405,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -859770.02
+          "saldo": -701807.31
         },
         {
           "data": "18/04",
@@ -8991,7 +6421,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -859770.02
+          "saldo": -701807.31
         },
         {
           "data": "19/04",
@@ -9007,7 +6437,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -859770.02
+          "saldo": -701807.31
         },
         {
           "data": "20/04",
@@ -9020,10 +6450,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -84846.0,
+          "despesas": -42423.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -944616.02
+          "saldo": -744230.31
         },
         {
           "data": "21/04",
@@ -9039,7 +6469,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -944616.02
+          "saldo": -744230.31
         },
         {
           "data": "22/04",
@@ -9055,7 +6485,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -944616.02
+          "saldo": -744230.31
         },
         {
           "data": "23/04",
@@ -9071,7 +6501,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -944616.02
+          "saldo": -744230.31
         },
         {
           "data": "24/04",
@@ -9087,7 +6517,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -944616.02
+          "saldo": -744230.31
         },
         {
           "data": "25/04",
@@ -9103,7 +6533,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -944616.02
+          "saldo": -744230.31
         },
         {
           "data": "26/04",
@@ -9119,7 +6549,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -944616.02
+          "saldo": -744230.31
         },
         {
           "data": "27/04",
@@ -9135,7 +6565,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -944616.02
+          "saldo": -744230.31
         },
         {
           "data": "28/04",
@@ -9151,7 +6581,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -944616.02
+          "saldo": -744230.31
         },
         {
           "data": "29/04",
@@ -9167,7 +6597,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -944616.02
+          "saldo": -744230.31
         },
         {
           "data": "30/04",
@@ -9180,10 +6610,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -2000.0,
+          "despesas": -1000.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -946616.02
+          "saldo": -745230.31
         },
         {
           "data": "01/05",
@@ -9199,7 +6629,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -946616.02
+          "saldo": -745230.31
         },
         {
           "data": "02/05",
@@ -9215,7 +6645,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -946616.02
+          "saldo": -745230.31
         },
         {
           "data": "03/05",
@@ -9231,7 +6661,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -946616.02
+          "saldo": -745230.31
         },
         {
           "data": "04/05",
@@ -9247,7 +6677,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -946616.02
+          "saldo": -745230.31
         },
         {
           "data": "05/05",
@@ -9260,10 +6690,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -60558.0,
+          "despesas": -28779.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1007174.02
+          "saldo": -774009.31
         },
         {
           "data": "06/05",
@@ -9279,7 +6709,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1007174.02
+          "saldo": -774009.31
         },
         {
           "data": "07/05",
@@ -9295,7 +6725,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1007174.02
+          "saldo": -774009.31
         },
         {
           "data": "08/05",
@@ -9308,10 +6738,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -23000.0,
+          "despesas": -11500.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1030174.02
+          "saldo": -785509.31
         },
         {
           "data": "09/05",
@@ -9327,7 +6757,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1030174.02
+          "saldo": -785509.31
         },
         {
           "data": "10/05",
@@ -9343,7 +6773,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1030174.02
+          "saldo": -785509.31
         },
         {
           "data": "11/05",
@@ -9359,7 +6789,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1030174.02
+          "saldo": -785509.31
         },
         {
           "data": "12/05",
@@ -9375,7 +6805,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1030174.02
+          "saldo": -785509.31
         },
         {
           "data": "13/05",
@@ -9391,7 +6821,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1030174.02
+          "saldo": -785509.31
         },
         {
           "data": "14/05",
@@ -9407,7 +6837,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1030174.02
+          "saldo": -785509.31
         },
         {
           "data": "15/05",
@@ -9420,10 +6850,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -13204.0,
+          "despesas": -6602.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1043378.02
+          "saldo": -792111.31
         },
         {
           "data": "16/05",
@@ -9439,7 +6869,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1043378.02
+          "saldo": -792111.31
         },
         {
           "data": "17/05",
@@ -9455,7 +6885,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1043378.02
+          "saldo": -792111.31
         },
         {
           "data": "18/05",
@@ -9471,7 +6901,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1043378.02
+          "saldo": -792111.31
         },
         {
           "data": "19/05",
@@ -9487,7 +6917,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1043378.02
+          "saldo": -792111.31
         },
         {
           "data": "20/05",
@@ -9500,10 +6930,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -84846.0,
+          "despesas": -42423.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1128224.02
+          "saldo": -834534.31
         },
         {
           "data": "21/05",
@@ -9519,7 +6949,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1128224.02
+          "saldo": -834534.31
         },
         {
           "data": "22/05",
@@ -9535,7 +6965,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1128224.02
+          "saldo": -834534.31
         },
         {
           "data": "23/05",
@@ -9551,7 +6981,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1128224.02
+          "saldo": -834534.31
         },
         {
           "data": "24/05",
@@ -9567,7 +6997,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1128224.02
+          "saldo": -834534.31
         },
         {
           "data": "25/05",
@@ -9583,7 +7013,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1128224.02
+          "saldo": -834534.31
         },
         {
           "data": "26/05",
@@ -9599,7 +7029,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1128224.02
+          "saldo": -834534.31
         },
         {
           "data": "27/05",
@@ -9615,7 +7045,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1128224.02
+          "saldo": -834534.31
         },
         {
           "data": "28/05",
@@ -9631,7 +7061,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1128224.02
+          "saldo": -834534.31
         },
         {
           "data": "29/05",
@@ -9644,10 +7074,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -2000.0,
+          "despesas": -1000.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1130224.02
+          "saldo": -835534.31
         },
         {
           "data": "30/05",
@@ -9663,7 +7093,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1130224.02
+          "saldo": -835534.31
         },
         {
           "data": "31/05",
@@ -9679,7 +7109,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1130224.02
+          "saldo": -835534.31
         },
         {
           "data": "01/06",
@@ -9695,7 +7125,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1130224.02
+          "saldo": -835534.31
         },
         {
           "data": "02/06",
@@ -9711,7 +7141,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1130224.02
+          "saldo": -835534.31
         },
         {
           "data": "03/06",
@@ -9727,7 +7157,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1130224.02
+          "saldo": -835534.31
         },
         {
           "data": "04/06",
@@ -9743,7 +7173,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1130224.02
+          "saldo": -835534.31
         },
         {
           "data": "05/06",
@@ -9756,10 +7186,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -60558.0,
+          "despesas": -28779.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1190782.02
+          "saldo": -864313.31
         },
         {
           "data": "06/06",
@@ -9775,7 +7205,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1190782.02
+          "saldo": -864313.31
         },
         {
           "data": "07/06",
@@ -9791,7 +7221,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1190782.02
+          "saldo": -864313.31
         },
         {
           "data": "08/06",
@@ -9807,7 +7237,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1190782.02
+          "saldo": -864313.31
         },
         {
           "data": "09/06",
@@ -9823,7 +7253,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1190782.02
+          "saldo": -864313.31
         },
         {
           "data": "10/06",
@@ -9836,10 +7266,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -23000.0,
+          "despesas": -11500.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1213782.02
+          "saldo": -875813.31
         },
         {
           "data": "11/06",
@@ -9855,7 +7285,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1213782.02
+          "saldo": -875813.31
         },
         {
           "data": "12/06",
@@ -9871,7 +7301,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1213782.02
+          "saldo": -875813.31
         },
         {
           "data": "13/06",
@@ -9887,7 +7317,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1213782.02
+          "saldo": -875813.31
         },
         {
           "data": "14/06",
@@ -9902,8 +7332,8 @@
           "aportes": 0.0,
           "despesas": 0.0,
           "aplicacoes": 0.0,
-          "shareholder": 0.0,
-          "saldo": -1213782.02
+          "shareholder": 208610.05,
+          "saldo": -667203.26
         },
         {
           "data": "15/06",
@@ -9916,10 +7346,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -13204.0,
+          "despesas": -33828.84,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1226986.02
+          "saldo": -701032.1000000001
         },
         {
           "data": "16/06",
@@ -9932,10 +7362,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": 0.0,
+          "despesas": -2840.01,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1226986.02
+          "saldo": -703872.1100000001
         },
         {
           "data": "17/06",
@@ -9948,10 +7378,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": 0.0,
+          "despesas": -9695.13,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1226986.02
+          "saldo": -713567.2400000001
         },
         {
           "data": "18/06",
@@ -9964,10 +7394,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": 0.0,
+          "despesas": -22259.68,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1226986.02
+          "saldo": -735826.92
         },
         {
           "data": "19/06",
@@ -9980,10 +7410,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -84846.0,
+          "despesas": -43732.87,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1311832.02
+          "saldo": -779559.79
         },
         {
           "data": "20/06",
@@ -9999,7 +7429,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1311832.02
+          "saldo": -779559.79
         },
         {
           "data": "21/06",
@@ -10015,7 +7445,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1311832.02
+          "saldo": -779559.79
         },
         {
           "data": "22/06",
@@ -10028,10 +7458,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": 0.0,
+          "despesas": -20043.27,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1311832.02
+          "saldo": -799603.06
         },
         {
           "data": "23/06",
@@ -10044,10 +7474,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": 0.0,
+          "despesas": -13608.52,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1311832.02
+          "saldo": -813211.5800000001
         },
         {
           "data": "24/06",
@@ -10060,10 +7490,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": 0.0,
+          "despesas": -18715.95,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1311832.02
+          "saldo": -831927.53
         },
         {
           "data": "25/06",
@@ -10076,10 +7506,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": 0.0,
+          "despesas": -24790.44,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1311832.02
+          "saldo": -856717.9700000001
         },
         {
           "data": "26/06",
@@ -10092,10 +7522,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": 0.0,
+          "despesas": -16341.23,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1311832.02
+          "saldo": -873059.2000000001
         },
         {
           "data": "27/06",
@@ -10108,10 +7538,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": 0.0,
+          "despesas": -25267.77,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1311832.02
+          "saldo": -898326.9700000001
         },
         {
           "data": "28/06",
@@ -10127,7 +7557,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1311832.02
+          "saldo": -898326.9700000001
         },
         {
           "data": "29/06",
@@ -10143,7 +7573,7 @@
           "despesas": 0.0,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1311832.02
+          "saldo": -898326.9700000001
         },
         {
           "data": "30/06",
@@ -10156,10 +7586,10 @@
           "entradas": 0.0,
           "resgates": 0.0,
           "aportes": 0.0,
-          "despesas": -2000.0,
+          "despesas": -5177.99,
           "aplicacoes": 0.0,
           "shareholder": 0.0,
-          "saldo": -1313832.02
+          "saldo": -903504.9600000001
         }
       ]
     }
