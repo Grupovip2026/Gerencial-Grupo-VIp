@@ -1,5 +1,5 @@
 {
-  "gerado_em": "19/07/2026 07:52",
+  "gerado_em": "20/07/2026 00:33",
   "fonte": "Resultado_Gerencial_2026.xlsx",
   "empresas": {
     "VIP": {
@@ -202,6 +202,46 @@
               "real": 0
             }
           }
+        },
+        {
+          "mes": "Jun",
+          "ano": 2026,
+          "mes_num": 6,
+          "order": 202606,
+          "rPrev": 293150.0,
+          "rReal": 404628.91,
+          "dPrev": 158885.36,
+          "dReal": 471927.92,
+          "resPrev": 134264.64,
+          "resReal": -67299.01000000001,
+          "dPessoalPrev": 7045.74,
+          "dPessoalReal": 8585.04,
+          "dMateriaPrev": 21761.12,
+          "dMateriaReal": 323838.7,
+          "dImpostosPrev": 25500.0,
+          "dImpostosReal": 0.0,
+          "dTaxasPrev": 76219.0,
+          "dTaxasReal": 88248.43,
+          "dCancelPrev": 14657.5,
+          "dCancelReal": 41482.2,
+          "dMarketingPrev": 3250.0,
+          "dMarketingReal": 0.0,
+          "dFinancPrev": 6602.0,
+          "dFinancReal": 6602.0,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 286000.0,
+              "real": 384556.12
+            },
+            "Shopee": {
+              "prev": 3300.0,
+              "real": 20072.79
+            },
+            "Amazon": {
+              "prev": 3850.0,
+              "real": 0
+            }
+          }
         }
       ]
     },
@@ -378,13 +418,13 @@
           "rPrev": 227700.0,
           "rReal": 249143.27,
           "dPrev": 194657.7,
-          "dReal": 106174.73,
+          "dReal": 158927.44,
           "resPrev": 33042.29999999999,
-          "resReal": 142968.53999999998,
+          "resReal": 90215.82999999999,
           "dPessoalPrev": 19009.31,
           "dPessoalReal": 19613.31,
           "dMateriaPrev": 98000.0,
-          "dMateriaReal": 0.0,
+          "dMateriaReal": 52752.71,
           "dImpostosPrev": 15500.0,
           "dImpostosReal": 12220.29,
           "dTaxasPrev": 44902.0,
@@ -407,6 +447,46 @@
             "Loja Fisica": {
               "prev": 55000.0,
               "real": 40471.71
+            }
+          }
+        },
+        {
+          "mes": "Jun",
+          "ano": 2026,
+          "mes_num": 6,
+          "order": 202606,
+          "rPrev": 227700.0,
+          "rReal": 209719.42,
+          "dPrev": 194496.31,
+          "dReal": 121058.48000000001,
+          "resPrev": 33203.69,
+          "resReal": 88660.94,
+          "dPessoalPrev": 19009.31,
+          "dPessoalReal": 19613.31,
+          "dMateriaPrev": 98000.0,
+          "dMateriaReal": 44476.94,
+          "dImpostosPrev": 15500.0,
+          "dImpostosReal": 0.0,
+          "dTaxasPrev": 44902.0,
+          "dTaxasReal": 31871.32,
+          "dCancelPrev": 8635.0,
+          "dCancelReal": 17831.35,
+          "dMarketingPrev": 0.0,
+          "dMarketingReal": 0.0,
+          "dFinancPrev": 0.0,
+          "dFinancReal": 0.0,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 170500.0,
+              "real": 128866.0
+            },
+            "Shopee": {
+              "prev": 2200.0,
+              "real": 36966.34
+            },
+            "Loja Fisica": {
+              "prev": 55000.0,
+              "real": 43887.08
             }
           }
         }
@@ -739,13 +819,13 @@
           "rPrev": 529100.0,
           "rReal": 669632.1699999999,
           "dPrev": 383179.82,
-          "dReal": 608802.6,
+          "dReal": 661555.3099999999,
           "resPrev": 145920.18,
-          "resReal": 60829.56999999999,
+          "resReal": 8076.860000000003,
           "dPessoalPrev": 26055.050000000003,
           "dPessoalReal": 28198.350000000002,
           "dMateriaPrev": 146922.88,
-          "dMateriaReal": 319945.38,
+          "dMateriaReal": 372698.09,
           "dImpostosPrev": 41000.0,
           "dImpostosReal": 43308.56,
           "dTaxasPrev": 123183.5,
@@ -772,6 +852,50 @@
             "Loja Fisica": {
               "prev": 55000.0,
               "real": 40471.71
+            }
+          }
+        },
+        {
+          "mes": "Jun",
+          "ano": 2026,
+          "mes_num": 6,
+          "order": 202606,
+          "rPrev": 520850.0,
+          "rReal": 614348.33,
+          "dPrev": 353381.67,
+          "dReal": 592986.4,
+          "resPrev": 167468.33000000002,
+          "resReal": 21361.929999999993,
+          "dPessoalPrev": 26055.050000000003,
+          "dPessoalReal": 28198.350000000002,
+          "dMateriaPrev": 119761.12,
+          "dMateriaReal": 368315.64,
+          "dImpostosPrev": 41000.0,
+          "dImpostosReal": 0.0,
+          "dTaxasPrev": 121121.0,
+          "dTaxasReal": 120119.75,
+          "dCancelPrev": 23292.5,
+          "dCancelReal": 59313.549999999996,
+          "dMarketingPrev": 3250.0,
+          "dMarketingReal": 0.0,
+          "dFinancPrev": 6602.0,
+          "dFinancReal": 6602.0,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 456500.0,
+              "real": 513422.12
+            },
+            "Shopee": {
+              "prev": 5500.0,
+              "real": 57039.13
+            },
+            "Amazon": {
+              "prev": 3850.0,
+              "real": 0
+            },
+            "Loja Fisica": {
+              "prev": 55000.0,
+              "real": 43887.08
             }
           }
         }
