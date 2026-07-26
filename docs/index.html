@@ -259,9 +259,21 @@ function renderGer(){
   const meses=months.map(m=>m.mes);
   mkChart('cReceita','bar',meses,[{label:'Previsto',data:months.map(m=>m.rPrev),backgroundColor:'rgba(255,255,255,.1)',borderRadius:4},{label:'Realizado',data:months.map(m=>m.rReal),backgroundColor:color,borderRadius:4}]);
   mkChart('cResultado','bar',meses,[{label:'Previsto',data:months.map(m=>m.resPrev),backgroundColor:'rgba(255,255,255,.1)',borderRadius:4},{label:'Realizado',data:months.map(m=>m.resReal),backgroundColor:months.map(m=>m.resReal>=0?color:'#FF6B6B'),borderRadius:4}]);
-  const cats={'Matéria Prima':['dMateriaPrev','dMateriaReal'],'Taxas':['dTaxasPrev','dTaxasReal'],'Cancelamentos':['dCancelPrev','dCancelReal'],'Impostos':['dImpostosPrev','dImpostosReal'],'Pessoal':['dPessoalPrev','dPessoalReal'],'Marketing':['dMarketingPrev','dMarketingReal'],'Financiamentos':['dFinancPrev','dFinancReal']};
-  const desp=Object.entries(cats).map(([cat,[fp,fr]])=>({cat,prev:months.reduce((s,m)=>s+(m[fp]||0),0),real:months.reduce((s,m)=>s+(m[fr]||0),0)})).filter(d=>d.prev>0||d.real>0);
-  if(desp.length)mkChart('cDespesas','bar',desp.map(d=>d.cat),[{label:'Previsto',data:desp.map(d=>d.prev),backgroundColor:'rgba(255,255,255,.1)',borderRadius:4},{label:'Realizado',data:desp.map(d=>d.real),backgroundColor:co.accent,borderRadius:4}],{hbar:true,extra:{indexAxis:'y'}});
+  // Usa dados do DRE para despesas (mais completo)
+  const dreMonths=(DATA.dre[gerCur==='V3'?'VIP':gerCur]?.months||[]).filter((_,i)=>gerSel.has(i));
+  const dreSource = dreMonths.length ? dreMonths : months;
+  const despCats=[
+    {cat:'CMV',field:'cmv'},
+    {cat:'Taxas Plataforma',field:'dTaxas'},
+    {cat:'Impostos',field:'impostos'},
+    {cat:'Pessoal',field:'dPessoal'},
+    {cat:'Devoluções',field:'devolucoes'},
+    {cat:'Financiamentos',field:'dFinanc'},
+    {cat:'Marketing',field:'dMarketing'},
+    {cat:'Outras',field:'dOutras'},
+  ];
+  const desp=despCats.map(({cat,field})=>({cat,real:dreSource.reduce((s,m)=>s+(m[field]||0),0)})).filter(d=>d.real>0);
+  if(desp.length)mkChart('cDespesas','bar',desp.map(d=>d.cat),[{label:'Realizado',data:desp.map(d=>d.real),backgroundColor:co.accent,borderRadius:4}],{hbar:true,extra:{indexAxis:'y'}});
   const cmap={};months.forEach(m=>{if(!m.canais)return;for(const[cn,cv]of Object.entries(m.canais)){if(!cmap[cn])cmap[cn]={prev:0,real:0};cmap[cn].prev+=cv.prev||0;cmap[cn].real+=cv.real||0}});
   const canais=Object.entries(cmap).map(([canal,v])=>({canal,...v})).filter(c=>c.prev>0||c.real>0);
   if(canais.length)mkChart('cCanais','bar',canais.map(c=>c.canal),[{label:'Previsto',data:canais.map(c=>c.prev),backgroundColor:'rgba(255,255,255,.1)',borderRadius:4},{label:'Realizado',data:canais.map(c=>c.real),backgroundColor:color,borderRadius:4}]);
