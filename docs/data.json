@@ -1,5 +1,5 @@
 {
-  "gerado_em": "26/07/2026 08:00",
+  "gerado_em": "26/07/2026 14:38",
   "fonte": "Resultado_Gerencial_2026.xlsx",
   "dre": {
     "VIP": {
@@ -264,6 +264,139 @@
           "ebitda": 28278.170000000006,
           "depreciacao": 0.0,
           "ebit": 28278.170000000006,
+          "lucroLiquido": 0.0
+        }
+      ]
+    },
+    "GRUPO": {
+      "color": "#F5A623",
+      "accent": "#C47D0E",
+      "label": "Grupo VIP",
+      "months": [
+        {
+          "mes": "Jan",
+          "mes_num": 1,
+          "ano": 2026,
+          "order": 202601,
+          "rBruta": 631926.15,
+          "devolucoes": 51820.159999999996,
+          "impostos": 42200.12,
+          "rLiquida": 537905.87,
+          "cmv": 315963.075,
+          "lucroBruto": 221942.79500000004,
+          "dPessoal": 24832.02,
+          "dMarketing": 0.0,
+          "dTaxas": 123240.64,
+          "dFinanc": 6602.0,
+          "dOutras": 8103.0,
+          "ebitda": 59165.13500000004,
+          "depreciacao": 1500.0,
+          "ebit": 57665.13500000004,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Fev",
+          "mes_num": 2,
+          "ano": 2026,
+          "order": 202602,
+          "rBruta": 530338.05,
+          "devolucoes": 48129.93,
+          "impostos": 35469.65,
+          "rLiquida": 446738.47,
+          "cmv": 265169.025,
+          "lucroBruto": 181569.44499999995,
+          "dPessoal": 24197.08,
+          "dMarketing": 0.0,
+          "dTaxas": 118528.31,
+          "dFinanc": 6602.0,
+          "dOutras": 11663.0,
+          "ebitda": 20579.054999999957,
+          "depreciacao": 1500.0,
+          "ebit": 19079.054999999957,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Mar",
+          "mes_num": 3,
+          "ano": 2026,
+          "order": 202603,
+          "rBruta": 675276.01,
+          "devolucoes": 53953.450000000004,
+          "impostos": 46169.18000000001,
+          "rLiquida": 575153.38,
+          "cmv": 337638.005,
+          "lucroBruto": 237515.37499999994,
+          "dPessoal": 25433.940000000002,
+          "dMarketing": 0.0,
+          "dTaxas": 144967.67,
+          "dFinanc": 6602.0,
+          "dOutras": 7572.0,
+          "ebitda": 52939.76499999995,
+          "depreciacao": 1500.0,
+          "ebit": 51439.76499999995,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Abr",
+          "mes_num": 4,
+          "ano": 2026,
+          "order": 202604,
+          "rBruta": 796960.97,
+          "devolucoes": 71069.8,
+          "impostos": 51225.899999999994,
+          "rLiquida": 674665.27,
+          "cmv": 398480.485,
+          "lucroBruto": 276184.78500000003,
+          "dPessoal": 26861.95,
+          "dMarketing": 0.0,
+          "dTaxas": 124129.14,
+          "dFinanc": 6602.0,
+          "dOutras": 9220.0,
+          "ebitda": 109371.69499999999,
+          "depreciacao": 1500.0,
+          "ebit": 107871.69499999999,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Mai",
+          "mes_num": 5,
+          "ano": 2026,
+          "order": 202605,
+          "rBruta": 664748.2999999999,
+          "devolucoes": 56790.23,
+          "impostos": 47220.29,
+          "rLiquida": 560737.7799999999,
+          "cmv": 332374.14999999997,
+          "lucroBruto": 228363.62999999995,
+          "dPessoal": 28198.350000000002,
+          "dMarketing": 0.0,
+          "dTaxas": 140426.13,
+          "dFinanc": 6602.0,
+          "dOutras": 9155.56,
+          "ebitda": 43981.589999999946,
+          "depreciacao": 1500.0,
+          "ebit": 42481.589999999946,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Jun",
+          "mes_num": 6,
+          "ano": 2026,
+          "order": 202606,
+          "rBruta": 614348.33,
+          "devolucoes": 59313.549999999996,
+          "impostos": 0.0,
+          "rLiquida": 555034.78,
+          "cmv": 307174.165,
+          "lucroBruto": 247860.615,
+          "dPessoal": 28198.350000000002,
+          "dMarketing": 0.0,
+          "dTaxas": 120119.75,
+          "dFinanc": 6602.0,
+          "dOutras": 9155.56,
+          "ebitda": 83784.95499999999,
+          "depreciacao": 1500.0,
+          "ebit": 82284.95499999999,
           "lucroLiquido": 0.0
         }
       ]
@@ -848,21 +981,124 @@
       ]
     }
   },
-  "contas_pagas": {
-    "VIP": {
-      "Jan": 252772.95,
-      "Fev": 228525.11,
-      "Mar": 268703.5,
-      "Abr": 223982.07,
-      "Mai": 319945.38,
-      "Jun": 130413.67
+  "divida": {
+    "pagas": {
+      "VIP": {
+        "Jan": 252772.95,
+        "Fev": 228525.11,
+        "Mar": 268703.5,
+        "Abr": 223982.07,
+        "Mai": 319945.38,
+        "Jun": 130413.67
+      },
+      "VIDAL": {
+        "Fev": 3059.0,
+        "Mar": 10570.07,
+        "Abr": 30495.45,
+        "Mai": 52752.71,
+        "Jun": 18754.78
+      },
+      "GRUPO": {
+        "Fev": 231584.11,
+        "Mai": 372698.09,
+        "Jan": 252772.95,
+        "Abr": 254477.52000000002,
+        "Mar": 279273.57,
+        "Jun": 149168.45
+      }
     },
-    "VIDAL": {
-      "Fev": 3059.0,
-      "Mar": 10570.07,
-      "Abr": 30495.45,
-      "Mai": 52752.71,
-      "Jun": 18754.78
+    "a_pagar": {
+      "VIP": {
+        "Mai": 2106.22,
+        "Jun": 188334.68,
+        "Jul": 284685.8,
+        "Ago": 196173.87,
+        "Set": 112354.99,
+        "Out": 50055.49,
+        "Nov": 18763.44
+      },
+      "GRUPO": {
+        "Mai": 2106.22,
+        "Jun": 188334.68,
+        "Jul": 284685.8,
+        "Ago": 196173.87,
+        "Set": 112354.99,
+        "Out": 50055.49,
+        "Nov": 18763.44
+      }
     }
+  },
+  "custos": {
+    "fixo": [
+      {
+        "label": "Despesas Pessoal",
+        "valor": 9122.65
+      },
+      {
+        "label": "Retirada (prolabore)",
+        "valor": 17000.0
+      },
+      {
+        "label": "Consultoria Financeira",
+        "valor": 1000.0
+      },
+      {
+        "label": "Consultoria Contabil",
+        "valor": 640.0
+      },
+      {
+        "label": "Aluguel + Condominio",
+        "valor": 2150.0
+      },
+      {
+        "label": "Luz",
+        "valor": 850.0
+      },
+      {
+        "label": "Agua",
+        "valor": 250.0
+      },
+      {
+        "label": "Bling",
+        "valor": 450.0
+      },
+      {
+        "label": "Despesas de venda",
+        "valor": 2000.0
+      },
+      {
+        "label": "Financiamento Pronamp",
+        "valor": 6602.0
+      }
+    ],
+    "variavel": [
+      {
+        "label": "Cartão de credito",
+        "valor": 5000.0
+      },
+      {
+        "label": "Materia prima",
+        "valor": 370000.0
+      },
+      {
+        "label": "Marketing",
+        "valor": 3000.0
+      },
+      {
+        "label": "Impostos",
+        "valor": 56000.0
+      },
+      {
+        "label": "Taxas das plataformas",
+        "valor": 155000.0
+      },
+      {
+        "label": "Cancelamentos e reembolsos",
+        "valor": 55000.0
+      }
+    ],
+    "total_fixo": 40064.65,
+    "total_variavel": 644000.0,
+    "total": 684064.65
   }
 }
