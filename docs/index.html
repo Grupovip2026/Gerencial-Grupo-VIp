@@ -111,6 +111,7 @@ tr.section-head td{background:rgba(255,255,255,.05);color:#888!important;font-si
   <div class="tabs">
     <button class="tab active-vip" onclick="setDre('VIP')">VIP MX</button>
     <button class="tab" onclick="setDre('VIDAL')">VIDAL</button>
+    <button class="tab" onclick="setDre('V3')">V3</button>
     <button class="tab" onclick="setDre('GRUPO')">Grupo VIP</button>
   </div>
   <div class="filter-bar">
@@ -260,7 +261,7 @@ function renderGer(){
   mkChart('cReceita','bar',meses,[{label:'Previsto',data:months.map(m=>m.rPrev),backgroundColor:'rgba(255,255,255,.1)',borderRadius:4},{label:'Realizado',data:months.map(m=>m.rReal),backgroundColor:color,borderRadius:4}]);
   mkChart('cResultado','bar',meses,[{label:'Previsto',data:months.map(m=>m.resPrev),backgroundColor:'rgba(255,255,255,.1)',borderRadius:4},{label:'Realizado',data:months.map(m=>m.resReal),backgroundColor:months.map(m=>m.resReal>=0?color:'#FF6B6B'),borderRadius:4}]);
   // Usa dados do DRE para despesas (mais completo)
-  const dreMonths=(DATA.dre[gerCur==='V3'?'VIP':gerCur]?.months||[]).filter((_,i)=>gerSel.has(i));
+  const dreMonths=(DATA.dre[gerCur]?.months||[]).filter((_,i)=>gerSel.has(i));
   const dreSource = dreMonths.length ? dreMonths : months;
   const despCats=[
     {cat:'CMV',field:'cmv'},
@@ -289,7 +290,7 @@ function renderGer(){
 // ── DRE ───────────────────────────────────────────────────────────────────────
 function setDre(k){
   if(!DATA)return; dreCur=k;
-  document.querySelectorAll('#page-dre .tab').forEach((t,i)=>{t.className='tab';if(['VIP','VIDAL','GRUPO'][i]===k)t.classList.add('active-'+k.toLowerCase())});
+  document.querySelectorAll('#page-dre .tab').forEach((t,i)=>{t.className='tab';if(['VIP','VIDAL','V3','GRUPO'][i]===k)t.classList.add('active-'+k.toLowerCase())});
   dreSel=new Set((DATA.dre[k]?.months||[]).map((_,i)=>i));
   buildDreFilter();renderDre();
 }
