@@ -209,14 +209,14 @@ def build_json():
 
     # DRE individual
     dre = {}
-    for emp, aba in [("VIP","DRE - VIP"),("VIDAL","DRE - VIDAL")]:
+    for emp, aba in [("VIP","DRE - VIP"),("VIDAL","DRE - VIDAL"),("V3","DRE - V3")]:
         months = parse_dre(wb, aba)
         dre[emp] = {**colors[emp], "months": months}
         print(f"  DRE {emp}: {len(months)} meses")
 
-    # DRE Grupo = soma VIP + VIDAL
+    # DRE Grupo = soma VIP + VIDAL + V3
     grupo_dre = {}
-    for emp in ["VIP","VIDAL"]:
+    for emp in ["VIP","VIDAL","V3"]:
         for m in dre[emp]["months"]:
             k = m["order"]
             if k not in grupo_dre:
