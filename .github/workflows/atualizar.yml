@@ -2,9 +2,9 @@ name: Atualizar Dashboard
 
 on:
   schedule:
-    - cron: "0 14 * * *"    # 11:00 BRT (14:00 UTC)
-    - cron: "0 20 * * *"    # 17:00 BRT (20:00 UTC)
-  workflow_dispatch:          # botão manual
+    - cron: "0 14 * * 1-5"   # 11:00 BRT (14:00 UTC) seg-sex
+    - cron: "0 20 * * 1-5"   # 17:00 BRT (20:00 UTC) seg-sex
+  workflow_dispatch:           # botão manual
 
 permissions:
   contents: write
@@ -27,53 +27,37 @@ jobs:
       - name: Instalar dependências
         run: pip install openpyxl requests
 
-      - name: Baixar planilha do OneDrive
+      - name: Baixar planilha do Google Drive
         run: |
           python3 - << 'PYEOF'
-          import requests, re
+          import requests, os
 
-          share_url = "https://1drv.ms/x/c/06512c644da1502a/IQBGDxWTefwUT7yBlWOzk7quAYvnsamvqIry1_DplFXf3io?e=lhlGdz"
+          file_id = "17ZPm6V--MTZvmeY5xoNhmUCMbc0ByrU8"
+          download_url = f"https://drive.google.com/uc?export=download&id={file_id}"
 
-          # Converte link de compartilhamento para link de download direto
           session = requests.Session()
-          session.headers.update({"User-Agent": "Mozilla/5.0"})
+          r = session.get(download_url, stream=True)
 
-          # Primeiro acessa o link para pegar o redirect
-          r = session.get(share_url, allow_redirects=True)
-          
-          # Tenta extrair URL de download direto
-          download_url = None
-          
-          # Método 1: procura pelo link de download no HTML
-          match = re.search(r'"downloadUrl":"([^"]+)"', r.text)
-          if match:
-              download_url = match.group(1).replace('\\u0026', '&')
-          
-          # Método 2: monta URL de download via API do OneDrive
-          if not download_url:
-              match = re.search(r'resid=([^&"]+)', r.url + r.text)
-              if match:
-                  resid = match.group(1)
-                  download_url = f"https://onedrive.live.com/download?resid={resid}&authkey=!{share_url.split('!')[-1].split('?')[0]}"
+          # Google Drive pede confirmação para arquivos grandes
+          token = None
+          for key, value in r.cookies.items():
+              if key.startswith("download_warning"):
+                  token = value
+                  break
 
-          if not download_url:
-              # Fallback: usa a URL direta com parâmetro download
-              base = share_url.split('?')[0]
-              download_url = base.replace('1drv.ms/x', 'onedrive.live.com/download') + "?download=1"
+          if token:
+              r = session.get(download_url + f"&confirm={token}", stream=True)
 
-          print(f"Download URL: {download_url[:80]}...")
-          r2 = session.get(download_url, stream=True)
-          print(f"Status: {r2.status_code} | Content-Type: {r2.headers.get('content-type','')}")
-          
-          with open("Resultado Gerencial 2026.xlsx", "wb") as f:
-              for chunk in r2.iter_content(chunk_size=8192):
-                  f.write(chunk)
-          
-          import os
-          size = os.path.getsize("Resultado Gerencial 2026.xlsx")
-          print(f"Arquivo salvo: {size} bytes")
+          filename = "Resultado Gerencial 2026.xlsx"
+          with open(filename, "wb") as f:
+              for chunk in r.iter_content(chunk_size=32768):
+                  if chunk:
+                      f.write(chunk)
+
+          size = os.path.getsize(filename)
+          print(f"✅ Arquivo salvo: {size:,} bytes")
           if size < 10000:
-              raise Exception(f"Arquivo muito pequeno ({size} bytes) - download falhou")
+              raise Exception(f"Download falhou — arquivo muito pequeno ({size} bytes)")
           PYEOF
 
       - name: Gerar data.json a partir do xlsx
@@ -84,5 +68,5 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add docs/data.json
-          git diff --cached --quiet || git commit -m "chore: atualiza data.json [$(date '+%d/%m/%Y %H:%M')]"
+          git diff --cached --quiet || git commit -m "chore: atualiza data.json [$(date '+%d/%m/%Y %H:%M' -u -d '+3 hours')]"
           git push
