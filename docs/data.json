@@ -1,5 +1,5 @@
 {
-  "gerado_em": "26/07/2026 14:38",
+  "gerado_em": "26/07/2026 14:47",
   "fonte": "Resultado_Gerencial_2026.xlsx",
   "dre": {
     "VIP": {
@@ -119,18 +119,18 @@
           "order": 202606,
           "rBruta": 404628.91,
           "devolucoes": 41482.2,
-          "impostos": 0.0,
-          "rLiquida": 363146.70999999996,
+          "impostos": 37601.78,
+          "rLiquida": 325544.92999999993,
           "cmv": 202314.455,
-          "lucroBruto": 160832.25499999998,
-          "dPessoal": 8585.04,
-          "dMarketing": 0.0,
+          "lucroBruto": 123230.47499999995,
+          "dPessoal": 8441.460000000001,
+          "dMarketing": 780.0,
           "dTaxas": 88248.43,
           "dFinanc": 6602.0,
           "dOutras": 1890.0,
-          "ebitda": 55506.784999999974,
+          "ebitda": 18048.58499999995,
           "depreciacao": 1500.0,
-          "ebit": 54006.784999999974,
+          "ebit": 16548.58499999995,
           "lucroLiquido": 0.0
         }
       ]
@@ -252,18 +252,18 @@
           "order": 202606,
           "rBruta": 209719.42,
           "devolucoes": 17831.35,
-          "impostos": 0.0,
-          "rLiquida": 191888.07,
+          "impostos": 8786.62,
+          "rLiquida": 183101.45,
           "cmv": 104859.71,
-          "lucroBruto": 87028.36,
-          "dPessoal": 19613.31,
+          "lucroBruto": 78241.74,
+          "dPessoal": 19753.78,
           "dMarketing": 0.0,
           "dTaxas": 31871.32,
           "dFinanc": 0.0,
           "dOutras": 7265.5599999999995,
-          "ebitda": 28278.170000000006,
+          "ebitda": 19351.08000000001,
           "depreciacao": 0.0,
-          "ebit": 28278.170000000006,
+          "ebit": 19351.08000000001,
           "lucroLiquido": 0.0
         }
       ]
@@ -385,18 +385,18 @@
           "order": 202606,
           "rBruta": 614348.33,
           "devolucoes": 59313.549999999996,
-          "impostos": 0.0,
-          "rLiquida": 555034.78,
+          "impostos": 46388.4,
+          "rLiquida": 508646.37999999995,
           "cmv": 307174.165,
-          "lucroBruto": 247860.615,
-          "dPessoal": 28198.350000000002,
-          "dMarketing": 0.0,
+          "lucroBruto": 201472.21499999997,
+          "dPessoal": 28195.239999999998,
+          "dMarketing": 780.0,
           "dTaxas": 120119.75,
           "dFinanc": 6602.0,
           "dOutras": 9155.56,
-          "ebitda": 83784.95499999999,
+          "ebitda": 37399.66499999996,
           "depreciacao": 1500.0,
-          "ebit": 82284.95499999999,
+          "ebit": 35899.66499999996,
           "lucroLiquido": 0.0
         }
       ]
@@ -542,9 +542,9 @@
           "rPrev": 293150.0,
           "rReal": 404628.91,
           "dPrev": 158885.36,
-          "dReal": 471927.92,
+          "dReal": 510166.12,
           "resPrev": 134264.64,
-          "resReal": -67299.01000000001,
+          "resReal": -105537.21000000002,
           "canais": {
             "Mercado Livre": {
               "prev": 286000.0,
@@ -705,9 +705,9 @@
           "rPrev": 227700.0,
           "rReal": 209719.42,
           "dPrev": 194496.31,
-          "dReal": 121058.48000000001,
+          "dReal": 129985.57,
           "resPrev": 33203.69,
-          "resReal": 88660.94,
+          "resReal": 79733.85,
           "canais": {
             "Mercado Livre": {
               "prev": 170500.0,
@@ -956,9 +956,9 @@
           "rPrev": 520850.0,
           "rReal": 614348.33,
           "dPrev": 353381.67,
-          "dReal": 592986.4,
+          "dReal": 640151.69,
           "resPrev": 167468.33000000002,
-          "resReal": 21361.929999999993,
+          "resReal": -25803.360000000015,
           "canais": {
             "Mercado Livre": {
               "prev": 456500.0,
@@ -999,12 +999,12 @@
         "Jun": 18754.78
       },
       "GRUPO": {
+        "Jun": 149168.45,
+        "Abr": 254477.52000000002,
         "Fev": 231584.11,
         "Mai": 372698.09,
         "Jan": 252772.95,
-        "Abr": 254477.52000000002,
-        "Mar": 279273.57,
-        "Jun": 149168.45
+        "Mar": 279273.57
       }
     },
     "a_pagar": {
@@ -1032,7 +1032,7 @@
     "fixo": [
       {
         "label": "Despesas Pessoal",
-        "valor": 9122.65
+        "valor": 11076.43
       },
       {
         "label": "Retirada (prolabore)",
@@ -1061,6 +1061,10 @@
       {
         "label": "Bling",
         "valor": 450.0
+      },
+      {
+        "label": "Marketing",
+        "valor": 780.0
       },
       {
         "label": "Despesas de venda",
@@ -1097,8 +1101,8 @@
         "valor": 55000.0
       }
     ],
-    "total_fixo": 40064.65,
+    "total_fixo": 42798.43,
     "total_variavel": 644000.0,
-    "total": 684064.65
+    "total": 686798.43
   }
 }
