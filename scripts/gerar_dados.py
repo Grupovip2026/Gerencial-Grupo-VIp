@@ -20,44 +20,32 @@ def safe(v):
     except: return 0.0
 
 def parse_dre(wb, aba):
-    """
-    Estrutura DRE: col A vazia, col B = label/valor alternados, cols C..G = meses 2..6
-    Row 3 = datas | Rows ímpares = labels | Rows pares = valores
-    """
     if aba not in wb.sheetnames: return []
     ws = wb[aba]
     rows = list(ws.iter_rows(values_only=True))
-
-    # Row 3 (índice 3): datas nas colunas 1..N
     date_row = rows[3]
     meses = []
     for ci in range(1, len(date_row)):
         v = date_row[ci]
         if isinstance(v, (datetime, date)):
-            meses.append({"ci": ci, "mes": MESES_NOMES.get(v.month,"?"),
-                          "mes_num": v.month, "ano": v.year,
-                          "order": v.year*100+v.month})
-
-    # Mapeia labels (linhas ímpares) -> linha de valores (linha par seguinte)
+            meses.append({"ci":ci,"mes":MESES_NOMES.get(v.month,"?"),"mes_num":v.month,"ano":v.year,"order":v.year*100+v.month})
     LABEL_MAP = {
-        "receita bruta de vendas":       "rBruta",
+        "receita bruta de vendas":"rBruta",
         "(-) devoluções e cancelamentos":"devolucoes",
-        "(-) impostos sobre vendas":     "impostos",
-        "receita líquida":               "rLiquida",
-        "(-) custo de mercadoria vendida (cmv)": "cmv",
-        "= lucro bruto":                 "lucroBruto",
-        "(-) despesas de pessoal":       "dPessoal",
-        "(-) despesas de marketing":     "dMarketing",
-        "(-) taxas de plataforma":       "dTaxas",
-        "(-) despesas financeiras / financiamentos": "dFinanc",
-        "(-) outras despesas operacionais": "dOutras",
-        "ebitda":                        "ebitda",
-        "(-) depreciação / amortização": "depreciacao",
-        "ebit":                          "ebit",
-        "lucro líquido":                 "lucroLiquido",
+        "(-) impostos sobre vendas":"impostos",
+        "receita líquida":"rLiquida",
+        "(-) custo de mercadoria vendida (cmv)":"cmv",
+        "= lucro bruto":"lucroBruto",
+        "(-) despesas de pessoal":"dPessoal",
+        "(-) despesas de marketing":"dMarketing",
+        "(-) taxas de plataforma":"dTaxas",
+        "(-) despesas financeiras / financiamentos":"dFinanc",
+        "(-) outras despesas operacionais":"dOutras",
+        "ebitda":"ebitda",
+        "(-) depreciação / amortização":"depreciacao",
+        "ebit":"ebit",
+        "lucro líquido":"lucroLiquido",
     }
-
-    # Label está em col B (ci=1), valor na próxima linha em col B (ci=1) e demais colunas
     row_data = {}
     i = 0
     while i < len(rows):
@@ -68,7 +56,6 @@ def parse_dre(wb, aba):
             i += 2
         else:
             i += 1
-
     result = []
     for m in meses:
         ci = m["ci"]
@@ -78,25 +65,81 @@ def parse_dre(wb, aba):
                       "depreciacao","ebit","lucroLiquido"]:
             rec[fname] = safe(row_data[fname][ci]) if fname in row_data else 0.0
         result.append(rec)
-
     return result
 
-def parse_contas_pagas(wb):
+def parse_divida_fornecedores(wb):
+    """
+    Col B(1)=mes VIP pago, C(2)=valor VIP pago
+    Col F(5)=mes VIDAL pago, G(6)=valor VIDAL pago
+    Col K(10)=mes VIP a pagar, L(11)=valor VIP a pagar
+    """
     aba = "Divida Fornecedores"
     if aba not in wb.sheetnames: return {}
     ws = wb[aba]
     rows = list(ws.iter_rows(values_only=True))
-    result = {"VIP":{}, "VIDAL":{}}
+    result = {
+        "pagas": {"VIP":{}, "VIDAL":{}, "GRUPO":{}},
+        "a_pagar": {"VIP":{}, "GRUPO":{}}
+    }
     for row in rows:
-        for emp, ci_mes, ci_val in [("VIP",1,2),("VIDAL",5,6)]:
-            v_mes = row[ci_mes] if len(row) > ci_mes else None
-            v_val = row[ci_val] if len(row) > ci_val else None
-            if isinstance(v_mes, (datetime, date)):
-                nome = MESES_NOMES.get(v_mes.month,"?")
-                val = safe(v_val)
-                if val > 0:
-                    result[emp][nome] = val
+        # Contas pagas VIP
+        v_mes = row[1] if len(row)>1 else None
+        v_val = row[2] if len(row)>2 else None
+        if isinstance(v_mes, (datetime,date)):
+            mn = MESES_NOMES.get(v_mes.month,"?")
+            val = safe(v_val)
+            if val > 0: result["pagas"]["VIP"][mn] = val
+
+        # Contas pagas VIDAL
+        v_mes = row[5] if len(row)>5 else None
+        v_val = row[6] if len(row)>6 else None
+        if isinstance(v_mes, (datetime,date)):
+            mn = MESES_NOMES.get(v_mes.month,"?")
+            val = safe(v_val)
+            if val > 0: result["pagas"]["VIDAL"][mn] = val
+
+        # Contas a pagar VIP
+        v_mes = row[10] if len(row)>10 else None
+        v_val = row[11] if len(row)>11 else None
+        if isinstance(v_mes, (datetime,date)):
+            mn = MESES_NOMES.get(v_mes.month,"?")
+            val = safe(v_val)
+            if val > 0: result["a_pagar"]["VIP"][mn] = val
+
+    # Consolida GRUPO pagas
+    todos_meses = set(list(result["pagas"]["VIP"].keys()) + list(result["pagas"]["VIDAL"].keys()))
+    for mn in todos_meses:
+        result["pagas"]["GRUPO"][mn] = result["pagas"]["VIP"].get(mn,0) + result["pagas"]["VIDAL"].get(mn,0)
+
+    # Consolida GRUPO a pagar
+    result["a_pagar"]["GRUPO"] = dict(result["a_pagar"]["VIP"])
+
+    print(f"  Pagas VIP: {list(result['pagas']['VIP'].keys())}")
+    print(f"  Pagas VIDAL: {list(result['pagas']['VIDAL'].keys())}")
+    print(f"  A pagar VIP: {list(result['a_pagar']['VIP'].keys())}")
     return result
+
+def parse_custos(wb):
+    """Fixo col B(1)/C(2), Variavel col F(5)/G(6)"""
+    if "Custos" not in wb.sheetnames: return {}
+    ws = wb["Custos"]
+    rows = list(ws.iter_rows(values_only=True))
+    fixo = []
+    variavel = []
+    total_fixo = 0
+    total_variavel = 0
+    for row in rows[3:]:
+        lbl_f = str(row[1]).strip() if row[1] else ""
+        val_f = safe(row[2]) if len(row)>2 else 0
+        lbl_v = str(row[5]).strip() if len(row)>5 and row[5] else ""
+        val_v = safe(row[6]) if len(row)>6 else 0
+        if lbl_f and lbl_f != "ORIGEM" and val_f > 0:
+            fixo.append({"label":lbl_f,"valor":val_f})
+            total_fixo += val_f
+        if lbl_v and lbl_v != "ORIGEM" and val_v > 0:
+            variavel.append({"label":lbl_v,"valor":val_v})
+            total_variavel += val_v
+    return {"fixo":fixo,"variavel":variavel,"total_fixo":total_fixo,"total_variavel":total_variavel,"total":total_fixo+total_variavel}
 
 def parse_plano(wb, aba_key):
     aba_map = {"VIP":"PLANO ORÇAMENTARIO - VIP","VIDAL":"PLANO ORÇAMENTARIO - VIDAL","V3":"PLANO ORÇAMENTARIO - V3"}
@@ -111,7 +154,7 @@ def parse_plano(wb, aba_key):
     col_map = {}
     for ci in range(2, len(date_row)):
         v = date_row[ci]
-        if isinstance(v, (datetime, date)):
+        if isinstance(v, (datetime,date)):
             nome = MESES_NOMES.get(v.month,"?")
             tipo_raw = str(pr_row[ci]).strip().lower() if pr_row[ci] else ""
             tipo = "previsto" if "prev" in tipo_raw else "realizado"
@@ -130,7 +173,7 @@ def parse_plano(wb, aba_key):
         if lbl in LABEL_MAP: row_data[LABEL_MAP[lbl]] = row
     meses_data = {}
     for ci, info in col_map.items():
-        key = (info["ano"], info["mes_num"])
+        key = (info["ano"],info["mes_num"])
         if key not in meses_data:
             meses_data[key] = {"mes":info["mes"],"ano":info["ano"],"mes_num":info["mes_num"],
                                "order":info["order"],"rPrev":0,"rReal":0,"dPrev":0,"dReal":0,
@@ -143,7 +186,7 @@ def parse_plano(wb, aba_key):
             ("amazonVip","Amazon"),("amazon","Amazon"),("lojaFisica","Loja Fisica")]:
             if ck in row_data:
                 v = safe(row_data[ck][ci])
-                if v == 0: continue
+                if v==0: continue
                 if cname not in meses_data[key]["canais"]: meses_data[key]["canais"][cname]={"prev":0,"real":0}
                 if info["tipo"]=="previsto": meses_data[key]["canais"][cname]["prev"]+=v
                 else: meses_data[key]["canais"][cname]["real"]+=v
@@ -164,18 +207,34 @@ def build_json():
               "V3":{"color":"#FF6B6B","accent":"#CC4444","label":"V3"},
               "GRUPO":{"color":"#F5A623","accent":"#C47D0E","label":"Grupo VIP"}}
 
+    # DRE individual
     dre = {}
     for emp, aba in [("VIP","DRE - VIP"),("VIDAL","DRE - VIDAL")]:
         months = parse_dre(wb, aba)
         dre[emp] = {**colors[emp], "months": months}
-        print(f"  DRE {emp}: {len(months)} meses {[m['mes'] for m in months]}")
+        print(f"  DRE {emp}: {len(months)} meses")
 
+    # DRE Grupo = soma VIP + VIDAL
+    grupo_dre = {}
+    for emp in ["VIP","VIDAL"]:
+        for m in dre[emp]["months"]:
+            k = m["order"]
+            if k not in grupo_dre:
+                grupo_dre[k] = copy.deepcopy(m)
+            else:
+                for f in ["rBruta","devolucoes","impostos","rLiquida","cmv","lucroBruto",
+                          "dPessoal","dMarketing","dTaxas","dFinanc","dOutras","ebitda",
+                          "depreciacao","ebit","lucroLiquido"]:
+                    grupo_dre[k][f] = grupo_dre[k].get(f,0) + m.get(f,0)
+    dre["GRUPO"] = {**colors["GRUPO"], "months": sorted(grupo_dre.values(), key=lambda x: x["order"])}
+    print(f"  DRE GRUPO: {len(dre['GRUPO']['months'])} meses")
+
+    # Plano orçamentário
     plano = {}
     for emp in ["VIP","VIDAL","V3"]:
         months = parse_plano(wb, emp)
         plano[emp] = {**colors[emp], "months": months}
         print(f"  Plano {emp}: {len(months)} meses")
-
     all_keys = {}
     for emp in ["VIP","VIDAL","V3"]:
         for m in plano[emp]["months"]:
@@ -190,13 +249,16 @@ def build_json():
                 all_keys[k]["canais"][cname]["real"]+=cv.get("real",0)
     plano["GRUPO"] = {**colors["GRUPO"],"months":sorted(all_keys.values(),key=lambda x:x["order"])}
 
-    contas_pagas = parse_contas_pagas(wb)
-    print(f"  Contas pagas VIP: {list(contas_pagas.get('VIP',{}).keys())}")
-    print(f"  Contas pagas VIDAL: {list(contas_pagas.get('VIDAL',{}).keys())}")
+    # Dívida fornecedores
+    divida = parse_divida_fornecedores(wb)
+
+    # Custos
+    custos = parse_custos(wb)
+    print(f"  Custos fixo: {len(custos.get('fixo',[]))} itens | variavel: {len(custos.get('variavel',[]))} itens")
 
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     out = {"gerado_em":datetime.now().strftime("%d/%m/%Y %H:%M"),"fonte":XLSX_PATH.name,
-           "dre":dre,"plano":plano,"contas_pagas":contas_pagas}
+           "dre":dre,"plano":plano,"divida":divida,"custos":custos}
     with open(OUT_PATH,"w",encoding="utf-8") as f: json.dump(out,f,ensure_ascii=False,indent=2)
     print(f"OK {OUT_PATH} gerado ({OUT_PATH.stat().st_size} bytes)")
 
