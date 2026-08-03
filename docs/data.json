@@ -1,5 +1,5 @@
 {
-  "gerado_em": "31/07/2026 20:54",
+  "gerado_em": "03/08/2026 16:12",
   "fonte": "Resultado Gerencial 2026.xlsx",
   "dre": {
     "VIP": {
@@ -383,20 +383,20 @@
           "mes_num": 6,
           "ano": 2026,
           "order": 202606,
-          "rBruta": 0.0,
-          "devolucoes": 0.0,
+          "rBruta": 2998.14,
+          "devolucoes": 801.85,
           "impostos": 0.0,
-          "rLiquida": 0.0,
-          "cmv": 0.0,
-          "lucroBruto": 0.0,
+          "rLiquida": 2196.29,
+          "cmv": 1349.163,
+          "lucroBruto": 847.127,
           "dPessoal": 0.0,
           "dMarketing": 0.0,
-          "dTaxas": 0.0,
+          "dTaxas": 850.98,
           "dFinanc": 0.0,
           "dOutras": 0.0,
-          "ebitda": 0.0,
+          "ebitda": -3.8530000000000655,
           "depreciacao": 0.0,
-          "ebit": 0.0,
+          "ebit": -3.8530000000000655,
           "lucroLiquido": 0.0
         }
       ]
@@ -516,20 +516,20 @@
           "mes_num": 6,
           "ano": 2026,
           "order": 202606,
-          "rBruta": 614348.33,
-          "devolucoes": 59313.549999999996,
+          "rBruta": 617346.47,
+          "devolucoes": 60115.399999999994,
           "impostos": 46388.4,
-          "rLiquida": 508646.37999999995,
-          "cmv": 276456.7485,
-          "lucroBruto": 232189.63149999996,
+          "rLiquida": 510842.6699999999,
+          "cmv": 277805.9115,
+          "lucroBruto": 233036.75849999997,
           "dPessoal": 28195.239999999998,
           "dMarketing": 780.0,
-          "dTaxas": 120119.75,
+          "dTaxas": 120970.73,
           "dFinanc": 6602.0,
           "dOutras": 9155.56,
-          "ebitda": 68117.08149999997,
+          "ebitda": 68113.22849999997,
           "depreciacao": 1500.0,
-          "ebit": 66617.08149999997,
+          "ebit": 66613.22849999997,
           "lucroLiquido": 0.0
         }
       ]
@@ -927,6 +927,19 @@
           "resPrev": 5775.0,
           "resReal": 2735.45,
           "canais": {}
+        },
+        {
+          "mes": "Jun",
+          "ano": 2026,
+          "mes_num": 6,
+          "order": 202606,
+          "rPrev": 8250.0,
+          "rReal": 2998.14,
+          "dPrev": 2475.0,
+          "dReal": 1652.83,
+          "resPrev": 5775.0,
+          "resReal": 1345.31,
+          "canais": {}
         }
       ]
     },
@@ -1086,12 +1099,12 @@
           "ano": 2026,
           "mes_num": 6,
           "order": 202606,
-          "rPrev": 520850.0,
-          "rReal": 614348.33,
-          "dPrev": 353381.67,
-          "dReal": 640151.69,
-          "resPrev": 167468.33000000002,
-          "resReal": -25803.360000000015,
+          "rPrev": 529100.0,
+          "rReal": 617346.47,
+          "dPrev": 355856.67,
+          "dReal": 641804.5199999999,
+          "resPrev": 173243.33000000002,
+          "resReal": -24458.050000000014,
           "canais": {
             "Mercado Livre": {
               "prev": 456500.0,
@@ -1132,12 +1145,12 @@
         "Jun": 18754.78
       },
       "GRUPO": {
-        "Fev": 231584.11,
-        "Mar": 279273.57,
-        "Jun": 149168.45,
         "Jan": 252772.95,
         "Abr": 254477.52000000002,
-        "Mai": 372698.09
+        "Mar": 279273.57,
+        "Mai": 372698.09,
+        "Fev": 231584.11,
+        "Jun": 149168.45
       }
     },
     "a_pagar": {
