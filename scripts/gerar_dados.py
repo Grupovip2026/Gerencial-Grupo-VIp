@@ -9,7 +9,7 @@ except ImportError:
     subprocess.check_call([sys.executable, "-m", "pip", "install", "openpyxl", "--quiet"])
     from openpyxl import load_workbook
 
-XLSX_PATH = Path("Resultado_Gerencial_2026.xlsx")
+XLSX_PATH = Path("Resultado Gerencial 2026.xlsx")
 OUT_PATH  = Path("docs/data.json")
 MESES_NOMES = {1:"Jan",2:"Fev",3:"Mar",4:"Abr",5:"Mai",6:"Jun",
                7:"Jul",8:"Ago",9:"Set",10:"Out",11:"Nov",12:"Dez"}
