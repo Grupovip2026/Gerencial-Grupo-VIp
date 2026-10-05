@@ -226,7 +226,7 @@ async function loadData(){
     DATA=await res.json();
     document.getElementById('badge-update').textContent='Atualizado '+DATA.gerado_em;
     const ma=(DATA.plano?.GRUPO?.months||[]).filter(m=>m.rReal>0).map(m=>m.mes);
-    if(ma.length)document.getElementById('period').textContent=ma[0]+' – '+ma[ma.length-1]+' 2026';
+    if(ma.length)document.getElementById('period').textContent=ma[0]+' – '+ma[ma.length-1]+' 2026 · Realizado';
     document.getElementById('footer').textContent='Fonte: '+DATA.fonte+' · '+DATA.gerado_em;
     setCompany('VIP'); setDre('VIP'); setDiv('VIP'); renderCustos();
   }catch(e){
@@ -274,19 +274,17 @@ function renderGer(){
   const months=(co.months||[]).filter((_,i)=>gerSel.has(i));
   if(!months.length)return;
   const color=co.color;
-  const totRR=months.reduce((s,m)=>s+m.rReal,0),totRP=months.reduce((s,m)=>s+m.rPrev,0);
-  const totDR=months.reduce((s,m)=>s+m.dReal,0),totDP=months.reduce((s,m)=>s+m.dPrev,0);
-  const totResR=months.reduce((s,m)=>s+m.resReal,0),totResP=months.reduce((s,m)=>s+m.resPrev,0);
-  const dR=pct(totRR,totRP),dD=pct(totDR,totDP),dRes=pct(totResR,totResP);
+  const totRR=months.reduce((s,m)=>s+m.rReal,0);
+  const totDR=months.reduce((s,m)=>s+m.dReal,0);
+  const totResR=months.reduce((s,m)=>s+m.resReal,0);
   document.getElementById('ger-kpis').innerHTML=`
-    <div class="kpi"><div class="kpi-label">Receita Realizada</div><div class="kpi-value pos">${fmt(totRR)}</div><div class="kpi-delta ${dR>=0?'pos':'neg'}">${dR>=0?'▲':'▼'} ${Math.abs(dR).toFixed(1)}% vs previsto</div></div>
-    <div class="kpi"><div class="kpi-label">Despesas Realizadas</div><div class="kpi-value ${totDR>totDP?'neg':'neutral'}">${fmt(totDR)}</div><div class="kpi-delta ${dD<=0?'pos':'neg'}">${dD>=0?'▲':'▼'} ${Math.abs(dD).toFixed(1)}% vs previsto</div></div>
-    <div class="kpi"><div class="kpi-label">Resultado Realizado</div><div class="kpi-value ${totResR>=0?'pos':'neg'}">${fmt(totResR)}</div><div class="kpi-delta ${dRes>=0?'pos':'neg'}">${dRes>=0?'▲':'▼'} ${Math.abs(dRes).toFixed(1)}% vs previsto</div></div>
-    <div class="kpi"><div class="kpi-label">Receita Prevista</div><div class="kpi-value dim">${fmt(totRP)}</div></div>
-    <div class="kpi"><div class="kpi-label">Resultado Previsto</div><div class="kpi-value dim">${fmt(totResP)}</div></div>`;
+    <div class="kpi"><div class="kpi-label">Receita Realizada</div><div class="kpi-value pos">${fmt(totRR)}</div></div>
+    <div class="kpi"><div class="kpi-label">Despesas Realizadas</div><div class="kpi-value ${totDR>0?'neg':'neutral'}">${fmt(totDR)}</div></div>
+    <div class="kpi"><div class="kpi-label">Resultado Realizado</div><div class="kpi-value ${totResR>=0?'pos':'neg'}">${fmt(totResR)}</div></div>
+    <div class="kpi"><div class="kpi-label">Margem</div><div class="kpi-value dim">${totRR?(((totResR/totRR)*100).toFixed(1)+'%'):'–'}</div></div>`;
   const meses=months.map(m=>m.mes);
-  mkChart('cReceita','bar',meses,[{label:'Previsto',data:months.map(m=>m.rPrev),backgroundColor:'rgba(255,255,255,.1)',borderRadius:4},{label:'Realizado',data:months.map(m=>m.rReal),backgroundColor:color,borderRadius:4}]);
-  mkChart('cResultado','bar',meses,[{label:'Previsto',data:months.map(m=>m.resPrev),backgroundColor:'rgba(255,255,255,.1)',borderRadius:4},{label:'Realizado',data:months.map(m=>m.resReal),backgroundColor:months.map(m=>m.resReal>=0?color:'#FF6B6B'),borderRadius:4}]);
+  mkChart('cReceita','bar',meses,[{label:'Realizado',data:months.map(m=>m.rReal),backgroundColor:color,borderRadius:4}]);
+  mkChart('cResultado','bar',meses,[{label:'Realizado',data:months.map(m=>m.resReal),backgroundColor:months.map(m=>m.resReal>=0?color:'#FF6B6B'),borderRadius:4}]);
   // Usa dados do DRE para despesas (mais completo)
   const dreMonths=(DATA.dre[gerCur]?.months||[]).filter((_,i)=>gerSel.has(i));
   const dreSource = dreMonths.length ? dreMonths : months;
@@ -304,13 +302,13 @@ function renderGer(){
   if(desp.length)mkChart('cDespesas','bar',desp.map(d=>d.cat),[{label:'Realizado',data:desp.map(d=>d.real),backgroundColor:co.accent,borderRadius:4}],{hbar:true,extra:{indexAxis:'y'}});
   const cmap={};months.forEach(m=>{if(!m.canais)return;for(const[cn,cv]of Object.entries(m.canais)){if(!cmap[cn])cmap[cn]={prev:0,real:0};cmap[cn].prev+=cv.prev||0;cmap[cn].real+=cv.real||0}});
   const canais=Object.entries(cmap).map(([canal,v])=>({canal,...v})).filter(c=>c.prev>0||c.real>0);
-  if(canais.length)mkChart('cCanais','bar',canais.map(c=>c.canal),[{label:'Previsto',data:canais.map(c=>c.prev),backgroundColor:'rgba(255,255,255,.1)',borderRadius:4},{label:'Realizado',data:canais.map(c=>c.real),backgroundColor:color,borderRadius:4}]);
-  let html='<thead><tr><th>Mês</th><th>Rec. Prev.</th><th>Rec. Real.</th><th>Δ</th><th>Desp. Prev.</th><th>Desp. Real.</th><th>Res. Prev.</th><th>Res. Real.</th></tr></thead><tbody>';
-  let[srp,srr,sdp,sdr,srrp,srrr]=[0,0,0,0,0,0];
-  months.forEach(m=>{srp+=m.rPrev;srr+=m.rReal;sdp+=m.dPrev;sdr+=m.dReal;srrp+=m.resPrev;srrr+=m.resReal;const dr=pct(m.rReal,m.rPrev);
-    html+=`<tr><td>${m.mes}/26</td><td class="dim">${fmt(m.rPrev)}</td><td class="neutral">${fmt(m.rReal)}</td><td class="${dr>=0?'pos':'neg'}">${fmtP(dr)}</td><td class="dim">${fmt(m.dPrev)}</td><td class="neutral">${fmt(m.dReal)}</td><td class="dim">${fmt(m.resPrev)}</td><td class="${m.resReal>=0?'pos':'neg'}">${fmt(m.resReal)}</td></tr>`;
+  if(canais.length)mkChart('cCanais','bar',canais.map(c=>c.canal),[{label:'Realizado',data:canais.map(c=>c.real),backgroundColor:color,borderRadius:4}]);
+  let html='<thead><tr><th>Mês</th><th>Receita</th><th>Despesas</th><th>Resultado</th></tr></thead><tbody>';
+  let[srr,sdr,srrr]=[0,0,0];
+  months.forEach(m=>{srr+=m.rReal;sdr+=m.dReal;srrr+=m.resReal;
+    html+=`<tr><td>${m.mes}/26</td><td class="pos">${fmt(m.rReal)}</td><td class="neg">${fmt(m.dReal)}</td><td class="${m.resReal>=0?'pos':'neg'}">${fmt(m.resReal)}</td></tr>`;
   });
-  html+=`<tr class="total-row"><td>TOTAL</td><td class="dim">${fmt(srp)}</td><td class="neutral">${fmt(srr)}</td><td class="${pct(srr,srp)>=0?'pos':'neg'}">${fmtP(pct(srr,srp))}</td><td class="dim">${fmt(sdp)}</td><td class="neutral">${fmt(sdr)}</td><td class="dim">${fmt(srrp)}</td><td class="${srrr>=0?'pos':'neg'}">${fmt(srrr)}</td></tr></tbody>`;
+  html+=`<tr class="total-row"><td>TOTAL</td><td class="pos">${fmt(srr)}</td><td class="neg">${fmt(sdr)}</td><td class="${srrr>=0?'pos':'neg'}">${fmt(srrr)}</td></tr></tbody>`;
   document.getElementById('ger-tbl').innerHTML=html;
 }
 
