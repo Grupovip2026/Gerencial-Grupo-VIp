@@ -1,5 +1,5 @@
 {
-  "gerado_em": "05/10/2026 14:49",
+  "gerado_em": "05/10/2026 14:58",
   "fonte": "Resultado Gerencial 2026.xlsx",
   "dre": {
     "VIP": {
@@ -292,20 +292,20 @@
           "mes_num": 7,
           "ano": 2026,
           "order": 202607,
-          "rBruta": 258689.12,
-          "devolucoes": 17138.28,
-          "impostos": 14859.2992,
-          "rLiquida": 226691.5408,
-          "cmv": 116410.104,
-          "lucroBruto": 110281.43679999998,
-          "dPessoal": 20855.92,
+          "rBruta": 0.0,
+          "devolucoes": 0.0,
+          "impostos": 0.0,
+          "rLiquida": 0.0,
+          "cmv": 0.0,
+          "lucroBruto": 0.0,
+          "dPessoal": 0.0,
           "dMarketing": 0.0,
-          "dTaxas": 42097.61,
+          "dTaxas": 0.0,
           "dFinanc": 0.0,
-          "dOutras": 8161.91,
-          "ebitda": 39165.99679999998,
+          "dOutras": 0.0,
+          "ebitda": 0.0,
           "depreciacao": 0.0,
-          "ebit": 39165.99679999998,
+          "ebit": 0.0,
           "lucroLiquido": 0.0
         }
       ]
@@ -579,20 +579,20 @@
           "mes_num": 7,
           "ano": 2026,
           "order": 202607,
-          "rBruta": 705934.46,
-          "devolucoes": 62482.96,
-          "impostos": 14859.2992,
-          "rLiquida": 628592.2008,
-          "cmv": 317670.50700000004,
-          "lucroBruto": 310921.6938,
-          "dPessoal": 28311.55,
+          "rBruta": 447245.34,
+          "devolucoes": 45344.68,
+          "impostos": 0.0,
+          "rLiquida": 401900.66000000003,
+          "cmv": 201260.40300000002,
+          "lucroBruto": 200640.257,
+          "dPessoal": 7455.63,
           "dMarketing": 780.0,
-          "dTaxas": 141065.18,
+          "dTaxas": 98967.57,
           "dFinanc": 6602.0,
-          "dOutras": 10051.91,
-          "ebitda": 124891.05379999998,
+          "dOutras": 1890.0,
+          "ebitda": 85725.057,
           "depreciacao": 1500.0,
-          "ebit": 123391.05379999998,
+          "ebit": 84225.057,
           "lucroLiquido": 0.0
         }
       ]
@@ -609,23 +609,23 @@
           "ano": 2026,
           "mes_num": 1,
           "order": 202601,
-          "rPrev": 266500.0,
+          "rPrev": 0,
           "rReal": 435355.47,
-          "dPrev": 395348.93,
+          "dPrev": 0,
           "dReal": 439765.25,
-          "resPrev": -128848.93,
+          "resPrev": 0,
           "resReal": -4409.780000000028,
           "canais": {
             "Mercado Livre": {
-              "prev": 260000.0,
+              "prev": 0,
               "real": 413271.86
             },
             "Shopee": {
-              "prev": 3000.0,
+              "prev": 0,
               "real": 11860.57
             },
             "Amazon": {
-              "prev": 3500.0,
+              "prev": 0,
               "real": 10223.04
             }
           }
@@ -635,24 +635,20 @@
           "ano": 2026,
           "mes_num": 2,
           "order": 202602,
-          "rPrev": 266500.0,
+          "rPrev": 0,
           "rReal": 363193.79000000004,
-          "dPrev": 343180.70999999996,
+          "dPrev": 0,
           "dReal": 389391.98,
-          "resPrev": -76680.70999999996,
+          "resPrev": 0,
           "resReal": -26198.189999999944,
           "canais": {
             "Mercado Livre": {
-              "prev": 260000.0,
+              "prev": 0,
               "real": 347450.9
             },
             "Shopee": {
-              "prev": 3000.0,
+              "prev": 0,
               "real": 15742.89
-            },
-            "Amazon": {
-              "prev": 3500.0,
-              "real": 0
             }
           }
         },
@@ -661,19 +657,19 @@
           "ano": 2026,
           "mes_num": 3,
           "order": 202603,
-          "rPrev": 263000.0,
+          "rPrev": 0,
           "rReal": 446257.54000000004,
-          "dPrev": 301860.87,
+          "dPrev": 0,
           "dReal": 464461.03,
-          "resPrev": -38860.869999999995,
+          "resPrev": 0,
           "resReal": -18203.48999999999,
           "canais": {
             "Mercado Livre": {
-              "prev": 260000.0,
+              "prev": 0,
               "real": 412851.33
             },
             "Shopee": {
-              "prev": 3000.0,
+              "prev": 0,
               "real": 33406.21
             }
           }
@@ -683,24 +679,20 @@
           "ano": 2026,
           "mes_num": 4,
           "order": 202604,
-          "rPrev": 293150.0,
+          "rPrev": 0,
           "rReal": 545913.33,
-          "dPrev": 228299.94,
+          "dPrev": 0,
           "dReal": 409521.58999999997,
-          "resPrev": 64850.06,
+          "resPrev": 0,
           "resReal": 136391.74,
           "canais": {
             "Mercado Livre": {
-              "prev": 286000.0,
+              "prev": 0,
               "real": 507580.01
             },
             "Shopee": {
-              "prev": 3300.0,
+              "prev": 0,
               "real": 38333.32
-            },
-            "Amazon": {
-              "prev": 3850.0,
-              "real": 0
             }
           }
         },
@@ -709,24 +701,20 @@
           "ano": 2026,
           "mes_num": 5,
           "order": 202605,
-          "rPrev": 293150.0,
+          "rPrev": 0,
           "rReal": 415605.02999999997,
-          "dPrev": 186047.12,
+          "dPrev": 0,
           "dReal": 500479.44999999995,
-          "resPrev": 107102.88,
+          "resPrev": 0,
           "resReal": -84874.41999999998,
           "canais": {
             "Mercado Livre": {
-              "prev": 286000.0,
+              "prev": 0,
               "real": 390663.79
             },
             "Shopee": {
-              "prev": 3300.0,
+              "prev": 0,
               "real": 24941.24
-            },
-            "Amazon": {
-              "prev": 3850.0,
-              "real": 0
             }
           }
         },
@@ -735,24 +723,20 @@
           "ano": 2026,
           "mes_num": 6,
           "order": 202606,
-          "rPrev": 293150.0,
+          "rPrev": 0,
           "rReal": 404628.91,
-          "dPrev": 158885.36,
+          "dPrev": 0,
           "dReal": 510166.12,
-          "resPrev": 134264.64,
+          "resPrev": 0,
           "resReal": -105537.21000000002,
           "canais": {
             "Mercado Livre": {
-              "prev": 286000.0,
+              "prev": 0,
               "real": 384556.12
             },
             "Shopee": {
-              "prev": 3300.0,
+              "prev": 0,
               "real": 20072.79
-            },
-            "Amazon": {
-              "prev": 3850.0,
-              "real": 0
             }
           }
         },
@@ -783,11 +767,11 @@
           "ano": 2026,
           "mes_num": 8,
           "order": 202608,
-          "rPrev": 0.0,
+          "rPrev": 0,
           "rReal": 443219.91,
-          "dPrev": 0.0,
+          "dPrev": 0,
           "dReal": 511594.3028,
-          "resPrev": 0.0,
+          "resPrev": 0,
           "resReal": -68374.39280000003,
           "canais": {
             "Mercado Livre": {
@@ -805,11 +789,11 @@
           "ano": 2026,
           "mes_num": 9,
           "order": 202609,
-          "rPrev": 0.0,
+          "rPrev": 0,
           "rReal": 340375.31,
-          "dPrev": 0.0,
+          "dPrev": 0,
           "dReal": 493017.4948,
-          "resPrev": 0.0,
+          "resPrev": 0,
           "resReal": -152642.1848,
           "canais": {
             "Mercado Livre": {
@@ -834,23 +818,23 @@
           "ano": 2026,
           "mes_num": 1,
           "order": 202601,
-          "rPrev": 207000.0,
+          "rPrev": 0,
           "rReal": 196570.68000000002,
-          "dPrev": 182853.5,
+          "dPrev": 0,
           "dReal": 71161.33,
-          "resPrev": 24146.5,
+          "resPrev": 0,
           "resReal": 125409.35000000002,
           "canais": {
             "Mercado Livre": {
-              "prev": 155000.0,
+              "prev": 0,
               "real": 138853.28
             },
             "Shopee": {
-              "prev": 2000.0,
+              "prev": 0,
               "real": 13695.54
             },
             "Loja Fisica": {
-              "prev": 50000.0,
+              "prev": 0,
               "real": 44021.86
             }
           }
@@ -860,23 +844,23 @@
           "ano": 2026,
           "mes_num": 2,
           "order": 202602,
-          "rPrev": 207000.0,
+          "rPrev": 0,
           "rReal": 167144.25999999998,
-          "dPrev": 182853.5,
+          "dPrev": 0,
           "dReal": 86782.26000000001,
-          "resPrev": 24146.5,
+          "resPrev": 0,
           "resReal": 80361.99999999997,
           "canais": {
             "Mercado Livre": {
-              "prev": 155000.0,
+              "prev": 0,
               "real": 120539.51
             },
             "Shopee": {
-              "prev": 2000.0,
+              "prev": 0,
               "real": 16807.43
             },
             "Loja Fisica": {
-              "prev": 50000.0,
+              "prev": 0,
               "real": 29797.32
             }
           }
@@ -886,23 +870,23 @@
           "ano": 2026,
           "mes_num": 3,
           "order": 202603,
-          "rPrev": 207000.0,
+          "rPrev": 0,
           "rReal": 229018.47,
-          "dPrev": 182853.5,
+          "dPrev": 0,
           "dReal": 101713.57,
-          "resPrev": 24146.5,
+          "resPrev": 0,
           "resReal": 127304.9,
           "canais": {
             "Mercado Livre": {
-              "prev": 155000.0,
+              "prev": 0,
               "real": 144159.46
             },
             "Shopee": {
-              "prev": 2000.0,
+              "prev": 0,
               "real": 28130.09
             },
             "Loja Fisica": {
-              "prev": 50000.0,
+              "prev": 0,
               "real": 56728.92
             }
           }
@@ -912,23 +896,23 @@
           "ano": 2026,
           "mes_num": 4,
           "order": 202604,
-          "rPrev": 227700.0,
+          "rPrev": 0,
           "rReal": 251047.64,
-          "dPrev": 194013.91,
+          "dPrev": 0,
           "dReal": 136146.61,
-          "resPrev": 33686.09,
+          "resPrev": 0,
           "resReal": 114901.03000000003,
           "canais": {
             "Mercado Livre": {
-              "prev": 170500.0,
+              "prev": 0,
               "real": 170208.59
             },
             "Shopee": {
-              "prev": 2200.0,
+              "prev": 0,
               "real": 22690.82
             },
             "Loja Fisica": {
-              "prev": 55000.0,
+              "prev": 0,
               "real": 58148.23
             }
           }
@@ -938,23 +922,23 @@
           "ano": 2026,
           "mes_num": 5,
           "order": 202605,
-          "rPrev": 227700.0,
+          "rPrev": 0,
           "rReal": 249143.27,
-          "dPrev": 194657.7,
+          "dPrev": 0,
           "dReal": 158927.44,
-          "resPrev": 33042.29999999999,
+          "resPrev": 0,
           "resReal": 90215.82999999999,
           "canais": {
             "Mercado Livre": {
-              "prev": 170500.0,
+              "prev": 0,
               "real": 177146.34
             },
             "Shopee": {
-              "prev": 2200.0,
+              "prev": 0,
               "real": 31525.22
             },
             "Loja Fisica": {
-              "prev": 55000.0,
+              "prev": 0,
               "real": 40471.71
             }
           }
@@ -964,23 +948,23 @@
           "ano": 2026,
           "mes_num": 6,
           "order": 202606,
-          "rPrev": 227700.0,
+          "rPrev": 0,
           "rReal": 209719.42,
-          "dPrev": 194496.31,
+          "dPrev": 0,
           "dReal": 129631.92000000001,
-          "resPrev": 33203.69,
+          "resPrev": 0,
           "resReal": 80087.5,
           "canais": {
             "Mercado Livre": {
-              "prev": 170500.0,
+              "prev": 0,
               "real": 128866.0
             },
             "Shopee": {
-              "prev": 2200.0,
+              "prev": 0,
               "real": 36966.34
             },
             "Loja Fisica": {
-              "prev": 55000.0,
+              "prev": 0,
               "real": 43887.08
             }
           }
@@ -990,23 +974,23 @@
           "ano": 2026,
           "mes_num": 7,
           "order": 202607,
-          "rPrev": 258689.12,
+          "rPrev": 0,
           "rReal": 258689.12,
-          "dPrev": 140034.13919999998,
+          "dPrev": 0,
           "dReal": 138187.5292,
-          "resPrev": 118654.98080000002,
+          "resPrev": 0,
           "resReal": 120501.5908,
           "canais": {
             "Mercado Livre": {
-              "prev": 167599.27,
+              "prev": 0,
               "real": 167599.27
             },
             "Shopee": {
-              "prev": 18141.97,
+              "prev": 0,
               "real": 18141.97
             },
             "Loja Fisica": {
-              "prev": 72947.88,
+              "prev": 0,
               "real": 72947.88
             }
           }
@@ -1016,11 +1000,11 @@
           "ano": 2026,
           "mes_num": 8,
           "order": 202608,
-          "rPrev": 0.0,
+          "rPrev": 0,
           "rReal": 281032.88,
-          "dPrev": 0.0,
+          "dPrev": 0,
           "dReal": 298079.5696,
-          "resPrev": 0.0,
+          "resPrev": 0,
           "resReal": -17046.689599999983,
           "canais": {
             "Mercado Livre": {
@@ -1042,11 +1026,11 @@
           "ano": 2026,
           "mes_num": 9,
           "order": 202609,
-          "rPrev": 0.0,
+          "rPrev": 0,
           "rReal": 250324.58,
-          "dPrev": 0.0,
+          "dPrev": 0,
           "dReal": 211895.12759999998,
-          "resPrev": 0.0,
+          "resPrev": 0,
           "resReal": 38429.45240000001,
           "canais": {
             "Mercado Livre": {
@@ -1075,11 +1059,11 @@
           "ano": 2026,
           "mes_num": 1,
           "order": 202601,
-          "rPrev": 7500.0,
+          "rPrev": 0,
           "rReal": 2706.0,
-          "dPrev": 2250.0,
+          "dPrev": 0,
           "dReal": 578.0,
-          "resPrev": 5250.0,
+          "resPrev": 0,
           "resReal": 2128.0,
           "canais": {}
         },
@@ -1088,11 +1072,11 @@
           "ano": 2026,
           "mes_num": 2,
           "order": 202602,
-          "rPrev": 7500.0,
+          "rPrev": 0,
           "rReal": 3774.1,
-          "dPrev": 2250.0,
+          "dPrev": 0,
           "dReal": 1002.38,
-          "resPrev": 5250.0,
+          "resPrev": 0,
           "resReal": 2771.72,
           "canais": {}
         },
@@ -1101,11 +1085,11 @@
           "ano": 2026,
           "mes_num": 3,
           "order": 202603,
-          "rPrev": 7500.0,
+          "rPrev": 0,
           "rReal": 3913.0,
-          "dPrev": 2250.0,
+          "dPrev": 0,
           "dReal": 1205.54,
-          "resPrev": 5250.0,
+          "resPrev": 0,
           "resReal": 2707.46,
           "canais": {}
         },
@@ -1114,11 +1098,11 @@
           "ano": 2026,
           "mes_num": 4,
           "order": 202604,
-          "rPrev": 8250.0,
+          "rPrev": 0,
           "rReal": 3918.0,
-          "dPrev": 2475.0,
+          "dPrev": 0,
           "dReal": 1404.5,
-          "resPrev": 5775.0,
+          "resPrev": 0,
           "resReal": 2513.5,
           "canais": {}
         },
@@ -1127,11 +1111,11 @@
           "ano": 2026,
           "mes_num": 5,
           "order": 202605,
-          "rPrev": 8250.0,
+          "rPrev": 0,
           "rReal": 4883.87,
-          "dPrev": 2475.0,
+          "dPrev": 0,
           "dReal": 2148.42,
-          "resPrev": 5775.0,
+          "resPrev": 0,
           "resReal": 2735.45,
           "canais": {}
         },
@@ -1140,11 +1124,11 @@
           "ano": 2026,
           "mes_num": 6,
           "order": 202606,
-          "rPrev": 8250.0,
+          "rPrev": 0,
           "rReal": 2998.14,
-          "dPrev": 2475.0,
+          "dPrev": 0,
           "dReal": 1652.83,
-          "resPrev": 5775.0,
+          "resPrev": 0,
           "resReal": 1345.31,
           "canais": {}
         }
@@ -1160,27 +1144,27 @@
           "ano": 2026,
           "mes_num": 1,
           "order": 202601,
-          "rPrev": 481000.0,
+          "rPrev": 0,
           "rReal": 634632.15,
-          "dPrev": 580452.4299999999,
+          "dPrev": 0,
           "dReal": 511504.58,
-          "resPrev": -99452.43,
+          "resPrev": 0,
           "resReal": 123127.56999999999,
           "canais": {
             "Mercado Livre": {
-              "prev": 415000.0,
+              "prev": 0,
               "real": 552125.14
             },
             "Shopee": {
-              "prev": 5000.0,
+              "prev": 0,
               "real": 25556.11
             },
             "Amazon": {
-              "prev": 3500.0,
+              "prev": 0,
               "real": 10223.04
             },
             "Loja Fisica": {
-              "prev": 50000.0,
+              "prev": 0,
               "real": 44021.86
             }
           }
@@ -1190,27 +1174,23 @@
           "ano": 2026,
           "mes_num": 2,
           "order": 202602,
-          "rPrev": 481000.0,
+          "rPrev": 0,
           "rReal": 534112.15,
-          "dPrev": 528284.21,
+          "dPrev": 0,
           "dReal": 477176.62,
-          "resPrev": -47284.20999999996,
+          "resPrev": 0,
           "resReal": 56935.53000000003,
           "canais": {
             "Mercado Livre": {
-              "prev": 415000.0,
+              "prev": 0,
               "real": 467990.41000000003
             },
             "Shopee": {
-              "prev": 5000.0,
+              "prev": 0,
               "real": 32550.32
             },
-            "Amazon": {
-              "prev": 3500.0,
-              "real": 0
-            },
             "Loja Fisica": {
-              "prev": 50000.0,
+              "prev": 0,
               "real": 29797.32
             }
           }
@@ -1220,23 +1200,23 @@
           "ano": 2026,
           "mes_num": 3,
           "order": 202603,
-          "rPrev": 477500.0,
+          "rPrev": 0,
           "rReal": 679189.01,
-          "dPrev": 486964.37,
+          "dPrev": 0,
           "dReal": 567380.1400000001,
-          "resPrev": -9464.369999999995,
+          "resPrev": 0,
           "resReal": 111808.87000000001,
           "canais": {
             "Mercado Livre": {
-              "prev": 415000.0,
+              "prev": 0,
               "real": 557010.79
             },
             "Shopee": {
-              "prev": 5000.0,
+              "prev": 0,
               "real": 61536.3
             },
             "Loja Fisica": {
-              "prev": 50000.0,
+              "prev": 0,
               "real": 56728.92
             }
           }
@@ -1246,27 +1226,23 @@
           "ano": 2026,
           "mes_num": 4,
           "order": 202604,
-          "rPrev": 529100.0,
+          "rPrev": 0,
           "rReal": 800878.97,
-          "dPrev": 424788.85,
+          "dPrev": 0,
           "dReal": 547072.7,
-          "resPrev": 104311.15,
+          "resPrev": 0,
           "resReal": 253806.27000000002,
           "canais": {
             "Mercado Livre": {
-              "prev": 456500.0,
+              "prev": 0,
               "real": 677788.6
             },
             "Shopee": {
-              "prev": 5500.0,
+              "prev": 0,
               "real": 61024.14
             },
-            "Amazon": {
-              "prev": 3850.0,
-              "real": 0
-            },
             "Loja Fisica": {
-              "prev": 55000.0,
+              "prev": 0,
               "real": 58148.23
             }
           }
@@ -1276,27 +1252,23 @@
           "ano": 2026,
           "mes_num": 5,
           "order": 202605,
-          "rPrev": 529100.0,
+          "rPrev": 0,
           "rReal": 669632.1699999999,
-          "dPrev": 383179.82,
+          "dPrev": 0,
           "dReal": 661555.3099999999,
-          "resPrev": 145920.18,
+          "resPrev": 0,
           "resReal": 8076.860000000003,
           "canais": {
             "Mercado Livre": {
-              "prev": 456500.0,
+              "prev": 0,
               "real": 567810.13
             },
             "Shopee": {
-              "prev": 5500.0,
+              "prev": 0,
               "real": 56466.46000000001
             },
-            "Amazon": {
-              "prev": 3850.0,
-              "real": 0
-            },
             "Loja Fisica": {
-              "prev": 55000.0,
+              "prev": 0,
               "real": 40471.71
             }
           }
@@ -1306,27 +1278,23 @@
           "ano": 2026,
           "mes_num": 6,
           "order": 202606,
-          "rPrev": 529100.0,
+          "rPrev": 0,
           "rReal": 617346.47,
-          "dPrev": 355856.67,
+          "dPrev": 0,
           "dReal": 641450.87,
-          "resPrev": 173243.33000000002,
+          "resPrev": 0,
           "resReal": -24104.40000000002,
           "canais": {
             "Mercado Livre": {
-              "prev": 456500.0,
+              "prev": 0,
               "real": 513422.12
             },
             "Shopee": {
-              "prev": 5500.0,
+              "prev": 0,
               "real": 57039.13
             },
-            "Amazon": {
-              "prev": 3850.0,
-              "real": 0
-            },
             "Loja Fisica": {
-              "prev": 55000.0,
+              "prev": 0,
               "real": 43887.08
             }
           }
@@ -1336,23 +1304,23 @@
           "ano": 2026,
           "mes_num": 7,
           "order": 202607,
-          "rPrev": 705934.46,
+          "rPrev": 447245.34,
           "rReal": 705934.46,
-          "dPrev": 669776.1292,
+          "dPrev": 529741.99,
           "dReal": 703709.1464,
-          "resPrev": 36158.330800000054,
+          "resPrev": -82496.64999999997,
           "resReal": 2225.3136000000522,
           "canais": {
             "Mercado Livre": {
-              "prev": 585678.65,
+              "prev": 418079.38,
               "real": 585678.65
             },
             "Shopee": {
-              "prev": 47307.93,
+              "prev": 29165.96,
               "real": 47307.93
             },
             "Loja Fisica": {
-              "prev": 72947.88,
+              "prev": 0,
               "real": 72947.88
             }
           }
@@ -1362,11 +1330,11 @@
           "ano": 2026,
           "mes_num": 8,
           "order": 202608,
-          "rPrev": 0.0,
+          "rPrev": 0,
           "rReal": 724252.79,
-          "dPrev": 0.0,
+          "dPrev": 0,
           "dReal": 809673.8724,
-          "resPrev": 0.0,
+          "resPrev": 0,
           "resReal": -85421.08240000001,
           "canais": {
             "Mercado Livre": {
@@ -1388,11 +1356,11 @@
           "ano": 2026,
           "mes_num": 9,
           "order": 202609,
-          "rPrev": 0.0,
+          "rPrev": 0,
           "rReal": 590699.89,
-          "dPrev": 0.0,
+          "dPrev": 0,
           "dReal": 704912.6224,
-          "resPrev": 0.0,
+          "resPrev": 0,
           "resReal": -114212.73239999998,
           "canais": {
             "Mercado Livre": {
@@ -1434,13 +1402,13 @@
       },
       "GRUPO": {
         "Ago": 162702.7,
-        "Jan": 252772.95,
+        "Mai": 372698.09,
         "Jun": 342593.48,
-        "Abr": 254477.52000000002,
         "Jul": 404779.52999999997,
-        "Fev": 231584.11,
         "Mar": 279273.57,
-        "Mai": 372698.09
+        "Jan": 252772.95,
+        "Fev": 231584.11,
+        "Abr": 254477.52000000002
       }
     },
     "a_pagar": {
@@ -1462,10 +1430,6 @@
   },
   "custos": {
     "fixo": [
-      {
-        "label": "Despesas Pessoal",
-        "valor": 11076.43
-      },
       {
         "label": "Retirada (prolabore)",
         "valor": 17000.0
@@ -1533,9 +1497,9 @@
         "valor": 55000.0
       }
     ],
-    "total_fixo": 42798.43,
+    "total_fixo": 31722.0,
     "total_variavel": 644000.0,
-    "total": 686798.43
+    "total": 675722.0
   },
   "orcamento_2027": [
     {
