@@ -1336,8 +1336,8 @@ function renderVendasVidalGeo(){
   ],{plugins:{legend:{position:'right'}}});
 
   mkChart('cVdEstados','bar',g.estados.slice(0,10).map(r=>r.uf),[
-    {label:'Receita',data:g.estados.slice(0,10).map(r=>r.receita),backgroundColor:'rgba(108,99,255,0.8)',borderColor:'#6C63FF',borderWidth:2}
-  ],{indexAxis:'y',plugins:{tooltip:{callbacks:{label:c=>' '+fmt(c.raw)}}}});
+    {label:'Receita',data:g.estados.slice(0,10).map(r=>r.receita),backgroundColor:'rgba(108,99,255,0.8)',borderRadius:4}
+  ],{hbar:true,extra:{indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fmt(c.raw)}}}}});
 
   const totPed=g.estados.reduce((a,r)=>a+r.pedidos,0);
   const totRec=g.estados.reduce((a,r)=>a+r.receita,0);
@@ -1360,8 +1360,8 @@ function renderVendasVidalGeo(){
   if(etbl) etbl.innerHTML=he;
 
   mkChart('cVdCidades','bar',g.cidades.slice(0,10).map(r=>r.cidade),[
-    {label:'Pedidos',data:g.cidades.slice(0,10).map(r=>r.pedidos),backgroundColor:'rgba(56,189,248,0.7)',borderColor:'#38bdf8',borderWidth:2}
-  ],{indexAxis:'y',plugins:{tooltip:{callbacks:{label:c=>' '+c.raw+' pedidos'}}}});
+    {label:'Pedidos',data:g.cidades.slice(0,10).map(r=>r.pedidos),backgroundColor:'rgba(56,189,248,0.7)',borderRadius:4}
+  ],{hbar:true,extra:{indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.raw+' pedidos'}}}}});
 
   let hc='<thead><tr><th>Cidade</th><th>UF</th><th>Pedidos</th><th>Receita</th><th>Ticket</th></tr></thead><tbody>';
   g.cidades.forEach(r=>{
@@ -1409,6 +1409,9 @@ function renderVendasVidalCancelDevolucoes(){
 }
 
 function renderVendasVidal(){
+  // Garante que todas as seções estejam visíveis antes de renderizar os charts
+  vdInitFilters();
+
   vdRenderFiltrado();
 
   // DOW chart
@@ -1418,8 +1421,8 @@ function renderVendasVidal(){
 
   // Top produtos
   mkChart('cVdProdutos','bar',VENDAS_VIDAL.top_produtos.map(r=>r.nome.length>35?r.nome.substring(0,35)+'…':r.nome),[
-    {label:'Receita',data:VENDAS_VIDAL.top_produtos.map(r=>r.total),backgroundColor:'rgba(108,99,255,0.8)',borderColor:'#6C63FF',borderWidth:2}
-  ],{indexAxis:'y',plugins:{tooltip:{callbacks:{label:c=>' '+fmt(c.raw)}}}});
+    {label:'Receita',data:VENDAS_VIDAL.top_produtos.map(r=>r.total),backgroundColor:'rgba(108,99,255,0.8)',borderRadius:4}
+  ],{hbar:true,extra:{indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fmt(c.raw)}}}}});
 
   const pInsight=document.getElementById('vd-produto-insight');
   if(pInsight){
@@ -1430,7 +1433,6 @@ function renderVendasVidal(){
 
   renderVendasVidalGeo();
   renderVendasVidalCancelDevolucoes();
-  vdInitFilters();
 }
 
 // ── GERENCIAL ──────────────────────────────────────────────────────────────────
