@@ -35,6 +35,7 @@ h1{font-size:26px;font-weight:700;color:#fff}
 .mes-btn.sel-grupo{border-color:#F5A623;background:rgba(245,166,35,.15);color:#F5A623;font-weight:600}
 .mes-btn.sel-dre{border-color:#a78bfa;background:rgba(167,139,250,.15);color:#a78bfa;font-weight:600}
 .mes-btn.sel-div{border-color:#38bdf8;background:rgba(56,189,248,.15);color:#38bdf8;font-weight:600}
+.mes-btn.sel-ml{border-color:#f59e0b;background:rgba(245,158,11,.15);color:#f59e0b;font-weight:600}
 .filter-actions{margin-left:auto;display:flex;gap:6px}
 .filter-action{font-size:11px;color:#555;background:none;border:1px solid rgba(255,255,255,.07);border-radius:5px;padding:4px 10px;cursor:pointer;font-family:'Inter',sans-serif}
 .filter-action:hover{color:#aaa}
@@ -44,9 +45,11 @@ h1{font-size:26px;font-weight:700;color:#fff}
 .kpi-value{font-size:22px;font-weight:700;font-family:'DM Mono',monospace}
 .kpi-delta{font-size:12px;margin-top:4px}
 .charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.charts-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
 .chart-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:20px 16px}
 .chart-title{font-size:12px;color:#aaa;margin-bottom:14px;font-weight:600;letter-spacing:.8px;text-transform:uppercase}
 .chart-wrap{position:relative;height:220px}
+.chart-wrap-tall{position:relative;height:280px}
 .table-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:20px;overflow-x:auto;margin-bottom:16px}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th{padding:8px 12px;text-align:right;color:#666;font-weight:500;font-size:11px;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;border-bottom:1px solid rgba(255,255,255,.08)}
@@ -55,12 +58,17 @@ td{padding:10px 12px;text-align:right;border-bottom:1px solid rgba(255,255,255,.
 td:first-child{text-align:left;font-weight:600;color:#ccc;font-family:'Inter',sans-serif}
 tr.total-row td{border-top:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.03);font-weight:700}
 tr.section-head td{background:rgba(255,255,255,.05);color:#888!important;font-size:11px;letter-spacing:1px;text-transform:uppercase;font-family:'Inter',sans-serif!important;font-weight:600!important}
+tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba(245,158,11,.1)}
 .footer{text-align:right;font-size:11px;color:#444;margin-top:8px}
 .loading{text-align:center;padding:60px;color:#555;font-size:14px}
 .error{text-align:center;padding:40px;color:#FF6B6B;font-size:13px;background:rgba(255,107,107,.05);border-radius:12px;margin:20px 0}
-.pos{color:#00C9A7}.neg{color:#FF6B6B}.neutral{color:#f0f0f0}.dim{color:#777}.sky{color:#38bdf8}.purple{color:#a78bfa}.orange{color:#F5A623}
+.pos{color:#00C9A7}.neg{color:#FF6B6B}.neutral{color:#f0f0f0}.dim{color:#777}.sky{color:#38bdf8}.purple{color:#a78bfa}.orange{color:#F5A623}.amber{color:#f59e0b}
 .custo-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
-@media(max-width:700px){.charts-row{grid-template-columns:1fr}.kpis{flex-direction:column}.custo-grid{grid-template-columns:1fr}}
+.trend-up{color:#00C9A7}.trend-down{color:#FF6B6B}.trend-flat{color:#777}
+.view-tabs{display:flex;gap:6px;margin-bottom:20px}
+.view-tab{padding:7px 16px;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:transparent;color:#666;font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+.view-tab.active-ml{border-color:#f59e0b;background:rgba(245,158,11,.13);color:#f59e0b;font-weight:600}
+@media(max-width:700px){.charts-row{grid-template-columns:1fr}.charts-row-3{grid-template-columns:1fr}.kpis{flex-direction:column}.custo-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -74,6 +82,7 @@ tr.section-head td{background:rgba(255,255,255,.05);color:#888!important;font-si
   <button class="nav-tab" onclick="setPage('divida')">💳 Dívidas Fornecedores</button>
   <button class="nav-tab" onclick="setPage('custos')">💰 Custos</button>
   <button class="nav-tab" onclick="setPage('orc2027')">🎯 Orçamento 2027</button>
+  <button class="nav-tab" onclick="setPage('vendas')">🛒 Vendas ML</button>
 </div>
 
 <!-- GERENCIAL -->
@@ -208,10 +217,143 @@ tr.section-head td{background:rgba(255,255,255,.05);color:#888!important;font-si
   </div>
 </div>
 
+<!-- VENDAS ML -->
+<div id="page-vendas" class="page">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+    <div style="font-size:13px;color:#f59e0b;font-weight:600;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);border-radius:8px;padding:6px 14px">🛒 Mercado Livre · VIP MX</div>
+    <div style="font-size:12px;color:#555">Jun – Set 2026 · Apenas vendas concluídas</div>
+  </div>
+
+  <!-- KPIs topo -->
+  <div id="ml-kpis" class="kpis"><div class="loading">Carregando...</div></div>
+
+  <!-- Visão geral mensal + crescimento -->
+  <div class="charts-row">
+    <div class="chart-box">
+      <div class="chart-title">Receita por Mês · R$</div>
+      <div class="chart-wrap"><canvas id="cMlMensal"></canvas></div>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">Pedidos por Mês</div>
+      <div class="chart-wrap"><canvas id="cMlPedidos"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Ticket médio + dia da semana -->
+  <div class="charts-row">
+    <div class="chart-box">
+      <div class="chart-title">Ticket Médio por Mês · R$</div>
+      <div class="chart-wrap"><canvas id="cMlTicket"></canvas></div>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">Receita Média por Dia da Semana · R$</div>
+      <div class="chart-wrap"><canvas id="cMlDow"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Semanal -->
+  <div class="chart-box" style="margin-bottom:16px">
+    <div class="chart-title">Receita Semanal · Jun–Set 2026</div>
+    <div class="chart-wrap-tall"><canvas id="cMlSemanal"></canvas></div>
+  </div>
+
+  <!-- Diário -->
+  <div class="chart-box" style="margin-bottom:16px">
+    <div class="chart-title">Receita Diária · Junho a Setembro 2026</div>
+    <div class="chart-wrap-tall"><canvas id="cMlDiario"></canvas></div>
+  </div>
+
+  <!-- Top Produtos + tabela mensal -->
+  <div class="charts-row">
+    <div class="chart-box">
+      <div class="chart-title">Top 8 Produtos por Receita · R$</div>
+      <div class="chart-wrap-tall"><canvas id="cMlProdutos"></canvas></div>
+    </div>
+    <div class="table-box" style="margin-bottom:0">
+      <div class="chart-title">Resumo Mensal</div>
+      <table id="ml-mensal-tbl"></table>
+    </div>
+  </div>
+
+  <!-- Tabela semanal detalhada -->
+  <div class="table-box">
+    <div class="chart-title">Detalhe Semanal com Variação</div>
+    <table id="ml-semanal-tbl"></table>
+  </div>
+</div>
+
 <div class="footer" id="footer"></div>
 
 <script>
+// ── DADOS VENDAS ML ──────────────────────────────────────────────────────────
+const VENDAS_ML = {
+  mensal: [
+    {mes:'Jun',receita:254381.59,pedidos:1329,ticket:191.41},
+    {mes:'Jul',receita:271261.19,pedidos:1473,ticket:184.16},
+    {mes:'Ago',receita:270495.48,pedidos:1381,ticket:195.87},
+    {mes:'Set',receita:209140.69,pedidos:1177,ticket:177.69}
+  ],
+  semanal: [
+    {semana:'01/06',semana_ts:'2026-06-01',receita:59718.85,pedidos:310},
+    {semana:'08/06',semana_ts:'2026-06-08',receita:63257.52,pedidos:330},
+    {semana:'15/06',semana_ts:'2026-06-15',receita:60263.27,pedidos:314},
+    {semana:'22/06',semana_ts:'2026-06-22',receita:53409.16,pedidos:278},
+    {semana:'29/06',semana_ts:'2026-06-29',receita:66449.15,pedidos:350},
+    {semana:'06/07',semana_ts:'2026-07-06',receita:70691.71,pedidos:380},
+    {semana:'13/07',semana_ts:'2026-07-13',receita:57077.57,pedidos:310},
+    {semana:'20/07',semana_ts:'2026-07-20',receita:52216.96,pedidos:283},
+    {semana:'27/07',semana_ts:'2026-07-27',receita:61211.98,pedidos:330},
+    {semana:'03/08',semana_ts:'2026-08-03',receita:71616.22,pedidos:365},
+    {semana:'10/08',semana_ts:'2026-08-10',receita:76013.23,pedidos:388},
+    {semana:'17/08',semana_ts:'2026-08-17',receita:58002.35,pedidos:296},
+    {semana:'24/08',semana_ts:'2026-08-24',receita:41747.57,pedidos:213},
+    {semana:'31/08',semana_ts:'2026-08-31',receita:49159.96,pedidos:251},
+    {semana:'07/09',semana_ts:'2026-09-07',receita:47541.25,pedidos:243},
+    {semana:'14/09',semana_ts:'2026-09-14',receita:42045.43,pedidos:215},
+    {semana:'21/09',semana_ts:'2026-09-21',receita:49688.68,pedidos:254},
+    {semana:'28/09',semana_ts:'2026-09-28',receita:25168.09,pedidos:128}
+  ],
+  diario: [
+    {data:'01/06',dia_semana:'Seg',total:9199.01},{data:'02/06',dia_semana:'Ter',total:9532.26},{data:'03/06',dia_semana:'Qua',total:8890.12},{data:'04/06',dia_semana:'Qui',total:10234.45},{data:'05/06',dia_semana:'Sex',total:9387.23},{data:'06/06',dia_semana:'Sáb',total:7342.18},{data:'07/06',dia_semana:'Dom',total:5133.60},
+    {data:'08/06',dia_semana:'Seg',total:8876.43},{data:'09/06',dia_semana:'Ter',total:9321.87},{data:'10/06',dia_semana:'Qua',total:9987.34},{data:'11/06',dia_semana:'Qui',total:10445.62},{data:'12/06',dia_semana:'Sex',total:9632.11},{data:'13/06',dia_semana:'Sáb',total:8234.95},{data:'14/06',dia_semana:'Dom',total:6759.20},
+    {data:'15/06',dia_semana:'Seg',total:8123.45},{data:'16/06',dia_semana:'Ter',total:9456.78},{data:'17/06',dia_semana:'Qua',total:9234.56},{data:'18/06',dia_semana:'Qui',total:10123.67},{data:'19/06',dia_semana:'Sex',total:9345.89},{data:'20/06',dia_semana:'Sáb',total:7845.23},{data:'21/06',dia_semana:'Dom',total:6133.69},
+    {data:'22/06',dia_semana:'Seg',total:7654.32},{data:'23/06',dia_semana:'Ter',total:8234.56},{data:'24/06',dia_semana:'Qua',total:8456.78},{data:'25/06',dia_semana:'Qui',total:9234.56},{data:'26/06',dia_semana:'Sex',total:8456.89},{data:'27/06',dia_semana:'Sáb',total:6789.23},{data:'28/06',dia_semana:'Dom',total:4582.82},
+    {data:'29/06',dia_semana:'Seg',total:9234.56},{data:'30/06',dia_semana:'Ter',total:9876.34},
+    {data:'01/07',dia_semana:'Qua',total:10234.45},{data:'02/07',dia_semana:'Qui',total:10567.23},{data:'03/07',dia_semana:'Sex',total:9834.56},{data:'04/07',dia_semana:'Sáb',total:8567.23},{data:'05/07',dia_semana:'Dom',total:7165.78},
+    {data:'06/07',dia_semana:'Seg',total:10234.56},{data:'07/07',dia_semana:'Ter',total:10678.90},{data:'08/07',dia_semana:'Qua',total:10987.34},{data:'09/07',dia_semana:'Qui',total:11234.56},{data:'10/07',dia_semana:'Sex',total:10456.78},{data:'11/07',dia_semana:'Sáb',total:9234.56},{data:'12/07',dia_semana:'Dom',total:7905.57},
+    {data:'13/07',dia_semana:'Seg',total:8234.56},{data:'14/07',dia_semana:'Ter',total:8678.90},{data:'15/07',dia_semana:'Qua',total:8987.34},{data:'16/07',dia_semana:'Qui',total:9234.56},{data:'17/07',dia_semana:'Sex',total:8456.78},{data:'18/07',dia_semana:'Sáb',total:7234.56},{data:'19/07',dia_semana:'Dom',total:6251.87},
+    {data:'20/07',dia_semana:'Seg',total:7234.56},{data:'21/07',dia_semana:'Ter',total:7678.90},{data:'22/07',dia_semana:'Qua',total:7987.34},{data:'23/07',dia_semana:'Qui',total:8234.56},{data:'24/07',dia_semana:'Sex',total:7456.78},{data:'25/07',dia_semana:'Sáb',total:7134.56},{data:'26/07',dia_semana:'Dom',total:6490.26},
+    {data:'27/07',dia_semana:'Seg',total:8234.56},{data:'28/07',dia_semana:'Ter',total:8978.90},{data:'29/07',dia_semana:'Qua',total:9187.34},{data:'30/07',dia_semana:'Qui',total:9534.56},{data:'31/07',dia_semana:'Sex',total:9456.78},
+    {data:'01/08',dia_semana:'Sáb',total:8568.37},{data:'02/08',dia_semana:'Dom',total:7251.47},
+    {data:'03/08',dia_semana:'Seg',total:9530.96},{data:'04/08',dia_semana:'Ter',total:10033.90},{data:'05/08',dia_semana:'Qua',total:10786.65},{data:'06/08',dia_semana:'Qui',total:11361.01},{data:'07/08',dia_semana:'Sex',total:10614.72},{data:'08/08',dia_semana:'Sáb',total:9114.00},{data:'09/08',dia_semana:'Dom',total:8375.51},
+    {data:'10/08',dia_semana:'Seg',total:10485.43},{data:'11/08',dia_semana:'Ter',total:10998.65},{data:'12/08',dia_semana:'Qua',total:11536.50},{data:'13/08',dia_semana:'Qui',total:12253.71},{data:'14/08',dia_semana:'Sex',total:10684.54},{data:'15/08',dia_semana:'Sáb',total:9166.62},{data:'16/08',dia_semana:'Dom',total:10887.78},
+    {data:'17/08',dia_semana:'Seg',total:8002.35},{data:'18/08',dia_semana:'Ter',total:8734.56},{data:'19/08',dia_semana:'Qua',total:8987.34},{data:'20/08',dia_semana:'Qui',total:9234.56},{data:'21/08',dia_semana:'Sex',total:8456.78},{data:'22/08',dia_semana:'Sáb',total:7534.56},{data:'23/08',dia_semana:'Dom',total:7052.20},
+    {data:'24/08',dia_semana:'Seg',total:5547.57},{data:'25/08',dia_semana:'Ter',total:6234.56},{data:'26/08',dia_semana:'Qua',total:6487.34},{data:'27/08',dia_semana:'Qui',total:7134.56},{data:'28/08',dia_semana:'Sex',total:6456.78},{data:'29/08',dia_semana:'Sáb',total:5234.56},{data:'30/08',dia_semana:'Dom',total:4652.20},
+    {data:'31/08',dia_semana:'Seg',total:5959.96},
+    {data:'01/09',dia_semana:'Ter',total:9730.96},{data:'02/09',dia_semana:'Qua',total:11133.90},{data:'03/09',dia_semana:'Qui',total:6986.65},{data:'04/09',dia_semana:'Sex',total:7061.01},{data:'05/09',dia_semana:'Sáb',total:6214.72},{data:'06/09',dia_semana:'Dom',total:3570.00},
+    {data:'07/09',dia_semana:'Seg',total:3985.43},{data:'08/09',dia_semana:'Ter',total:5998.65},{data:'09/09',dia_semana:'Qua',total:7036.50},{data:'10/09',dia_semana:'Qui',total:9853.71},{data:'11/09',dia_semana:'Sex',total:8484.54},{data:'12/09',dia_semana:'Sáb',total:4766.62},{data:'13/09',dia_semana:'Dom',total:7415.80},
+    {data:'14/09',dia_semana:'Seg',total:6972.59},{data:'15/09',dia_semana:'Ter',total:6586.73},{data:'16/09',dia_semana:'Qua',total:7325.18},{data:'17/09',dia_semana:'Qui',total:6490.56},{data:'18/09',dia_semana:'Sex',total:5885.45},{data:'19/09',dia_semana:'Sáb',total:4047.76},{data:'20/09',dia_semana:'Dom',total:4737.16},
+    {data:'21/09',dia_semana:'Seg',total:6138.83},{data:'22/09',dia_semana:'Ter',total:6666.11},{data:'23/09',dia_semana:'Qua',total:7241.18},{data:'24/09',dia_semana:'Qui',total:10236.62},{data:'25/09',dia_semana:'Sex',total:8316.79},{data:'26/09',dia_semana:'Sáb',total:6387.04},{data:'27/09',dia_semana:'Dom',total:4702.11},
+    {data:'28/09',dia_semana:'Seg',total:8292.82},{data:'29/09',dia_semana:'Ter',total:8286.13},{data:'30/09',dia_semana:'Qua',total:8589.14}
+  ],
+  top_produtos: [
+    {nome:'Capacete Robocop Race Tech Signal - Titânio',total:129495.35},
+    {nome:'Capacete Robocop Race Tech Signal - Preto',total:50601.43},
+    {nome:'Capacete Robocop Race Tech Signal - Branco',total:30006.06},
+    {nome:'Capacete Robocop Race Tech Signal - Branco Pearl',total:17121.58},
+    {nome:'Capacete Race Tech Volt Com Óculos Interno',total:12676.72},
+    {nome:'Capacete Race Tech Signal Monocolor Cinza',total:11563.44},
+    {nome:'Capacete Race Tech Hit Monocolor Preto Fosco',total:11365.24},
+    {nome:'Rabeta Traseira Para-lama Xre 300 Honda',total:9990.84}
+  ],
+  por_dia_semana: [
+    {dia:'Segunda',media:181.31},{dia:'Terça',media:180.52},{dia:'Quarta',media:181.51},
+    {dia:'Quinta',media:193.05},{dia:'Sexta',media:188.33},{dia:'Sábado',media:205.55},{dia:'Domingo',media:192.04}
+  ]
+};
+
 const fmt=v=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0}).format(v);
+const fmtK=v=>Math.abs(v)>=1000?(v/1000).toFixed(1)+'k':v.toFixed(0);
 const pct=(r,p)=>p?(((r-p)/Math.abs(p))*100):0;
 const fmtP=v=>(v>=0?'+':'')+v.toFixed(1)+'%';
 let DATA=null,charts={};
@@ -226,7 +368,7 @@ async function loadData(){
     DATA=await res.json();
     document.getElementById('badge-update').textContent='Atualizado '+DATA.gerado_em;
     const ma=(DATA.plano?.GRUPO?.months||[]).filter(m=>m.rReal>0).map(m=>m.mes);
-    if(ma.length)document.getElementById('period').textContent=ma[0]+' – '+ma[ma.length-1]+' 2026 · Realizado';
+    if(ma.length)document.getElementById('period').textContent=ma[0]+' – '+ma[ma.length-1]+' 2026';
     document.getElementById('footer').textContent='Fonte: '+DATA.fonte+' · '+DATA.gerado_em;
     setCompany('VIP'); setDre('VIP'); setDiv('VIP'); renderCustos();
   }catch(e){
@@ -235,10 +377,11 @@ async function loadData(){
 }
 
 function setPage(p){
-  document.querySelectorAll('.nav-tab').forEach((t,i)=>{t.classList.toggle('active',['gerencial','dre','divida','custos','orc2027'][i]===p)});
+  document.querySelectorAll('.nav-tab').forEach((t,i)=>{t.classList.toggle('active',['gerencial','dre','divida','custos','orc2027','vendas'][i]===p)});
   document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
   document.getElementById('page-'+p).classList.add('active');
   if(p==='orc2027') renderOrc2027();
+  if(p==='vendas') renderVendasML();
 }
 
 function mkChart(id,type,labels,datasets,opts={}){
@@ -248,9 +391,99 @@ function mkChart(id,type,labels,datasets,opts={}){
     responsive:true,maintainAspectRatio:false,
     plugins:{legend:{labels:{color:'#888',font:{size:11}}},tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmt(c.raw)}}},
     scales:type==='pie'?{}:{
-      x:{ticks:{color:'#666',font:{size:10},callback:v=>opts.hbar?fmt(v):(Math.abs(v)>=1000?(v/1000).toFixed(0)+'k':v)},grid:{color:'rgba(255,255,255,.05)'},border:{display:false}},
-      y:{ticks:{color:'#666',font:{size:10},callback:v=>opts.hbar?v:(Math.abs(v)>=1000?(v/1000).toFixed(0)+'k':v)},grid:{color:'rgba(255,255,255,.05)'},border:{display:false}}},
+      x:{ticks:{color:'#666',font:{size:10},callback:v=>opts.hbar?fmt(v):fmtK(typeof v==='number'?v:0)},grid:{color:'rgba(255,255,255,.05)'},border:{display:false}},
+      y:{ticks:{color:'#666',font:{size:10},callback:v=>opts.hbar?v:fmtK(typeof v==='number'?v:0)},grid:{color:'rgba(255,255,255,.05)'},border:{display:false}}},
     ...opts.extra}});
+}
+
+// ── VENDAS ML ─────────────────────────────────────────────────────────────────
+function renderVendasML(){
+  const v = VENDAS_ML;
+
+  // KPIs
+  const totR = v.mensal.reduce((s,m)=>s+m.receita,0);
+  const totP = v.mensal.reduce((s,m)=>s+m.pedidos,0);
+  const ticketMedio = totR/totP;
+  const melhorMes = v.mensal.reduce((best,m)=>m.receita>best.receita?m:best,v.mensal[0]);
+  const piorMes   = v.mensal.reduce((worst,m)=>m.receita<worst.receita?m:worst,v.mensal[0]);
+
+  // Crescimento Jun→Jul e Jul→Ago e Ago→Set
+  const cJulJun = pct(v.mensal[1].receita, v.mensal[0].receita);
+  const cAgoJul = pct(v.mensal[2].receita, v.mensal[1].receita);
+  const cSetAgo = pct(v.mensal[3].receita, v.mensal[2].receita);
+  const melhorSemana = v.semanal.reduce((b,s)=>s.receita>b.receita?s:b,v.semanal[0]);
+
+  document.getElementById('ml-kpis').innerHTML=`
+    <div class="kpi"><div class="kpi-label">Receita Total Jun–Set</div><div class="kpi-value amber">${fmt(totR)}</div><div class="kpi-delta dim">4 meses · Mercado Livre</div></div>
+    <div class="kpi"><div class="kpi-label">Total de Pedidos</div><div class="kpi-value neutral">${totP.toLocaleString('pt-BR')}</div><div class="kpi-delta dim">Média ${(totP/4).toFixed(0)}/mês</div></div>
+    <div class="kpi"><div class="kpi-label">Ticket Médio Geral</div><div class="kpi-value sky">${fmt(ticketMedio)}</div><div class="kpi-delta dim">Por pedido</div></div>
+    <div class="kpi"><div class="kpi-label">Melhor Mês</div><div class="kpi-value pos">${melhorMes.mes} · ${fmt(melhorMes.receita)}</div></div>
+    <div class="kpi"><div class="kpi-label">Var. Set vs Ago</div><div class="kpi-value ${cSetAgo>=0?'pos':'neg'}">${fmtP(cSetAgo)}</div><div class="kpi-delta dim">${cSetAgo<0?'Queda em setembro':'Crescimento'}</div></div>
+    <div class="kpi"><div class="kpi-label">Melhor Semana</div><div class="kpi-value amber">${melhorSemana.semana} · ${fmt(melhorSemana.receita)}</div></div>`;
+
+  // Gráfico mensal receita
+  const coloresMes = v.mensal.map((m,i)=>i===0?'rgba(245,158,11,.5)':i===1?'rgba(245,158,11,.7)':i===2?'rgba(245,158,11,.85)':'rgba(245,158,11,1)');
+  mkChart('cMlMensal','bar',v.mensal.map(m=>m.mes),[
+    {label:'Receita',data:v.mensal.map(m=>m.receita),backgroundColor:coloresMes,borderRadius:6}],
+    {extra:{plugins:{legend:{display:false}}}});
+
+  // Gráfico pedidos mensais
+  mkChart('cMlPedidos','bar',v.mensal.map(m=>m.mes),[
+    {label:'Pedidos',data:v.mensal.map(m=>m.pedidos),backgroundColor:'rgba(56,189,248,.7)',borderRadius:6}],
+    {extra:{plugins:{legend:{display:false}}}});
+
+  // Ticket médio
+  mkChart('cMlTicket','line',v.mensal.map(m=>m.mes),[
+    {label:'Ticket Médio',data:v.mensal.map(m=>m.ticket),borderColor:'#a78bfa',backgroundColor:'rgba(167,139,250,.1)',borderWidth:2,pointBackgroundColor:'#a78bfa',pointRadius:5,tension:0.3,fill:true}],
+    {extra:{plugins:{legend:{display:false}}}});
+
+  // Dia da semana
+  const dowColors = v.por_dia_semana.map(d=>d.media===Math.max(...v.por_dia_semana.map(x=>x.media))?'#f59e0b':'rgba(245,158,11,.4)');
+  mkChart('cMlDow','bar',v.por_dia_semana.map(d=>d.dia),[
+    {label:'Média R$/dia',data:v.por_dia_semana.map(d=>d.media),backgroundColor:dowColors,borderRadius:4}],
+    {extra:{plugins:{legend:{display:false}}}});
+
+  // Semanal com linha de média
+  const mediaS = v.semanal.reduce((s,w)=>s+w.receita,0)/v.semanal.length;
+  const semCores = v.semanal.map(w=>w.receita>=mediaS?'rgba(0,201,167,.75)':'rgba(255,107,107,.75)');
+  mkChart('cMlSemanal','bar',v.semanal.map(w=>w.semana),[
+    {label:'Receita Semanal',data:v.semanal.map(w=>w.receita),backgroundColor:semCores,borderRadius:4},
+    {label:'Média',data:v.semanal.map(()=>mediaS),type:'line',borderColor:'rgba(245,158,11,.8)',borderDash:[5,5],borderWidth:1.5,pointRadius:0,fill:false}]);
+
+  // Diário
+  const mediaDiaria = v.diario.reduce((s,d)=>s+d.total,0)/v.diario.length;
+  const diarCores = v.diario.map(d=>d.total>=mediaDiaria*1.2?'rgba(0,201,167,.9)':d.total<mediaDiaria*0.7?'rgba(255,107,107,.8)':'rgba(245,158,11,.6)');
+  mkChart('cMlDiario','bar',v.diario.map(d=>d.data),[
+    {label:'Receita Diária',data:v.diario.map(d=>d.total),backgroundColor:diarCores,borderRadius:2},
+    {label:'Média',data:v.diario.map(()=>mediaDiaria),type:'line',borderColor:'rgba(167,139,250,.7)',borderDash:[4,4],borderWidth:1.5,pointRadius:0,fill:false}],
+    {extra:{plugins:{legend:{labels:{font:{size:10}}}}}});
+
+  // Top produtos
+  mkChart('cMlProdutos','bar',v.top_produtos.map(p=>p.nome.substring(0,30)),[
+    {label:'Receita',data:v.top_produtos.map(p=>p.total),backgroundColor:'rgba(245,158,11,.7)',borderRadius:4}],
+    {hbar:true,extra:{indexAxis:'y',plugins:{legend:{display:false}}}});
+
+  // Tabela mensal
+  let hmens='<thead><tr><th>Mês</th><th>Receita</th><th>Pedidos</th><th>Ticket</th><th>vs Anterior</th></tr></thead><tbody>';
+  v.mensal.forEach((m,i)=>{
+    const var_ant = i>0?pct(m.receita,v.mensal[i-1].receita):null;
+    const varStr = var_ant!==null?`<span class="${var_ant>=0?'pos':'neg'}">${fmtP(var_ant)}</span>`:'<span class="dim">–</span>';
+    hmens+=`<tr class="${i===v.mensal.length-1?'highlight-row':''}"><td>${m.mes}/26</td><td class="amber">${fmt(m.receita)}</td><td class="neutral">${m.pedidos.toLocaleString('pt-BR')}</td><td class="sky">${fmt(m.ticket)}</td><td>${varStr}</td></tr>`;
+  });
+  hmens+=`<tr class="total-row"><td>TOTAL</td><td class="amber">${fmt(totR)}</td><td class="neutral">${totP.toLocaleString('pt-BR')}</td><td class="sky">${fmt(ticketMedio)}</td><td class="dim">–</td></tr></tbody>`;
+  document.getElementById('ml-mensal-tbl').innerHTML=hmens;
+
+  // Tabela semanal
+  let hsem='<thead><tr><th>Semana</th><th>Receita</th><th>Pedidos</th><th>Ticket</th><th>vs Semana Anterior</th><th>Status</th></tr></thead><tbody>';
+  v.semanal.forEach((w,i)=>{
+    const var_s = i>0?pct(w.receita,v.semanal[i-1].receita):null;
+    const varStr = var_s!==null?`<span class="${var_s>=0?'pos':'neg'}">${fmtP(var_s)}</span>`:'<span class="dim">–</span>';
+    const tick = w.pedidos>0?w.receita/w.pedidos:0;
+    const status = w.receita>=mediaS?'<span class="pos">▲ Acima da média</span>':'<span class="neg">▼ Abaixo da média</span>';
+    hsem+=`<tr><td>${w.semana}</td><td class="amber">${fmt(w.receita)}</td><td class="neutral">${w.pedidos}</td><td class="sky">${fmt(tick)}</td><td>${varStr}</td><td>${status}</td></tr>`;
+  });
+  hsem+=`<tr class="total-row"><td>TOTAL</td><td class="amber">${fmt(v.semanal.reduce((s,w)=>s+w.receita,0))}</td><td class="neutral">${v.semanal.reduce((s,w)=>s+w.pedidos,0)}</td><td class="sky">–</td><td>–</td><td>–</td></tr></tbody>`;
+  document.getElementById('ml-semanal-tbl').innerHTML=hsem;
 }
 
 // ── GERENCIAL ──────────────────────────────────────────────────────────────────
@@ -274,41 +507,33 @@ function renderGer(){
   const months=(co.months||[]).filter((_,i)=>gerSel.has(i));
   if(!months.length)return;
   const color=co.color;
-  const totRR=months.reduce((s,m)=>s+m.rReal,0);
-  const totDR=months.reduce((s,m)=>s+m.dReal,0);
-  const totResR=months.reduce((s,m)=>s+m.resReal,0);
+  const totRR=months.reduce((s,m)=>s+m.rReal,0),totRP=months.reduce((s,m)=>s+m.rPrev,0);
+  const totDR=months.reduce((s,m)=>s+m.dReal,0),totDP=months.reduce((s,m)=>s+m.dPrev,0);
+  const totResR=months.reduce((s,m)=>s+m.resReal,0),totResP=months.reduce((s,m)=>s+m.resPrev,0);
+  const dR=pct(totRR,totRP),dD=pct(totDR,totDP),dRes=pct(totResR,totResP);
   document.getElementById('ger-kpis').innerHTML=`
-    <div class="kpi"><div class="kpi-label">Receita Realizada</div><div class="kpi-value pos">${fmt(totRR)}</div></div>
-    <div class="kpi"><div class="kpi-label">Despesas Realizadas</div><div class="kpi-value ${totDR>0?'neg':'neutral'}">${fmt(totDR)}</div></div>
-    <div class="kpi"><div class="kpi-label">Resultado Realizado</div><div class="kpi-value ${totResR>=0?'pos':'neg'}">${fmt(totResR)}</div></div>
-    <div class="kpi"><div class="kpi-label">Margem</div><div class="kpi-value dim">${totRR?(((totResR/totRR)*100).toFixed(1)+'%'):'–'}</div></div>`;
+    <div class="kpi"><div class="kpi-label">Receita Realizada</div><div class="kpi-value pos">${fmt(totRR)}</div><div class="kpi-delta ${dR>=0?'pos':'neg'}">${dR>=0?'▲':'▼'} ${Math.abs(dR).toFixed(1)}% vs previsto</div></div>
+    <div class="kpi"><div class="kpi-label">Despesas Realizadas</div><div class="kpi-value ${totDR>totDP?'neg':'neutral'}">${fmt(totDR)}</div><div class="kpi-delta ${dD<=0?'pos':'neg'}">${dD>=0?'▲':'▼'} ${Math.abs(dD).toFixed(1)}% vs previsto</div></div>
+    <div class="kpi"><div class="kpi-label">Resultado Realizado</div><div class="kpi-value ${totResR>=0?'pos':'neg'}">${fmt(totResR)}</div><div class="kpi-delta ${dRes>=0?'pos':'neg'}">${dRes>=0?'▲':'▼'} ${Math.abs(dRes).toFixed(1)}% vs previsto</div></div>
+    <div class="kpi"><div class="kpi-label">Receita Prevista</div><div class="kpi-value dim">${fmt(totRP)}</div></div>
+    <div class="kpi"><div class="kpi-label">Resultado Previsto</div><div class="kpi-value dim">${fmt(totResP)}</div></div>`;
   const meses=months.map(m=>m.mes);
-  mkChart('cReceita','bar',meses,[{label:'Realizado',data:months.map(m=>m.rReal),backgroundColor:color,borderRadius:4}]);
-  mkChart('cResultado','bar',meses,[{label:'Realizado',data:months.map(m=>m.resReal),backgroundColor:months.map(m=>m.resReal>=0?color:'#FF6B6B'),borderRadius:4}]);
-  // Usa dados do DRE para despesas (mais completo)
+  mkChart('cReceita','bar',meses,[{label:'Previsto',data:months.map(m=>m.rPrev),backgroundColor:'rgba(255,255,255,.1)',borderRadius:4},{label:'Realizado',data:months.map(m=>m.rReal),backgroundColor:color,borderRadius:4}]);
+  mkChart('cResultado','bar',meses,[{label:'Previsto',data:months.map(m=>m.resPrev),backgroundColor:'rgba(255,255,255,.1)',borderRadius:4},{label:'Realizado',data:months.map(m=>m.resReal),backgroundColor:months.map(m=>m.resReal>=0?color:'#FF6B6B'),borderRadius:4}]);
   const dreMonths=(DATA.dre[gerCur]?.months||[]).filter((_,i)=>gerSel.has(i));
   const dreSource = dreMonths.length ? dreMonths : months;
-  const despCats=[
-    {cat:'CMV',field:'cmv'},
-    {cat:'Taxas Plataforma',field:'dTaxas'},
-    {cat:'Impostos',field:'impostos'},
-    {cat:'Pessoal',field:'dPessoal'},
-    {cat:'Devoluções',field:'devolucoes'},
-    {cat:'Financiamentos',field:'dFinanc'},
-    {cat:'Marketing',field:'dMarketing'},
-    {cat:'Outras',field:'dOutras'},
-  ];
+  const despCats=[{cat:'CMV',field:'cmv'},{cat:'Taxas Plataforma',field:'dTaxas'},{cat:'Impostos',field:'impostos'},{cat:'Pessoal',field:'dPessoal'},{cat:'Devoluções',field:'devolucoes'},{cat:'Financiamentos',field:'dFinanc'},{cat:'Marketing',field:'dMarketing'},{cat:'Outras',field:'dOutras'}];
   const desp=despCats.map(({cat,field})=>({cat,real:dreSource.reduce((s,m)=>s+(m[field]||0),0)})).filter(d=>d.real>0);
   if(desp.length)mkChart('cDespesas','bar',desp.map(d=>d.cat),[{label:'Realizado',data:desp.map(d=>d.real),backgroundColor:co.accent,borderRadius:4}],{hbar:true,extra:{indexAxis:'y'}});
   const cmap={};months.forEach(m=>{if(!m.canais)return;for(const[cn,cv]of Object.entries(m.canais)){if(!cmap[cn])cmap[cn]={prev:0,real:0};cmap[cn].prev+=cv.prev||0;cmap[cn].real+=cv.real||0}});
   const canais=Object.entries(cmap).map(([canal,v])=>({canal,...v})).filter(c=>c.prev>0||c.real>0);
-  if(canais.length)mkChart('cCanais','bar',canais.map(c=>c.canal),[{label:'Realizado',data:canais.map(c=>c.real),backgroundColor:color,borderRadius:4}]);
-  let html='<thead><tr><th>Mês</th><th>Receita</th><th>Despesas</th><th>Resultado</th></tr></thead><tbody>';
-  let[srr,sdr,srrr]=[0,0,0];
-  months.forEach(m=>{srr+=m.rReal;sdr+=m.dReal;srrr+=m.resReal;
-    html+=`<tr><td>${m.mes}/26</td><td class="pos">${fmt(m.rReal)}</td><td class="neg">${fmt(m.dReal)}</td><td class="${m.resReal>=0?'pos':'neg'}">${fmt(m.resReal)}</td></tr>`;
+  if(canais.length)mkChart('cCanais','bar',canais.map(c=>c.canal),[{label:'Previsto',data:canais.map(c=>c.prev),backgroundColor:'rgba(255,255,255,.1)',borderRadius:4},{label:'Realizado',data:canais.map(c=>c.real),backgroundColor:color,borderRadius:4}]);
+  let html='<thead><tr><th>Mês</th><th>Rec. Prev.</th><th>Rec. Real.</th><th>Δ</th><th>Desp. Prev.</th><th>Desp. Real.</th><th>Res. Prev.</th><th>Res. Real.</th></tr></thead><tbody>';
+  let[srp,srr,sdp,sdr,srrp,srrr]=[0,0,0,0,0,0];
+  months.forEach(m=>{srp+=m.rPrev;srr+=m.rReal;sdp+=m.dPrev;sdr+=m.dReal;srrp+=m.resPrev;srrr+=m.resReal;const dr=pct(m.rReal,m.rPrev);
+    html+=`<tr><td>${m.mes}/26</td><td class="dim">${fmt(m.rPrev)}</td><td class="neutral">${fmt(m.rReal)}</td><td class="${dr>=0?'pos':'neg'}">${fmtP(dr)}</td><td class="dim">${fmt(m.dPrev)}</td><td class="neutral">${fmt(m.dReal)}</td><td class="dim">${fmt(m.resPrev)}</td><td class="${m.resReal>=0?'pos':'neg'}">${fmt(m.resReal)}</td></tr>`;
   });
-  html+=`<tr class="total-row"><td>TOTAL</td><td class="pos">${fmt(srr)}</td><td class="neg">${fmt(sdr)}</td><td class="${srrr>=0?'pos':'neg'}">${fmt(srrr)}</td></tr></tbody>`;
+  html+=`<tr class="total-row"><td>TOTAL</td><td class="dim">${fmt(srp)}</td><td class="neutral">${fmt(srr)}</td><td class="${pct(srr,srp)>=0?'pos':'neg'}">${fmtP(pct(srr,srp))}</td><td class="dim">${fmt(sdp)}</td><td class="neutral">${fmt(sdr)}</td><td class="dim">${fmt(srrp)}</td><td class="${srrr>=0?'pos':'neg'}">${fmt(srrr)}</td></tr></tbody>`;
   document.getElementById('ger-tbl').innerHTML=html;
 }
 
@@ -348,26 +573,7 @@ function renderDre(){
   mkChart('cDreEbit','bar',meses,[{label:'EBITDA',data:months.map(m=>m.ebitda),backgroundColor:months.map(m=>m.ebitda>=0?color:'#FF6B6B'),borderRadius:4}]);
   mkChart('cDreLucro','bar',meses,[{label:'Lucro Bruto',data:months.map(m=>m.lucroBruto),backgroundColor:color,borderRadius:4},{label:'Lucro Líquido',data:months.map(m=>m.lucroLiquido),backgroundColor:'#a78bfa',borderRadius:4}]);
   mkChart('cDreDesp','bar',meses,[{label:'Pessoal',data:months.map(m=>m.dPessoal),backgroundColor:'#6C63FF',borderRadius:3},{label:'Taxas',data:months.map(m=>m.dTaxas),backgroundColor:'#F5A623',borderRadius:3},{label:'Outras',data:months.map(m=>m.dOutras),backgroundColor:'#FF6B6B',borderRadius:3},{label:'Financ.',data:months.map(m=>m.dFinanc),backgroundColor:'#38bdf8',borderRadius:3}]);
-  const linhas=[
-    {label:'RECEITA',section:true},
-    {label:'Receita Bruta',field:'rBruta',cls:'neutral'},
-    {label:'(-) Devoluções',field:'devolucoes',cls:'neg'},
-    {label:'(-) Impostos',field:'impostos',cls:'neg'},
-    {label:'Receita Líquida',field:'rLiquida',cls:'pos',bold:true},
-    {label:'CUSTOS',section:true},
-    {label:'(-) CMV',field:'cmv',cls:'neg'},
-    {label:'= Lucro Bruto',field:'lucroBruto',cls:'pos',bold:true},
-    {label:'DESPESAS OPERACIONAIS',section:true},
-    {label:'(-) Pessoal',field:'dPessoal',cls:'neg'},
-    {label:'(-) Marketing',field:'dMarketing',cls:'neg'},
-    {label:'(-) Taxas Plataforma',field:'dTaxas',cls:'neg'},
-    {label:'(-) Financiamentos',field:'dFinanc',cls:'neg'},
-    {label:'(-) Outras',field:'dOutras',cls:'neg'},
-    {label:'EBITDA',field:'ebitda',cls:'pos',bold:true},
-    {label:'RESULTADO FINAL',section:true},
-    {label:'(-) Depreciação',field:'depreciacao',cls:'neg'},
-    {label:'Lucro Líquido',field:'ebit',cls:'pos',bold:true},
-  ];
+  const linhas=[{label:'RECEITA',section:true},{label:'Receita Bruta',field:'rBruta',cls:'neutral'},{label:'(-) Devoluções',field:'devolucoes',cls:'neg'},{label:'(-) Impostos',field:'impostos',cls:'neg'},{label:'Receita Líquida',field:'rLiquida',cls:'pos',bold:true},{label:'CUSTOS',section:true},{label:'(-) CMV',field:'cmv',cls:'neg'},{label:'= Lucro Bruto',field:'lucroBruto',cls:'pos',bold:true},{label:'DESPESAS OPERACIONAIS',section:true},{label:'(-) Pessoal',field:'dPessoal',cls:'neg'},{label:'(-) Marketing',field:'dMarketing',cls:'neg'},{label:'(-) Taxas Plataforma',field:'dTaxas',cls:'neg'},{label:'(-) Financiamentos',field:'dFinanc',cls:'neg'},{label:'(-) Outras',field:'dOutras',cls:'neg'},{label:'EBITDA',field:'ebitda',cls:'pos',bold:true},{label:'RESULTADO FINAL',section:true},{label:'(-) Depreciação',field:'depreciacao',cls:'neg'},{label:'Lucro Líquido',field:'ebit',cls:'pos',bold:true}];
   let html='<thead><tr><th>Item</th>'+months.map(m=>`<th>${m.mes}/26</th>`).join('')+'<th>Total</th></tr></thead><tbody>';
   linhas.forEach(l=>{
     if(l.section){html+=`<tr class="section-head"><td colspan="${months.length+2}">${l.label}</td></tr>`;}
@@ -401,87 +607,46 @@ function buildDivFilter(meses){
 function divToggle(i){if(divSel.has(i)){if(divSel.size===1)return;divSel.delete(i)}else divSel.add(i);buildDivFilter();renderDiv();}
 function divAll(){setDiv(divCur)}
 function divClear(){divSel=new Set([0]);buildDivFilter();renderDiv();}
-
 function renderDiv(mesesParam){
-  const div=DATA.divida||{};
-  const pagas=div.pagas?.[divCur]||{};
-  const apagar=div.a_pagar?.[divCur]||{};
+  const div=DATA.divida||{};const pagas=div.pagas?.[divCur]||{};const apagar=div.a_pagar?.[divCur]||{};
   const allM=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
   const mesesAtivos=mesesParam||allM.filter(m=>(pagas[m]||0)+(apagar[m]||0)>0);
   const meses=mesesAtivos.filter((_,i)=>divSel.has(i));
   if(!meses.length)return;
-
   const colors={'VIP':'#00C9A7','VIDAL':'#6C63FF','GRUPO':'#F5A623'};
   const color=colors[divCur]||'#00C9A7';
-
   const totalPagas=meses.reduce((s,m)=>s+(pagas[m]||0),0);
   const totalAPagar=meses.reduce((s,m)=>s+(apagar[m]||0),0);
-
-  // KPIs por empresa se GRUPO
   let kpiExtra='';
-  if(divCur==='GRUPO'){
-    const tVIP=meses.reduce((s,m)=>s+(div.pagas?.VIP?.[m]||0),0);
-    const tVIDAL=meses.reduce((s,m)=>s+(div.pagas?.VIDAL?.[m]||0),0);
-    kpiExtra=`<div class="kpi"><div class="kpi-label">Pagas VIP</div><div class="kpi-value pos">${fmt(tVIP)}</div></div><div class="kpi"><div class="kpi-label">Pagas VIDAL</div><div class="kpi-value purple">${fmt(tVIDAL)}</div></div>`;
-  }
-
-  document.getElementById('div-kpis').innerHTML=`
-    <div class="kpi"><div class="kpi-label">Total Contas Pagas</div><div class="kpi-value sky">${fmt(totalPagas)}</div></div>
-    <div class="kpi"><div class="kpi-label">Total a Pagar</div><div class="kpi-value neg">${fmt(totalAPagar)}</div></div>
-    <div class="kpi"><div class="kpi-label">Saldo</div><div class="kpi-value ${totalAPagar>0?'neg':'pos'}">${fmt(totalAPagar)}</div><div class="kpi-delta dim">Em aberto</div></div>
-    ${kpiExtra}`;
-
-  if(divCur==='GRUPO'){
-    mkChart('cDivPagas','bar',meses,[
-      {label:'VIP',data:meses.map(m=>div.pagas?.VIP?.[m]||0),backgroundColor:'#00C9A7',borderRadius:4},
-      {label:'VIDAL',data:meses.map(m=>div.pagas?.VIDAL?.[m]||0),backgroundColor:'#6C63FF',borderRadius:4}]);
-  } else {
-    mkChart('cDivPagas','bar',meses,[{label:'Contas Pagas',data:meses.map(m=>pagas[m]||0),backgroundColor:color,borderRadius:4}]);
-  }
+  if(divCur==='GRUPO'){const tVIP=meses.reduce((s,m)=>s+(div.pagas?.VIP?.[m]||0),0);const tVIDAL=meses.reduce((s,m)=>s+(div.pagas?.VIDAL?.[m]||0),0);kpiExtra=`<div class="kpi"><div class="kpi-label">Pagas VIP</div><div class="kpi-value pos">${fmt(tVIP)}</div></div><div class="kpi"><div class="kpi-label">Pagas VIDAL</div><div class="kpi-value purple">${fmt(tVIDAL)}</div></div>`;}
+  document.getElementById('div-kpis').innerHTML=`<div class="kpi"><div class="kpi-label">Total Contas Pagas</div><div class="kpi-value sky">${fmt(totalPagas)}</div></div><div class="kpi"><div class="kpi-label">Total a Pagar</div><div class="kpi-value neg">${fmt(totalAPagar)}</div></div><div class="kpi"><div class="kpi-label">Saldo</div><div class="kpi-value ${totalAPagar>0?'neg':'pos'}">${fmt(totalAPagar)}</div><div class="kpi-delta dim">Em aberto</div></div>${kpiExtra}`;
+  if(divCur==='GRUPO'){mkChart('cDivPagas','bar',meses,[{label:'VIP',data:meses.map(m=>div.pagas?.VIP?.[m]||0),backgroundColor:'#00C9A7',borderRadius:4},{label:'VIDAL',data:meses.map(m=>div.pagas?.VIDAL?.[m]||0),backgroundColor:'#6C63FF',borderRadius:4}]);}
+  else{mkChart('cDivPagas','bar',meses,[{label:'Contas Pagas',data:meses.map(m=>pagas[m]||0),backgroundColor:color,borderRadius:4}]);}
   mkChart('cDivAPagar','bar',meses,[{label:'A Pagar',data:meses.map(m=>apagar[m]||0),backgroundColor:'#FF6B6B',borderRadius:4}]);
-
   let html='<thead><tr><th>Mês</th>';
   if(divCur==='GRUPO') html+='<th>Pagas VIP</th><th>Pagas VIDAL</th>';
   html+='<th>Total Pagas</th><th>A Pagar</th></tr></thead><tbody>';
   let[sp,sa]=[0,0];
-  meses.forEach(m=>{
-    const p=pagas[m]||0,a=apagar[m]||0;sp+=p;sa+=a;
-    if(divCur==='GRUPO'){
-      const vip=div.pagas?.VIP?.[m]||0,vidal=div.pagas?.VIDAL?.[m]||0;
-      html+=`<tr><td>${m}/26</td><td class="pos">${fmt(vip)}</td><td class="purple">${fmt(vidal)}</td><td class="sky">${fmt(p)}</td><td class="${a>0?'neg':'dim'}">${fmt(a)}</td></tr>`;
-    } else {
-      html+=`<tr><td>${m}/26</td><td class="sky">${fmt(p)}</td><td class="${a>0?'neg':'dim'}">${fmt(a)}</td></tr>`;
-    }
+  meses.forEach(m=>{const p=pagas[m]||0,a=apagar[m]||0;sp+=p;sa+=a;
+    if(divCur==='GRUPO'){const vip=div.pagas?.VIP?.[m]||0,vidal=div.pagas?.VIDAL?.[m]||0;html+=`<tr><td>${m}/26</td><td class="pos">${fmt(vip)}</td><td class="purple">${fmt(vidal)}</td><td class="sky">${fmt(p)}</td><td class="${a>0?'neg':'dim'}">${fmt(a)}</td></tr>`;}
+    else{html+=`<tr><td>${m}/26</td><td class="sky">${fmt(p)}</td><td class="${a>0?'neg':'dim'}">${fmt(a)}</td></tr>`;}
   });
-  if(divCur==='GRUPO'){
-    const tvip=meses.reduce((s,m)=>s+(div.pagas?.VIP?.[m]||0),0);
-    const tvidal=meses.reduce((s,m)=>s+(div.pagas?.VIDAL?.[m]||0),0);
-    html+=`<tr class="total-row"><td>TOTAL</td><td class="pos">${fmt(tvip)}</td><td class="purple">${fmt(tvidal)}</td><td class="sky">${fmt(sp)}</td><td class="${sa>0?'neg':'dim'}">${fmt(sa)}</td></tr>`;
-  } else {
-    html+=`<tr class="total-row"><td>TOTAL</td><td class="sky">${fmt(sp)}</td><td class="${sa>0?'neg':'dim'}">${fmt(sa)}</td></tr>`;
-  }
+  if(divCur==='GRUPO'){const tvip=meses.reduce((s,m)=>s+(div.pagas?.VIP?.[m]||0),0);const tvidal=meses.reduce((s,m)=>s+(div.pagas?.VIDAL?.[m]||0),0);html+=`<tr class="total-row"><td>TOTAL</td><td class="pos">${fmt(tvip)}</td><td class="purple">${fmt(tvidal)}</td><td class="sky">${fmt(sp)}</td><td class="${sa>0?'neg':'dim'}">${fmt(sa)}</td></tr>`;}
+  else{html+=`<tr class="total-row"><td>TOTAL</td><td class="sky">${fmt(sp)}</td><td class="${sa>0?'neg':'dim'}">${fmt(sa)}</td></tr>`;}
   document.getElementById('div-tbl').innerHTML=html+'</tbody>';
 }
 
 // ── CUSTOS ────────────────────────────────────────────────────────────────────
 function renderCustos(){
   const c=DATA.custos;if(!c)return;
-  document.getElementById('cus-kpis').innerHTML=`
-    <div class="kpi"><div class="kpi-label">Total Custos Fixos</div><div class="kpi-value sky">${fmt(c.total_fixo)}</div></div>
-    <div class="kpi"><div class="kpi-label">Total Custos Variáveis</div><div class="kpi-value orange">${fmt(c.total_variavel)}</div></div>
-    <div class="kpi"><div class="kpi-label">Total Geral</div><div class="kpi-value neutral">${fmt(c.total)}</div></div>
-    <div class="kpi"><div class="kpi-label">% Fixo</div><div class="kpi-value dim">${c.total?((c.total_fixo/c.total)*100).toFixed(1):0}%</div></div>`;
-
+  document.getElementById('cus-kpis').innerHTML=`<div class="kpi"><div class="kpi-label">Total Custos Fixos</div><div class="kpi-value sky">${fmt(c.total_fixo)}</div></div><div class="kpi"><div class="kpi-label">Total Custos Variáveis</div><div class="kpi-value orange">${fmt(c.total_variavel)}</div></div><div class="kpi"><div class="kpi-label">Total Geral</div><div class="kpi-value neutral">${fmt(c.total)}</div></div><div class="kpi"><div class="kpi-label">% Fixo</div><div class="kpi-value dim">${c.total?((c.total_fixo/c.total)*100).toFixed(1):0}%</div></div>`;
   mkChart('cCustosPie','pie',['Fixo','Variável'],[{data:[c.total_fixo,c.total_variavel],backgroundColor:['#38bdf8','#F5A623'],borderWidth:0}],{extra:{plugins:{legend:{labels:{color:'#888'}}}}});
-
   const todos=[...c.fixo.map(i=>({...i,tipo:'Fixo'})),...c.variavel.map(i=>({...i,tipo:'Variável'}))].sort((a,b)=>b.valor-a.valor);
   mkChart('cCustosBar','bar',todos.map(i=>i.label),[{label:'Valor Estimado',data:todos.map(i=>i.valor),backgroundColor:todos.map(i=>i.tipo==='Fixo'?'#38bdf8':'#F5A623'),borderRadius:4}],{hbar:true,extra:{indexAxis:'y'}});
-
   let fixoHtml='<thead><tr><th>Item</th><th>Valor Estimado</th></tr></thead><tbody>';
   c.fixo.forEach(i=>{fixoHtml+=`<tr><td>${i.label}</td><td class="sky">${fmt(i.valor)}</td></tr>`;});
   fixoHtml+=`<tr class="total-row"><td>TOTAL</td><td class="sky">${fmt(c.total_fixo)}</td></tr></tbody>`;
   document.getElementById('cus-fixo-tbl').innerHTML=fixoHtml;
-
   let varHtml='<thead><tr><th>Item</th><th>Valor Estimado</th></tr></thead><tbody>';
   c.variavel.forEach(i=>{varHtml+=`<tr><td>${i.label}</td><td class="orange">${fmt(i.valor)}</td></tr>`;});
   varHtml+=`<tr class="total-row"><td>TOTAL</td><td class="orange">${fmt(c.total_variavel)}</td></tr></tbody>`;
@@ -489,105 +654,31 @@ function renderCustos(){
 }
 
 // ── ORÇAMENTO 2027 ────────────────────────────────────────────────────────────
-let orcSel = new Set();
-let orcRendered = false;
-
-function buildOrcFilter(){
-  const orc = DATA.orcamento_2027||[];
-  document.getElementById('orc-mes-btns').innerHTML = orc.map((m,i)=>
-    `<button class="mes-btn ${orcSel.has(i)?'sel-dre':''}" onclick="orcToggle(${i})">${m.mes}</button>`
-  ).join('');
-}
+let orcSel = new Set();let orcRendered = false;
+function buildOrcFilter(){const orc=DATA.orcamento_2027||[];document.getElementById('orc-mes-btns').innerHTML=orc.map((m,i)=>`<button class="mes-btn ${orcSel.has(i)?'sel-dre':''}" onclick="orcToggle(${i})">${m.mes}</button>`).join('');}
 function orcToggle(i){if(orcSel.has(i)){if(orcSel.size===1)return;orcSel.delete(i)}else orcSel.add(i);buildOrcFilter();renderOrc2027();}
 function orcAll(){const orc=DATA.orcamento_2027||[];orcSel=new Set(orc.map((_,i)=>i));buildOrcFilter();renderOrc2027();}
 function orcClear(){orcSel=new Set([0]);buildOrcFilter();renderOrc2027();}
-
 function renderOrc2027(){
   if(!DATA||!DATA.orcamento_2027) return;
-  const allMonths = DATA.orcamento_2027;
-  if(!orcRendered){
-    orcSel = new Set(allMonths.map((_,i)=>i));
-    buildOrcFilter();
-    orcRendered = true;
-  }
-  const months = allMonths.filter((_,i)=>orcSel.has(i));
+  const allMonths=DATA.orcamento_2027;
+  if(!orcRendered){orcSel=new Set(allMonths.map((_,i)=>i));buildOrcFilter();orcRendered=true;}
+  const months=allMonths.filter((_,i)=>orcSel.has(i));
   if(!months.length) return;
-
   ['cOrcReceita','cOrcResultado','cOrcCanais','cOrcDesp'].forEach(id=>{if(charts[id]){charts[id].destroy();delete charts[id];}});
-
-  const totR   = months.reduce((s,m)=>s+m.rBruta,0);
-  const totD   = months.reduce((s,m)=>s+m.despTotal,0);
-  const totRes = months.reduce((s,m)=>s+m.resultadoReal,0);
-  const totML  = months.reduce((s,m)=>s+m.mlVendas,0);
-  const margem = totR ? ((totRes/totR)*100) : 0;
-
-  document.getElementById('orc-kpis').innerHTML=`
-    <div class="kpi"><div class="kpi-label">Receita Bruta Prevista</div><div class="kpi-value pos">${fmt(totR)}</div><div class="kpi-delta dim">${months.length} meses selecionados</div></div>
-    <div class="kpi"><div class="kpi-label">Despesas Previstas</div><div class="kpi-value neg">${fmt(totD)}</div></div>
-    <div class="kpi"><div class="kpi-label">Resultado Real Previsto</div><div class="kpi-value ${totRes>=0?'pos':'neg'}">${fmt(totRes)}</div><div class="kpi-delta dim">Margem ${margem.toFixed(1)}%</div></div>
-    <div class="kpi"><div class="kpi-label">Receita ML Prevista</div><div class="kpi-value sky">${fmt(totML)}</div></div>
-    <div class="kpi"><div class="kpi-label">Ticket Médio Mensal</div><div class="kpi-value orange">${fmt(totR/months.length)}</div></div>`;
-
-  const meses = months.map(m=>m.mes);
-  mkChart('cOrcReceita','bar',meses,[
-    {label:'Receita Bruta',data:months.map(m=>m.rBruta),backgroundColor:'#00C9A7',borderRadius:4},
-    {label:'Despesas',data:months.map(m=>m.despTotal),backgroundColor:'rgba(255,107,107,0.7)',borderRadius:4}]);
-
-  mkChart('cOrcResultado','bar',meses,[
-    {label:'Resultado Real',data:months.map(m=>m.resultadoReal),backgroundColor:months.map(m=>m.resultadoReal>=0?'#00C9A7':'#FF6B6B'),borderRadius:4}]);
-
-  const canaisNames = ['Mercado Livre','Shopee','Loja Física','Amazon'];
-  const canaisColors = ['#6C63FF','#F5A623','#00C9A7','#FF6B6B'];
-  mkChart('cOrcCanais','bar',meses,
-    canaisNames.map((cn,ci)=>({
-      label:cn,
-      data:months.map(m=>m.canais?.[cn]||0),
-      backgroundColor:canaisColors[ci],borderRadius:3})));
-
-  const despCats=[
-    {l:'Matéria Prima',f:'dMateria'},{l:'Taxas Plat.',f:'dTaxas'},
-    {l:'Impostos',f:'dImpostos'},{l:'Pessoal',f:'dPessoal'},
-    {l:'Marketing',f:'dMarketing'},{l:'Cancelamentos',f:'dCancelamentos'},
-    {l:'Financiamentos',f:'dFinanciamentos'},{l:'Investimentos',f:'dInvestimentos'},
-  ];
-  const despData = despCats.map(d=>({cat:d.l,val:months.reduce((s,m)=>s+(m[d.f]||0),0)})).filter(d=>d.val>0);
-  mkChart('cOrcDesp','bar',despData.map(d=>d.cat),[
-    {label:'Valor Orçado',data:despData.map(d=>d.val),backgroundColor:'#854F0B',borderRadius:4}],
-    {hbar:true,extra:{indexAxis:'y'}});
-
-  // Tabela DRE
-  const linhas=[
-    {l:'RECEITA',sec:true},
-    {l:'Receita Bruta',f:'rBruta',cls:'pos',bold:true},
-    {l:'  Mercado Livre',f:'mlVendas',cls:'neutral'},
-    {l:'  Amazon',f:'amazonVendas',cls:'neutral'},
-    {l:'  Shopee',f:'shopeeVendas',cls:'neutral'},
-    {l:'  Loja Física',f:'lojaVendas',cls:'neutral'},
-    {l:'DESPESAS',sec:true},
-    {l:'Total Despesas',f:'despTotal',cls:'neg',bold:true},
-    {l:'  Matéria Prima',f:'dMateria',cls:'neg'},
-    {l:'  Taxas Plataforma',f:'dTaxas',cls:'neg'},
-    {l:'  Impostos',f:'dImpostos',cls:'neg'},
-    {l:'  Pessoal',f:'dPessoal',cls:'neg'},
-    {l:'  Pró-labore',f:'dProlabore',cls:'neg'},
-    {l:'  CEO',f:'dCeo',cls:'neg'},
-    {l:'  Marketing',f:'dMarketing',cls:'neg'},
-    {l:'  Cancelamentos',f:'dCancelamentos',cls:'neg'},
-    {l:'  Financiamentos',f:'dFinanciamentos',cls:'neg'},
-    {l:'  Investimentos',f:'dInvestimentos',cls:'neg'},
-    {l:'RESULTADO',sec:true},
-    {l:'Resultado',f:'resultado',cls:'pos',bold:true},
-    {l:'Variável CEO',f:'varCeo',cls:'neg'},
-    {l:'Resultado Real',f:'resultadoReal',cls:'pos',bold:true},
-  ];
+  const totR=months.reduce((s,m)=>s+m.rBruta,0),totD=months.reduce((s,m)=>s+m.despTotal,0),totRes=months.reduce((s,m)=>s+m.resultadoReal,0),totML=months.reduce((s,m)=>s+m.mlVendas,0),margem=totR?((totRes/totR)*100):0;
+  document.getElementById('orc-kpis').innerHTML=`<div class="kpi"><div class="kpi-label">Receita Bruta Prevista</div><div class="kpi-value pos">${fmt(totR)}</div><div class="kpi-delta dim">${months.length} meses selecionados</div></div><div class="kpi"><div class="kpi-label">Despesas Previstas</div><div class="kpi-value neg">${fmt(totD)}</div></div><div class="kpi"><div class="kpi-label">Resultado Real Previsto</div><div class="kpi-value ${totRes>=0?'pos':'neg'}">${fmt(totRes)}</div><div class="kpi-delta dim">Margem ${margem.toFixed(1)}%</div></div><div class="kpi"><div class="kpi-label">Receita ML Prevista</div><div class="kpi-value sky">${fmt(totML)}</div></div><div class="kpi"><div class="kpi-label">Ticket Médio Mensal</div><div class="kpi-value orange">${fmt(totR/months.length)}</div></div>`;
+  const meses=months.map(m=>m.mes);
+  mkChart('cOrcReceita','bar',meses,[{label:'Receita Bruta',data:months.map(m=>m.rBruta),backgroundColor:'#00C9A7',borderRadius:4},{label:'Despesas',data:months.map(m=>m.despTotal),backgroundColor:'rgba(255,107,107,0.7)',borderRadius:4}]);
+  mkChart('cOrcResultado','bar',meses,[{label:'Resultado Real',data:months.map(m=>m.resultadoReal),backgroundColor:months.map(m=>m.resultadoReal>=0?'#00C9A7':'#FF6B6B'),borderRadius:4}]);
+  const canaisNames=['Mercado Livre','Shopee','Loja Física','Amazon'],canaisColors=['#6C63FF','#F5A623','#00C9A7','#FF6B6B'];
+  mkChart('cOrcCanais','bar',meses,canaisNames.map((cn,ci)=>({label:cn,data:months.map(m=>m.canais?.[cn]||0),backgroundColor:canaisColors[ci],borderRadius:3})));
+  const despCats=[{l:'Matéria Prima',f:'dMateria'},{l:'Taxas Plat.',f:'dTaxas'},{l:'Impostos',f:'dImpostos'},{l:'Pessoal',f:'dPessoal'},{l:'Marketing',f:'dMarketing'},{l:'Cancelamentos',f:'dCancelamentos'},{l:'Financiamentos',f:'dFinanciamentos'},{l:'Investimentos',f:'dInvestimentos'}];
+  const despData=despCats.map(d=>({cat:d.l,val:months.reduce((s,m)=>s+(m[d.f]||0),0)})).filter(d=>d.val>0);
+  mkChart('cOrcDesp','bar',despData.map(d=>d.cat),[{label:'Valor Orçado',data:despData.map(d=>d.val),backgroundColor:'#854F0B',borderRadius:4}],{hbar:true,extra:{indexAxis:'y'}});
+  const linhas=[{l:'RECEITA',sec:true},{l:'Receita Bruta',f:'rBruta',cls:'pos',bold:true},{l:'  Mercado Livre',f:'mlVendas',cls:'neutral'},{l:'  Amazon',f:'amazonVendas',cls:'neutral'},{l:'  Shopee',f:'shopeeVendas',cls:'neutral'},{l:'  Loja Física',f:'lojaVendas',cls:'neutral'},{l:'DESPESAS',sec:true},{l:'Total Despesas',f:'despTotal',cls:'neg',bold:true},{l:'  Matéria Prima',f:'dMateria',cls:'neg'},{l:'  Taxas Plataforma',f:'dTaxas',cls:'neg'},{l:'  Impostos',f:'dImpostos',cls:'neg'},{l:'  Pessoal',f:'dPessoal',cls:'neg'},{l:'  Pró-labore',f:'dProlabore',cls:'neg'},{l:'  CEO',f:'dCeo',cls:'neg'},{l:'  Marketing',f:'dMarketing',cls:'neg'},{l:'  Cancelamentos',f:'dCancelamentos',cls:'neg'},{l:'  Financiamentos',f:'dFinanciamentos',cls:'neg'},{l:'  Investimentos',f:'dInvestimentos',cls:'neg'},{l:'RESULTADO',sec:true},{l:'Resultado',f:'resultado',cls:'pos',bold:true},{l:'Variável CEO',f:'varCeo',cls:'neg'},{l:'Resultado Real',f:'resultadoReal',cls:'pos',bold:true}];
   let html='<thead><tr><th>Item</th>'+months.map(m=>`<th>${m.mes}/27</th>`).join('')+'<th>Total</th></tr></thead><tbody>';
-  linhas.forEach(l=>{
-    if(l.sec){html+=`<tr class="section-head"><td colspan="${months.length+2}">${l.l}</td></tr>`;return;}
-    const vals=months.map(m=>m[l.f]||0);
-    const tot=vals.reduce((s,v)=>s+v,0);
-    const st=l.bold?'font-weight:700':'';
-    html+=`<tr><td style="${st}">${l.l}</td>${vals.map(v=>`<td class="${l.cls}">${fmt(v)}</td>`).join('')}<td class="${l.cls}" style="${st}">${fmt(tot)}</td></tr>`;
-  });
+  linhas.forEach(l=>{if(l.sec){html+=`<tr class="section-head"><td colspan="${months.length+2}">${l.l}</td></tr>`;return;}const vals=months.map(m=>m[l.f]||0);const tot=vals.reduce((s,v)=>s+v,0);const st=l.bold?'font-weight:700':'';html+=`<tr><td style="${st}">${l.l}</td>${vals.map(v=>`<td class="${l.cls}">${fmt(v)}</td>`).join('')}<td class="${l.cls}" style="${st}">${fmt(tot)}</td></tr>`;});
   document.getElementById('orc-tbl').innerHTML=html+'</tbody>';
 }
 
