@@ -219,133 +219,159 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
 
 <!-- VENDAS ML -->
 <div id="page-vendas" class="page">
-  <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
     <div style="font-size:13px;color:#f59e0b;font-weight:600;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);border-radius:8px;padding:6px 14px">🛒 Mercado Livre · VIP MX</div>
     <div style="font-size:12px;color:#555">Jun – Set 2026 · Apenas vendas concluídas</div>
   </div>
 
+  <!-- FILTROS -->
+  <div class="filter-bar" style="margin-bottom:20px">
+    <span class="filter-label">Mês:</span>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <button id="ml-f-jun" class="mes-btn sel-ml" onclick="mlToggleMes('Jun')">Jun</button>
+      <button id="ml-f-jul" class="mes-btn sel-ml" onclick="mlToggleMes('Jul')">Jul</button>
+      <button id="ml-f-ago" class="mes-btn sel-ml" onclick="mlToggleMes('Ago')">Ago</button>
+      <button id="ml-f-set" class="mes-btn sel-ml" onclick="mlToggleMes('Set')">Set</button>
+    </div>
+    <div style="width:1px;background:rgba(255,255,255,.08);margin:0 8px;align-self:stretch"></div>
+    <span class="filter-label">Exibir:</span>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <button id="ml-v-receita"  class="mes-btn sel-ml" onclick="mlToggleView('receita')" title="Receita R$">R$</button>
+      <button id="ml-v-pedidos"  class="mes-btn sel-ml" onclick="mlToggleView('pedidos')" title="Qtd. Pedidos">Pedidos</button>
+      <button id="ml-v-ticket"   class="mes-btn sel-ml" onclick="mlToggleView('ticket')"  title="Ticket Médio">Ticket</button>
+      <button id="ml-v-diario"   class="mes-btn sel-ml" onclick="mlToggleView('diario')"  title="Gráfico Diário">Diário</button>
+      <button id="ml-v-semanal"  class="mes-btn sel-ml" onclick="mlToggleView('semanal')" title="Gráfico Semanal">Semanal</button>
+      <button id="ml-v-produtos" class="mes-btn sel-ml" onclick="mlToggleView('produtos')" title="Top Produtos">Produtos</button>
+      <button id="ml-v-geo"      class="mes-btn sel-ml" onclick="mlToggleView('geo')"      title="Localização">📍 Geo</button>
+      <button id="ml-v-cancel"   class="mes-btn sel-ml" onclick="mlToggleView('cancel')"   title="Cancelamentos">⚠️ Cancel.</button>
+    </div>
+    <div class="filter-actions">
+      <button class="filter-action" onclick="mlFilterAll()">Todos</button>
+      <button class="filter-action" onclick="mlFilterClear()">Limpar</button>
+    </div>
+  </div>
+
   <!-- KPIs topo -->
-  <div id="ml-kpis" class="kpis"><div class="loading">Carregando...</div></div>
+  <div id="ml-kpis" class="kpis"></div>
 
-  <!-- Visão geral mensal + crescimento -->
-  <div class="charts-row">
-    <div class="chart-box">
-      <div class="chart-title">Receita por Mês · R$</div>
-      <div class="chart-wrap"><canvas id="cMlMensal"></canvas></div>
+  <!-- Seção: Receita / Pedidos / Ticket -->
+  <div data-ml-section="receita pedidos ticket">
+    <div class="charts-row">
+      <div class="chart-box">
+        <div class="chart-title">Receita por Mês · R$</div>
+        <div class="chart-wrap"><canvas id="cMlMensal"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">Pedidos por Mês</div>
+        <div class="chart-wrap"><canvas id="cMlPedidos"></canvas></div>
+      </div>
     </div>
-    <div class="chart-box">
-      <div class="chart-title">Pedidos por Mês</div>
-      <div class="chart-wrap"><canvas id="cMlPedidos"></canvas></div>
+    <div class="charts-row">
+      <div class="chart-box">
+        <div class="chart-title">Ticket Médio por Mês · R$</div>
+        <div class="chart-wrap"><canvas id="cMlTicket"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">Receita Média por Dia da Semana · R$</div>
+        <div class="chart-wrap"><canvas id="cMlDow"></canvas></div>
+      </div>
     </div>
-  </div>
-
-  <!-- Ticket médio + dia da semana -->
-  <div class="charts-row">
-    <div class="chart-box">
-      <div class="chart-title">Ticket Médio por Mês · R$</div>
-      <div class="chart-wrap"><canvas id="cMlTicket"></canvas></div>
-    </div>
-    <div class="chart-box">
-      <div class="chart-title">Receita Média por Dia da Semana · R$</div>
-      <div class="chart-wrap"><canvas id="cMlDow"></canvas></div>
-    </div>
-  </div>
-
-  <!-- Semanal -->
-  <div class="chart-box" style="margin-bottom:16px">
-    <div class="chart-title">Receita Semanal · Jun–Set 2026</div>
-    <div class="chart-wrap-tall"><canvas id="cMlSemanal"></canvas></div>
-  </div>
-
-  <!-- Diário -->
-  <div class="chart-box" style="margin-bottom:16px">
-    <div class="chart-title">Receita Diária · Junho a Setembro 2026</div>
-    <div class="chart-wrap-tall"><canvas id="cMlDiario"></canvas></div>
-  </div>
-
-  <!-- Top Produtos + tabela mensal -->
-  <div class="charts-row">
-    <div class="chart-box">
-      <div class="chart-title">Top 8 Produtos por Receita · R$</div>
-      <div class="chart-wrap-tall"><canvas id="cMlProdutos"></canvas></div>
-    </div>
-    <div class="table-box" style="margin-bottom:0">
+    <div class="table-box">
       <div class="chart-title">Resumo Mensal</div>
       <table id="ml-mensal-tbl"></table>
     </div>
   </div>
 
-  <!-- Tabela semanal detalhada -->
-  <div class="table-box">
-    <div class="chart-title">Detalhe Semanal com Variação</div>
-    <table id="ml-semanal-tbl"></table>
-  </div>
-
-  <!-- LOCALIZAÇÃO GEOGRÁFICA -->
-  <div style="display:flex;align-items:center;gap:10px;margin:28px 0 16px">
-    <div style="font-size:13px;color:#38bdf8;font-weight:600;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.25);border-radius:8px;padding:6px 14px">📍 Localização de Vendas</div>
-    <div style="font-size:12px;color:#555">Cidades e estados dos compradores · Jun–Set 2026</div>
-  </div>
-
-  <!-- KPIs geo -->
-  <div id="ml-geo-kpis" class="kpis"></div>
-
-  <!-- Gráficos geo -->
-  <div class="charts-row">
-    <div class="chart-box">
-      <div class="chart-title">Top 10 Estados por Receita · R$</div>
-      <div class="chart-wrap-tall"><canvas id="cMlEstados"></canvas></div>
+  <!-- Seção: Semanal -->
+  <div data-ml-section="semanal">
+    <div class="chart-box" style="margin-bottom:16px">
+      <div class="chart-title">Receita Semanal · Jun–Set 2026</div>
+      <div class="chart-wrap-tall"><canvas id="cMlSemanal"></canvas></div>
     </div>
-    <div class="chart-box">
-      <div class="chart-title">Receita por Região do Brasil</div>
-      <div class="chart-wrap-tall"><canvas id="cMlRegioes"></canvas></div>
+    <div class="table-box">
+      <div class="chart-title">Detalhe Semanal com Variação</div>
+      <table id="ml-semanal-tbl"></table>
     </div>
   </div>
 
-  <div class="chart-box" style="margin-bottom:16px">
-    <div class="chart-title">Top 15 Cidades por Receita · R$</div>
-    <div class="chart-wrap-tall"><canvas id="cMlCidades"></canvas></div>
-  </div>
-
-  <!-- Tabela estados -->
-  <div class="charts-row">
-    <div class="table-box" style="margin-bottom:0">
-      <div class="chart-title">Ranking por Estado</div>
-      <table id="ml-estados-tbl"></table>
-    </div>
-    <div class="table-box" style="margin-bottom:0">
-      <div class="chart-title">Top 20 Cidades</div>
-      <table id="ml-cidades-tbl"></table>
+  <!-- Seção: Diário -->
+  <div data-ml-section="diario">
+    <div class="chart-box" style="margin-bottom:16px">
+      <div class="chart-title">Receita Diária · Junho a Setembro 2026</div>
+      <div class="chart-wrap-tall"><canvas id="cMlDiario"></canvas></div>
     </div>
   </div>
 
-  <!-- CANCELAMENTOS E DEVOLUÇÕES -->
-  <div style="display:flex;align-items:center;gap:10px;margin:28px 0 16px">
-    <div style="font-size:13px;color:#FF6B6B;font-weight:600;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.25);border-radius:8px;padding:6px 14px">⚠️ Cancelamentos & Devoluções</div>
-    <div style="font-size:12px;color:#555">Pedidos não concluídos · Jun–Set 2026</div>
-  </div>
-
-  <!-- KPIs cancelamento/devolução -->
-  <div id="ml-perda-kpis" class="kpis"></div>
-
-  <!-- Gráficos cancelamento/devolução -->
-  <div class="charts-row">
-    <div class="chart-box">
-      <div class="chart-title">Qtd. Cancelamentos e Devoluções por Mês</div>
-      <div class="chart-wrap"><canvas id="cMlCancelQtd"></canvas></div>
-    </div>
-    <div class="chart-box">
-      <div class="chart-title">Receita Potencial Perdida por Mês · R$</div>
-      <div class="chart-wrap"><canvas id="cMlCancelVal"></canvas></div>
+  <!-- Seção: Produtos -->
+  <div data-ml-section="produtos">
+    <div class="charts-row">
+      <div class="chart-box">
+        <div class="chart-title">Top 8 Produtos por Receita · R$</div>
+        <div class="chart-wrap-tall"><canvas id="cMlProdutos"></canvas></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;flex:1">
+        <div class="chart-box" style="flex:1">
+          <div class="chart-title" style="margin-bottom:8px">Insight de Produtos</div>
+          <div id="ml-produto-insight" style="font-size:13px;color:#888;line-height:1.7"></div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Tabela detalhada cancelamentos/devoluções -->
-  <div class="table-box">
-    <div class="chart-title">Impacto Mensal — Receita Potencial Perdida</div>
-    <table id="ml-cancel-tbl"></table>
+  <!-- Seção: Geo -->
+  <div data-ml-section="geo">
+    <div style="display:flex;align-items:center;gap:10px;margin:16px 0 16px">
+      <div style="font-size:13px;color:#38bdf8;font-weight:600;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.25);border-radius:8px;padding:6px 14px">📍 Localização de Vendas</div>
+    </div>
+    <div id="ml-geo-kpis" class="kpis"></div>
+    <div class="charts-row">
+      <div class="chart-box">
+        <div class="chart-title">Top 10 Estados por Receita · R$</div>
+        <div class="chart-wrap-tall"><canvas id="cMlEstados"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">Receita por Região do Brasil</div>
+        <div class="chart-wrap-tall"><canvas id="cMlRegioes"></canvas></div>
+      </div>
+    </div>
+    <div class="chart-box" style="margin-bottom:16px">
+      <div class="chart-title">Top 15 Cidades por Receita · R$</div>
+      <div class="chart-wrap-tall"><canvas id="cMlCidades"></canvas></div>
+    </div>
+    <div class="charts-row">
+      <div class="table-box" style="margin-bottom:0">
+        <div class="chart-title">Ranking por Estado</div>
+        <table id="ml-estados-tbl"></table>
+      </div>
+      <div class="table-box" style="margin-bottom:0">
+        <div class="chart-title">Top 20 Cidades</div>
+        <table id="ml-cidades-tbl"></table>
+      </div>
+    </div>
   </div>
-</div>
+
+  <!-- Seção: Cancelamentos -->
+  <div data-ml-section="cancel">
+    <div style="display:flex;align-items:center;gap:10px;margin:16px 0 16px">
+      <div style="font-size:13px;color:#FF6B6B;font-weight:600;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.25);border-radius:8px;padding:6px 14px">⚠️ Cancelamentos & Devoluções</div>
+    </div>
+    <div id="ml-perda-kpis" class="kpis"></div>
+    <div class="charts-row">
+      <div class="chart-box">
+        <div class="chart-title">Qtd. Cancelamentos e Devoluções por Mês</div>
+        <div class="chart-wrap"><canvas id="cMlCancelQtd"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">Receita Potencial Perdida por Mês · R$</div>
+        <div class="chart-wrap"><canvas id="cMlCancelVal"></canvas></div>
+      </div>
+    </div>
+    <!-- Tabela detalhada cancelamentos/devoluções -->
+    <div class="table-box">
+      <div class="chart-title">Impacto Mensal — Receita Potencial Perdida</div>
+      <table id="ml-cancel-tbl"></table>
+    </div>
+  </div><!-- /cancel -->
 
 <div class="footer" id="footer"></div>
 
@@ -603,6 +629,15 @@ function renderVendasML(){
     {label:'Média',data:v.diario.map(()=>mediaDiaria),type:'line',borderColor:'rgba(167,139,250,.7)',borderDash:[4,4],borderWidth:1.5,pointRadius:0,fill:false}],
     {extra:{plugins:{legend:{labels:{font:{size:10}}}}}});
 
+  // Produto insight
+  const topProd = v.top_produtos[0];
+  const top3Pct = ((v.top_produtos.slice(0,3).reduce((s,p)=>s+p.total,0)/v.top_produtos.reduce((s,p)=>s+p.total,0))*100).toFixed(0);
+  const el=document.getElementById('ml-produto-insight');
+  if(el) el.innerHTML=`
+    <div style="margin-bottom:10px"><span style="color:#f59e0b;font-weight:600">🏆 Produto líder:</span> ${topProd.nome.substring(0,50)}<br><span style="color:#888">Receita: <span style="color:#f59e0b">${fmt(topProd.total)}</span></span></div>
+    <div style="margin-bottom:10px"><span style="color:#38bdf8;font-weight:600">📊 Concentração:</span> Top 3 produtos representam <span style="color:#38bdf8">${top3Pct}%</span> da receita de produtos</div>
+    <div><span style="color:#a78bfa;font-weight:600">💡 Insight:</span> Portfólio concentrado — considere diversificar para reduzir risco de dependência de SKUs principais</div>`;
+
   // Top produtos
   mkChart('cMlProdutos','bar',v.top_produtos.map(p=>p.nome.substring(0,30)),[
     {label:'Receita',data:v.top_produtos.map(p=>p.total),backgroundColor:'rgba(245,158,11,.7)',borderRadius:4}],
@@ -620,6 +655,7 @@ function renderVendasML(){
 
   renderGeo();
   renderCancelDevolucoes();
+  mlInitFilters();
 
   // Tabela semanal
   let hsem='<thead><tr><th>Semana</th><th>Receita</th><th>Pedidos</th><th>Ticket</th><th>vs Semana Anterior</th><th>Status</th></tr></thead><tbody>';
@@ -753,6 +789,202 @@ function renderCancelDevolucoes(){
     <td class="dim">${fmt(totPot)}</td>
   </tr></tbody>`;
   document.getElementById('ml-cancel-tbl').innerHTML=h;
+}
+
+// ── FILTROS VENDAS ML ─────────────────────────────────────────────────────────
+// Estado dos filtros
+let mlMesesSel = new Set(['Jun','Jul','Ago','Set']);
+let mlViewSel  = new Set(['receita','pedidos','ticket','diario','semanal','produtos','geo','cancel']);
+
+// Mapa: id do botão → chave do estado
+const ML_MES_MAP  = {Jun:'ml-f-jun', Jul:'ml-f-jul', Ago:'ml-f-ago', Set:'ml-f-set'};
+const ML_VIEW_MAP = {receita:'ml-v-receita',pedidos:'ml-v-pedidos',ticket:'ml-v-ticket',
+                     diario:'ml-v-diario',semanal:'ml-v-semanal',produtos:'ml-v-produtos',
+                     geo:'ml-v-geo',cancel:'ml-v-cancel'};
+
+// Atualiza visual dos botões de mês
+function mlSyncMesBtns(){
+  Object.entries(ML_MES_MAP).forEach(([mes,id])=>{
+    const b=document.getElementById(id);
+    if(!b)return;
+    if(mlMesesSel.has(mes)){b.classList.add('sel-ml')}
+    else{b.classList.remove('sel-ml')}
+  });
+}
+
+// Atualiza visual dos botões de view
+function mlSyncViewBtns(){
+  Object.entries(ML_VIEW_MAP).forEach(([view,id])=>{
+    const b=document.getElementById(id);
+    if(!b)return;
+    if(mlViewSel.has(view)){b.classList.add('sel-ml')}
+    else{b.classList.remove('sel-ml')}
+  });
+}
+
+// Mostra/oculta seções conforme mlViewSel
+function mlApplySections(){
+  document.querySelectorAll('#page-vendas [data-ml-section]').forEach(el=>{
+    const tags = el.getAttribute('data-ml-section').split(' ');
+    // mostrar se qualquer tag da seção estiver selecionada
+    const visible = tags.some(t=>mlViewSel.has(t));
+    el.style.display = visible ? '' : 'none';
+  });
+}
+
+// Toggle de mês: adiciona/remove do set e re-renderiza gráficos que dependem de meses
+function mlToggleMes(mes){
+  if(mlMesesSel.has(mes)){
+    if(mlMesesSel.size===1)return; // não deixa zerar
+    mlMesesSel.delete(mes);
+  } else {
+    mlMesesSel.add(mes);
+  }
+  mlSyncMesBtns();
+  mlRenderFiltrado();
+}
+
+// Toggle de view: mostra/oculta seção
+function mlToggleView(view){
+  if(mlViewSel.has(view)){
+    mlViewSel.delete(view);
+  } else {
+    mlViewSel.add(view);
+  }
+  mlSyncViewBtns();
+  mlApplySections();
+}
+
+// Selecionar tudo
+function mlFilterAll(){
+  mlMesesSel = new Set(['Jun','Jul','Ago','Set']);
+  mlViewSel  = new Set(['receita','pedidos','ticket','diario','semanal','produtos','geo','cancel']);
+  mlSyncMesBtns();
+  mlSyncViewBtns();
+  mlApplySections();
+  mlRenderFiltrado();
+}
+
+// Limpar: fica apenas o último mês (Set) e apenas receita
+function mlFilterClear(){
+  mlMesesSel = new Set(['Set']);
+  mlViewSel  = new Set(['receita']);
+  mlSyncMesBtns();
+  mlSyncViewBtns();
+  mlApplySections();
+  mlRenderFiltrado();
+}
+
+// Re-renderiza apenas os gráficos e KPIs que dependem do filtro de meses
+function mlRenderFiltrado(){
+  const v = VENDAS_ML;
+  const mesOrdem = ['Jun','Jul','Ago','Set'];
+  // dados filtrados (ordem cronológica preservada)
+  const mFilt = mesOrdem.filter(m=>mlMesesSel.has(m)).map(m=>v.mensal.find(x=>x.mes===m)).filter(Boolean);
+  if(!mFilt.length) return;
+
+  // ── KPIs ──
+  const totR  = mFilt.reduce((s,m)=>s+m.receita,0);
+  const totP  = mFilt.reduce((s,m)=>s+m.pedidos,0);
+  const ticket = totP>0?totR/totP:0;
+  const melhorMes = mFilt.reduce((b,m)=>m.receita>b.receita?m:b,mFilt[0]);
+  const cSetAgo = mFilt.length>=2?pct(mFilt[mFilt.length-1].receita,mFilt[mFilt.length-2].receita):0;
+  const melhorSemana = v.semanal.reduce((b,s)=>s.receita>b.receita?s:b,v.semanal[0]);
+
+  document.getElementById('ml-kpis').innerHTML=`
+    <div class="kpi"><div class="kpi-label">Receita Total (Filtro)</div><div class="kpi-value amber">${fmt(totR)}</div><div class="kpi-delta dim">${mFilt.length} mes(es) selecionado(s)</div></div>
+    <div class="kpi"><div class="kpi-label">Total de Pedidos</div><div class="kpi-value neutral">${totP.toLocaleString('pt-BR')}</div><div class="kpi-delta dim">Média ${mFilt.length>0?(totP/mFilt.length).toFixed(0):0}/mês</div></div>
+    <div class="kpi"><div class="kpi-label">Ticket Médio</div><div class="kpi-value sky">${fmt(ticket)}</div><div class="kpi-delta dim">Por pedido</div></div>
+    <div class="kpi"><div class="kpi-label">Melhor Mês (Filtro)</div><div class="kpi-value pos">${melhorMes.mes} · ${fmt(melhorMes.receita)}</div></div>
+    ${mFilt.length>=2?`<div class="kpi"><div class="kpi-label">Var. ${mFilt[mFilt.length-1].mes} vs ${mFilt[mFilt.length-2].mes}</div><div class="kpi-value ${cSetAgo>=0?'pos':'neg'}">${fmtP(cSetAgo)}</div></div>`:''}
+    <div class="kpi"><div class="kpi-label">Melhor Semana</div><div class="kpi-value amber">${melhorSemana.semana} · ${fmt(melhorSemana.receita)}</div></div>`;
+
+  // ── Gráfico mensal receita ──
+  const coloresMes = mFilt.map((_,i)=>`rgba(245,158,11,${0.5+(0.5*i/(mFilt.length||1))})`);
+  mkChart('cMlMensal','bar',mFilt.map(m=>m.mes),[
+    {label:'Receita',data:mFilt.map(m=>m.receita),backgroundColor:coloresMes,borderRadius:6}],
+    {extra:{plugins:{legend:{display:false}}}});
+
+  // ── Gráfico pedidos ──
+  mkChart('cMlPedidos','bar',mFilt.map(m=>m.mes),[
+    {label:'Pedidos',data:mFilt.map(m=>m.pedidos),backgroundColor:'rgba(56,189,248,.7)',borderRadius:6}],
+    {extra:{plugins:{legend:{display:false}}}});
+
+  // ── Ticket médio ──
+  mkChart('cMlTicket','line',mFilt.map(m=>m.mes),[
+    {label:'Ticket Médio',data:mFilt.map(m=>m.ticket),borderColor:'#a78bfa',backgroundColor:'rgba(167,139,250,.1)',borderWidth:2,pointBackgroundColor:'#a78bfa',pointRadius:5,tension:0.3,fill:true}],
+    {extra:{plugins:{legend:{display:false}}}});
+
+  // ── Tabela mensal ──
+  let hmens='<thead><tr><th>Mês</th><th>Receita</th><th>Pedidos</th><th>Ticket</th><th>vs Anterior</th></tr></thead><tbody>';
+  mFilt.forEach((m,i)=>{
+    const var_ant = i>0?pct(m.receita,mFilt[i-1].receita):null;
+    const varStr = var_ant!==null?`<span class="${var_ant>=0?'pos':'neg'}">${fmtP(var_ant)}</span>`:'<span class="dim">–</span>';
+    hmens+=`<tr class="${i===mFilt.length-1?'highlight-row':''}"><td>${m.mes}/26</td><td class="amber">${fmt(m.receita)}</td><td class="neutral">${m.pedidos.toLocaleString('pt-BR')}</td><td class="sky">${fmt(m.ticket)}</td><td>${varStr}</td></tr>`;
+  });
+  hmens+=`<tr class="total-row"><td>TOTAL</td><td class="amber">${fmt(totR)}</td><td class="neutral">${totP.toLocaleString('pt-BR')}</td><td class="sky">${fmt(ticket)}</td><td class="dim">–</td></tr></tbody>`;
+  document.getElementById('ml-mensal-tbl').innerHTML=hmens;
+
+  // ── Semanal — filtra por meses selecionados usando semana_ts ──
+  const mFiltNomes = new Set(mFilt.map(m=>m.mes)); // ex: Set{'Jun','Jul'}
+  const semFilt = v.semanal.filter(w=>{
+    // cada semana tem campo semana_ts (ex: "2026-06-01") → extrai mês
+    if(w.semana_ts){
+      const d=new Date(w.semana_ts+'T00:00:00');
+      const mName=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][d.getMonth()];
+      return mFiltNomes.has(mName);
+    }
+    // fallback: se semana contém o nome do mês
+    return [...mFiltNomes].some(mn=>w.semana.toLowerCase().includes(mn.toLowerCase()));
+  });
+
+  if(semFilt.length>0){
+    const mediaS2 = semFilt.reduce((s,w)=>s+w.receita,0)/semFilt.length;
+    const semCores2 = semFilt.map(w=>w.receita>=mediaS2?'rgba(0,201,167,.75)':'rgba(255,107,107,.75)');
+    mkChart('cMlSemanal','bar',semFilt.map(w=>w.semana),[
+      {label:'Receita Semanal',data:semFilt.map(w=>w.receita),backgroundColor:semCores2,borderRadius:4},
+      {label:'Média',data:semFilt.map(()=>mediaS2),type:'line',borderColor:'rgba(245,158,11,.8)',borderDash:[5,5],borderWidth:1.5,pointRadius:0,fill:false}]);
+    // Tabela semanal
+    let hsem='<thead><tr><th>Semana</th><th>Receita</th><th>Pedidos</th><th>Ticket</th><th>vs Anterior</th><th>Status</th></tr></thead><tbody>';
+    semFilt.forEach((w,i)=>{
+      const var_s = i>0?pct(w.receita,semFilt[i-1].receita):null;
+      const varStr = var_s!==null?`<span class="${var_s>=0?'pos':'neg'}">${fmtP(var_s)}</span>`:'<span class="dim">–</span>';
+      const tick = w.pedidos>0?w.receita/w.pedidos:0;
+      const status = w.receita>=mediaS2?'<span class="pos">▲ Acima</span>':'<span class="neg">▼ Abaixo</span>';
+      hsem+=`<tr><td>${w.semana}</td><td class="amber">${fmt(w.receita)}</td><td class="neutral">${w.pedidos}</td><td class="sky">${fmt(tick)}</td><td>${varStr}</td><td>${status}</td></tr>`;
+    });
+    hsem+=`<tr class="total-row"><td>TOTAL</td><td class="amber">${fmt(semFilt.reduce((s,w)=>s+w.receita,0))}</td><td class="neutral">${semFilt.reduce((s,w)=>s+w.pedidos,0)}</td><td colspan="3">–</td></tr></tbody>`;
+    document.getElementById('ml-semanal-tbl').innerHTML=hsem;
+  }
+
+  // ── Diário ──
+  const mAbrev = {Jan:'january',Fev:'february',Mar:'march',Abr:'april',Mai:'may',Jun:'june',
+                   Jul:'july',Ago:'august',Set:'september',Out:'october',Nov:'november',Dez:'december'};
+  const diarFilt = v.diario.filter(d=>{
+    // d.data ex: "01/06", "15/07"
+    const partes=d.data.split('/');
+    if(partes.length===2){
+      const mNum=parseInt(partes[1],10);
+      const mNames=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+      return mFiltNomes.has(mNames[mNum-1]);
+    }
+    return true;
+  });
+  if(diarFilt.length>0){
+    const mediaDiaria2=diarFilt.reduce((s,d)=>s+d.total,0)/diarFilt.length;
+    const diarCores2=diarFilt.map(d=>d.total>=mediaDiaria2*1.2?'rgba(0,201,167,.9)':d.total<mediaDiaria2*0.7?'rgba(255,107,107,.8)':'rgba(245,158,11,.6)');
+    mkChart('cMlDiario','bar',diarFilt.map(d=>d.data),[
+      {label:'Receita Diária',data:diarFilt.map(d=>d.total),backgroundColor:diarCores2,borderRadius:2},
+      {label:'Média',data:diarFilt.map(()=>mediaDiaria2),type:'line',borderColor:'rgba(167,139,250,.7)',borderDash:[4,4],borderWidth:1.5,pointRadius:0,fill:false}],
+      {extra:{plugins:{legend:{labels:{font:{size:10}}}}}});
+  }
+}
+
+// Chamado ao abrir a aba pela primeira vez — garante que as seções e botões estejam sincronizados
+function mlInitFilters(){
+  mlSyncMesBtns();
+  mlSyncViewBtns();
+  mlApplySections();
 }
 
 // ── GERENCIAL ──────────────────────────────────────────────────────────────────
