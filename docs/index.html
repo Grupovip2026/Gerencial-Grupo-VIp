@@ -280,6 +280,33 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
     <div class="chart-title">Detalhe Semanal com Variação</div>
     <table id="ml-semanal-tbl"></table>
   </div>
+
+  <!-- CANCELAMENTOS E DEVOLUÇÕES -->
+  <div style="display:flex;align-items:center;gap:10px;margin:28px 0 16px">
+    <div style="font-size:13px;color:#FF6B6B;font-weight:600;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.25);border-radius:8px;padding:6px 14px">⚠️ Cancelamentos & Devoluções</div>
+    <div style="font-size:12px;color:#555">Pedidos não concluídos · Jun–Set 2026</div>
+  </div>
+
+  <!-- KPIs cancelamento/devolução -->
+  <div id="ml-perda-kpis" class="kpis"></div>
+
+  <!-- Gráficos cancelamento/devolução -->
+  <div class="charts-row">
+    <div class="chart-box">
+      <div class="chart-title">Qtd. Cancelamentos e Devoluções por Mês</div>
+      <div class="chart-wrap"><canvas id="cMlCancelQtd"></canvas></div>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">Receita Potencial Perdida por Mês · R$</div>
+      <div class="chart-wrap"><canvas id="cMlCancelVal"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Tabela detalhada cancelamentos/devoluções -->
+  <div class="table-box">
+    <div class="chart-title">Impacto Mensal — Receita Potencial Perdida</div>
+    <table id="ml-cancel-tbl"></table>
+  </div>
 </div>
 
 <div class="footer" id="footer"></div>
@@ -336,6 +363,26 @@ const VENDAS_ML = {
     {data:'21/09',dia_semana:'Seg',total:6138.83},{data:'22/09',dia_semana:'Ter',total:6666.11},{data:'23/09',dia_semana:'Qua',total:7241.18},{data:'24/09',dia_semana:'Qui',total:10236.62},{data:'25/09',dia_semana:'Sex',total:8316.79},{data:'26/09',dia_semana:'Sáb',total:6387.04},{data:'27/09',dia_semana:'Dom',total:4702.11},
     {data:'28/09',dia_semana:'Seg',total:8292.82},{data:'29/09',dia_semana:'Ter',total:8286.13},{data:'30/09',dia_semana:'Qua',total:8589.14}
   ],
+  cancelamentos_devolucoes: {
+    mensal: [
+      {mes:'Jun', qtd_cancel:93, val_cancel:26233, qtd_devol:84, val_devol:25789, receita_realizada:254382},
+      {mes:'Jul', qtd_cancel:92, val_cancel:29898, qtd_devol:87, val_devol:28905, receita_realizada:271095},
+      {mes:'Ago', qtd_cancel:107,val_cancel:31622, qtd_devol:99, val_devol:37234, receita_realizada:270445},
+      {mes:'Set', qtd_cancel:77, val_cancel:27067, qtd_devol:69, val_devol:18457, receita_realizada:209141}
+    ],
+    tipos_cancelamento: [
+      {tipo:'Cancelada pelo comprador', qtd:354},
+      {tipo:'Cancelada pelo Mercado Livre', qtd:14},
+      {tipo:'Cancelada', qtd:1}
+    ],
+    tipos_devolucao: [
+      {tipo:'Devolução finalizada com reembolso', qtd:138},
+      {tipo:'Devolução finalizada', qtd:85},
+      {tipo:'Colocamos o produto à venda novamente', qtd:20},
+      {tipo:'Mediação com reembolso', qtd:4},
+      {tipo:'Outros em andamento', qtd:92}
+    ]
+  },
   top_produtos: [
     {nome:'Capacete Robocop Race Tech Signal - Titânio',total:129495.35},
     {nome:'Capacete Robocop Race Tech Signal - Preto',total:50601.43},
@@ -473,6 +520,8 @@ function renderVendasML(){
   hmens+=`<tr class="total-row"><td>TOTAL</td><td class="amber">${fmt(totR)}</td><td class="neutral">${totP.toLocaleString('pt-BR')}</td><td class="sky">${fmt(ticketMedio)}</td><td class="dim">–</td></tr></tbody>`;
   document.getElementById('ml-mensal-tbl').innerHTML=hmens;
 
+  renderCancelDevolucoes();
+
   // Tabela semanal
   let hsem='<thead><tr><th>Semana</th><th>Receita</th><th>Pedidos</th><th>Ticket</th><th>vs Semana Anterior</th><th>Status</th></tr></thead><tbody>';
   v.semanal.forEach((w,i)=>{
@@ -484,6 +533,71 @@ function renderVendasML(){
   });
   hsem+=`<tr class="total-row"><td>TOTAL</td><td class="amber">${fmt(v.semanal.reduce((s,w)=>s+w.receita,0))}</td><td class="neutral">${v.semanal.reduce((s,w)=>s+w.pedidos,0)}</td><td class="sky">–</td><td>–</td><td>–</td></tr></tbody>`;
   document.getElementById('ml-semanal-tbl').innerHTML=hsem;
+}
+
+function renderCancelDevolucoes(){
+  const cd = VENDAS_ML.cancelamentos_devolucoes;
+  const m = cd.mensal;
+
+  const totQtdC = m.reduce((s,x)=>s+x.qtd_cancel,0);
+  const totQtdD = m.reduce((s,x)=>s+x.qtd_devol,0);
+  const totValC = m.reduce((s,x)=>s+x.val_cancel,0);
+  const totValD = m.reduce((s,x)=>s+x.val_devol,0);
+  const totPerdido = totValC + totValD;
+  const totReceita = m.reduce((s,x)=>s+x.receita_realizada,0);
+  const taxaCancel = ((totQtdC/(totQtdC+totQtdD+5361))*100);
+  const taxaDevol  = ((totQtdD/(totQtdC+totQtdD+5361))*100);
+  const pctPerdido = (totPerdido/(totReceita+totPerdido))*100;
+
+  document.getElementById('ml-perda-kpis').innerHTML=`
+    <div class="kpi"><div class="kpi-label">Total Cancelamentos</div><div class="kpi-value neg">${totQtdC}</div><div class="kpi-delta dim">Pedidos não concluídos</div></div>
+    <div class="kpi"><div class="kpi-label">Receita Perdida (Cancelam.)</div><div class="kpi-value neg">${fmt(totValC)}</div><div class="kpi-delta dim">Valor dos pedidos cancelados</div></div>
+    <div class="kpi"><div class="kpi-label">Total Devoluções</div><div class="kpi-value neg">${totQtdD}</div><div class="kpi-delta dim">Pedidos devolvidos</div></div>
+    <div class="kpi"><div class="kpi-label">Receita Perdida (Devol.)</div><div class="kpi-value neg">${fmt(totValD)}</div><div class="kpi-delta dim">Valor das devoluções</div></div>
+    <div class="kpi"><div class="kpi-label">Total Receita Potencial Perdida</div><div class="kpi-value neg">${fmt(totPerdido)}</div><div class="kpi-delta dim">${pctPerdido.toFixed(1)}% da receita potencial total</div></div>
+    <div class="kpi"><div class="kpi-label">Taxa Cancel. + Devol.</div><div class="kpi-value neg">${(taxaCancel+taxaDevol).toFixed(1)}%</div><div class="kpi-delta dim">Sobre total de pedidos</div></div>`;
+
+  // Gráfico quantidade
+  mkChart('cMlCancelQtd','bar',m.map(x=>x.mes),[
+    {label:'Cancelamentos',data:m.map(x=>x.qtd_cancel),backgroundColor:'rgba(255,107,107,.8)',borderRadius:4},
+    {label:'Devoluções',data:m.map(x=>x.qtd_devol),backgroundColor:'rgba(245,158,11,.7)',borderRadius:4}],
+    {extra:{plugins:{tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.raw+' pedidos'}}},
+      scales:{x:{ticks:{color:'#666',font:{size:10}}},y:{ticks:{color:'#666',font:{size:10},callback:v=>v},grid:{color:'rgba(255,255,255,.05)'}}}}});
+
+  // Gráfico valor
+  mkChart('cMlCancelVal','bar',m.map(x=>x.mes),[
+    {label:'Cancelamentos',data:m.map(x=>x.val_cancel),backgroundColor:'rgba(255,107,107,.8)',borderRadius:4},
+    {label:'Devoluções',data:m.map(x=>x.val_devol),backgroundColor:'rgba(245,158,11,.7)',borderRadius:4}]);
+
+  // Tabela detalhada
+  let h='<thead><tr><th>Mês</th><th>Qtd Cancel.</th><th>R$ Cancel.</th><th>Qtd Devol.</th><th>R$ Devol.</th><th>Total Perdido</th><th>% da Receita</th><th>Receita Potencial</th></tr></thead><tbody>';
+  m.forEach(x=>{
+    const perdido = x.val_cancel+x.val_devol;
+    const potencial = x.receita_realizada+perdido;
+    const pct_mes = (perdido/potencial*100).toFixed(1);
+    h+=`<tr>
+      <td>${x.mes}/26</td>
+      <td class="neg">${x.qtd_cancel}</td>
+      <td class="neg">${fmt(x.val_cancel)}</td>
+      <td class="amber">${x.qtd_devol}</td>
+      <td class="amber">${fmt(x.val_devol)}</td>
+      <td class="neg" style="font-weight:600">${fmt(perdido)}</td>
+      <td class="neg">${pct_mes}%</td>
+      <td class="dim">${fmt(potencial)}</td>
+    </tr>`;
+  });
+  const totPot = totReceita+totPerdido;
+  h+=`<tr class="total-row">
+    <td>TOTAL</td>
+    <td class="neg">${totQtdC}</td>
+    <td class="neg">${fmt(totValC)}</td>
+    <td class="amber">${totQtdD}</td>
+    <td class="amber">${fmt(totValD)}</td>
+    <td class="neg" style="font-weight:700">${fmt(totPerdido)}</td>
+    <td class="neg">${pctPerdido.toFixed(1)}%</td>
+    <td class="dim">${fmt(totPot)}</td>
+  </tr></tbody>`;
+  document.getElementById('ml-cancel-tbl').innerHTML=h;
 }
 
 // ── GERENCIAL ──────────────────────────────────────────────────────────────────
