@@ -281,6 +281,44 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
     <table id="ml-semanal-tbl"></table>
   </div>
 
+  <!-- LOCALIZAÇÃO GEOGRÁFICA -->
+  <div style="display:flex;align-items:center;gap:10px;margin:28px 0 16px">
+    <div style="font-size:13px;color:#38bdf8;font-weight:600;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.25);border-radius:8px;padding:6px 14px">📍 Localização de Vendas</div>
+    <div style="font-size:12px;color:#555">Cidades e estados dos compradores · Jun–Set 2026</div>
+  </div>
+
+  <!-- KPIs geo -->
+  <div id="ml-geo-kpis" class="kpis"></div>
+
+  <!-- Gráficos geo -->
+  <div class="charts-row">
+    <div class="chart-box">
+      <div class="chart-title">Top 10 Estados por Receita · R$</div>
+      <div class="chart-wrap-tall"><canvas id="cMlEstados"></canvas></div>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">Receita por Região do Brasil</div>
+      <div class="chart-wrap-tall"><canvas id="cMlRegioes"></canvas></div>
+    </div>
+  </div>
+
+  <div class="chart-box" style="margin-bottom:16px">
+    <div class="chart-title">Top 15 Cidades por Receita · R$</div>
+    <div class="chart-wrap-tall"><canvas id="cMlCidades"></canvas></div>
+  </div>
+
+  <!-- Tabela estados -->
+  <div class="charts-row">
+    <div class="table-box" style="margin-bottom:0">
+      <div class="chart-title">Ranking por Estado</div>
+      <table id="ml-estados-tbl"></table>
+    </div>
+    <div class="table-box" style="margin-bottom:0">
+      <div class="chart-title">Top 20 Cidades</div>
+      <table id="ml-cidades-tbl"></table>
+    </div>
+  </div>
+
   <!-- CANCELAMENTOS E DEVOLUÇÕES -->
   <div style="display:flex;align-items:center;gap:10px;margin:28px 0 16px">
     <div style="font-size:13px;color:#FF6B6B;font-weight:600;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.25);border-radius:8px;padding:6px 14px">⚠️ Cancelamentos & Devoluções</div>
@@ -363,6 +401,66 @@ const VENDAS_ML = {
     {data:'21/09',dia_semana:'Seg',total:6138.83},{data:'22/09',dia_semana:'Ter',total:6666.11},{data:'23/09',dia_semana:'Qua',total:7241.18},{data:'24/09',dia_semana:'Qui',total:10236.62},{data:'25/09',dia_semana:'Sex',total:8316.79},{data:'26/09',dia_semana:'Sáb',total:6387.04},{data:'27/09',dia_semana:'Dom',total:4702.11},
     {data:'28/09',dia_semana:'Seg',total:8292.82},{data:'29/09',dia_semana:'Ter',total:8286.13},{data:'30/09',dia_semana:'Qua',total:8589.14}
   ],
+  geo: {
+    regioes: [
+      {regiao:'Sudeste',   pedidos:2886, receita:562139.73, pct:55.9},
+      {regiao:'Nordeste',  pedidos:1197, receita:205805.93, pct:20.5},
+      {regiao:'Sul',       pedidos:673,  receita:125469.50, pct:12.5},
+      {regiao:'Centro-Oeste',pedidos:332,receita:61211.25,  pct:6.1},
+      {regiao:'Norte',     pedidos:283,  receita:50435.56,  pct:5.0}
+    ],
+    estados: [
+      {uf:'São Paulo',         pedidos:1250, receita:239188.26, pct:23.80, ticket:191.35},
+      {uf:'Minas Gerais',      pedidos:1028, receita:184853.73, pct:18.39, ticket:179.82},
+      {uf:'Rio de Janeiro',    pedidos:452,  receita:106993.93, pct:10.65, ticket:236.71},
+      {uf:'Bahia',             pedidos:488,  receita:78614.76,  pct:7.82,  ticket:161.10},
+      {uf:'Paraná',            pedidos:279,  receita:53826.41,  pct:5.36,  ticket:192.93},
+      {uf:'Santa Catarina',    pedidos:220,  receita:38926.35,  pct:3.87,  ticket:176.94},
+      {uf:'Rio Grande do Sul', pedidos:174,  receita:32716.74,  pct:3.26,  ticket:188.03},
+      {uf:'Pernambuco',        pedidos:188,  receita:32414.21,  pct:3.23,  ticket:172.42},
+      {uf:'Espírito Santo',    pedidos:156,  receita:31103.81,  pct:3.09,  ticket:199.38},
+      {uf:'Goiás',             pedidos:129,  receita:25446.31,  pct:2.53,  ticket:197.26},
+      {uf:'Pará',              pedidos:146,  receita:23411.96,  pct:2.33,  ticket:160.36},
+      {uf:'Ceará',             pedidos:116,  receita:22042.10,  pct:2.19,  ticket:190.02},
+      {uf:'Maranhão',          pedidos:129,  receita:19004.50,  pct:1.89,  ticket:147.32},
+      {uf:'Mato Grosso',       pedidos:84,   receita:14735.37,  pct:1.47,  ticket:175.42},
+      {uf:'Paraíba',           pedidos:70,   receita:13384.35,  pct:1.33,  ticket:191.20},
+      {uf:'Mato Grosso do Sul',pedidos:75,   receita:13270.31,  pct:1.32,  ticket:176.94},
+      {uf:'Alagoas',           pedidos:74,   receita:13059.77,  pct:1.30,  ticket:176.48},
+      {uf:'Rio Grande do Norte',pedidos:48,  receita:9204.71,   pct:0.92,  ticket:191.76},
+      {uf:'Sergipe',           pedidos:39,   receita:9180.08,   pct:0.91,  ticket:235.39},
+      {uf:'Piauí',             pedidos:45,   receita:8901.45,   pct:0.89,  ticket:197.81},
+      {uf:'Rondônia',          pedidos:45,   receita:8432.66,   pct:0.84,  ticket:187.39},
+      {uf:'Distrito Federal',  pedidos:44,   receita:7759.26,   pct:0.77,  ticket:176.35},
+      {uf:'Amazonas',          pedidos:36,   receita:7705.54,   pct:0.77,  ticket:214.04},
+      {uf:'Tocantins',         pedidos:35,   receita:5902.79,   pct:0.59,  ticket:168.65},
+      {uf:'Acre',              pedidos:12,   receita:3548.19,   pct:0.35,  ticket:295.68},
+      {uf:'Roraima',           pedidos:7,    receita:867.44,    pct:0.09,  ticket:123.92},
+      {uf:'Amapá',             pedidos:2,    receita:566.98,    pct:0.06,  ticket:283.49}
+    ],
+    cidades: [
+      {cidade:'São Paulo',            uf:'SP', pedidos:220, receita:50659.05, ticket:230.27},
+      {cidade:'Rio de Janeiro',        uf:'RJ', pedidos:150, receita:36659.60, ticket:244.40},
+      {cidade:'Belo Horizonte',        uf:'MG', pedidos:85,  receita:16516.53, ticket:194.31},
+      {cidade:'Salvador',              uf:'BA', pedidos:58,  receita:9186.20,  ticket:158.38},
+      {cidade:'Brasília',              uf:'DF', pedidos:44,  receita:7759.26,  ticket:176.35},
+      {cidade:'Florianópolis',         uf:'SC', pedidos:26,  receita:6759.63,  ticket:259.99},
+      {cidade:'Sorocaba',              uf:'SP', pedidos:32,  receita:6624.77,  ticket:207.02},
+      {cidade:'Manaus',                uf:'AM', pedidos:30,  receita:6141.12,  ticket:204.70},
+      {cidade:'Nova Iguaçu',           uf:'RJ', pedidos:21,  receita:5891.49,  ticket:280.55},
+      {cidade:'Contagem',              uf:'MG', pedidos:31,  receita:5501.57,  ticket:177.47},
+      {cidade:'Goiânia',               uf:'GO', pedidos:23,  receita:5360.26,  ticket:233.05},
+      {cidade:'Curitiba',              uf:'PR', pedidos:32,  receita:4925.51,  ticket:153.92},
+      {cidade:'Fortaleza',             uf:'CE', pedidos:31,  receita:4911.83,  ticket:158.45},
+      {cidade:'Ipatinga',              uf:'MG', pedidos:19,  receita:4739.73,  ticket:249.46},
+      {cidade:'Duque de Caxias',       uf:'RJ', pedidos:18,  receita:4626.67,  ticket:257.04},
+      {cidade:'Recife',                uf:'PE', pedidos:26,  receita:4575.04,  ticket:175.96},
+      {cidade:'Ribeirão das Neves',    uf:'MG', pedidos:21,  receita:4533.64,  ticket:215.89},
+      {cidade:'João Pessoa',           uf:'PB', pedidos:20,  receita:4531.13,  ticket:226.56},
+      {cidade:'São Bernardo do Campo', uf:'SP', pedidos:16,  receita:4465.45,  ticket:279.09},
+      {cidade:'Embu das Artes',        uf:'SP', pedidos:18,  receita:4449.38,  ticket:247.19}
+    ]
+  },
   cancelamentos_devolucoes: {
     mensal: [
       {mes:'Jun', qtd_cancel:93, val_cancel:26233, qtd_devol:84, val_devol:25789, receita_realizada:254382},
@@ -520,6 +618,7 @@ function renderVendasML(){
   hmens+=`<tr class="total-row"><td>TOTAL</td><td class="amber">${fmt(totR)}</td><td class="neutral">${totP.toLocaleString('pt-BR')}</td><td class="sky">${fmt(ticketMedio)}</td><td class="dim">–</td></tr></tbody>`;
   document.getElementById('ml-mensal-tbl').innerHTML=hmens;
 
+  renderGeo();
   renderCancelDevolucoes();
 
   // Tabela semanal
@@ -533,6 +632,62 @@ function renderVendasML(){
   });
   hsem+=`<tr class="total-row"><td>TOTAL</td><td class="amber">${fmt(v.semanal.reduce((s,w)=>s+w.receita,0))}</td><td class="neutral">${v.semanal.reduce((s,w)=>s+w.pedidos,0)}</td><td class="sky">–</td><td>–</td><td>–</td></tr></tbody>`;
   document.getElementById('ml-semanal-tbl').innerHTML=hsem;
+}
+
+function renderGeo(){
+  const g = VENDAS_ML.geo;
+  const totalR = g.estados.reduce((s,e)=>s+e.receita,0);
+  const totalP = g.estados.reduce((s,e)=>s+e.pedidos,0);
+  const top1 = g.estados[0];
+  const melhorTicket = [...g.estados].sort((a,b)=>b.ticket-a.ticket)[0];
+  const qtdEstados = g.estados.length;
+
+  document.getElementById('ml-geo-kpis').innerHTML=`
+    <div class="kpi"><div class="kpi-label">Estados Atendidos</div><div class="kpi-value sky">${qtdEstados}</div><div class="kpi-delta dim">De todas as regiões do Brasil</div></div>
+    <div class="kpi"><div class="kpi-label">Estado Líder</div><div class="kpi-value neutral">São Paulo</div><div class="kpi-delta dim">${fmt(top1.receita)} · ${top1.pct}% da receita</div></div>
+    <div class="kpi"><div class="kpi-label">Top Região</div><div class="kpi-value pos">Sudeste</div><div class="kpi-delta dim">55,9% da receita total</div></div>
+    <div class="kpi"><div class="kpi-label">Maior Ticket Médio</div><div class="kpi-value amber">${melhorTicket.uf}</div><div class="kpi-delta dim">${fmt(melhorTicket.ticket)} por pedido</div></div>
+    <div class="kpi"><div class="kpi-label">Cidade Líder</div><div class="kpi-value sky">São Paulo/SP</div><div class="kpi-delta dim">${fmt(g.cidades[0].receita)} · ${g.cidades[0].pedidos} pedidos</div></div>`;
+
+  // Top 10 estados (barras horizontais)
+  const top10e = g.estados.slice(0,10);
+  const regCores = {'São Paulo':'#f59e0b','Minas Gerais':'#f59e0b','Rio de Janeiro':'#f59e0b','Espírito Santo':'#f59e0b',
+    'Bahia':'#a78bfa','Pernambuco':'#a78bfa','Maranhão':'#a78bfa','Ceará':'#a78bfa','Alagoas':'#a78bfa',
+    'Paraná':'#38bdf8','Santa Catarina':'#38bdf8','Rio Grande do Sul':'#38bdf8',
+    'Goiás':'#00C9A7','Mato Grosso':'#00C9A7','Mato Grosso do Sul':'#00C9A7','Distrito Federal':'#00C9A7',
+    'Pará':'#FF6B6B','Amazonas':'#FF6B6B','Rondônia':'#FF6B6B'};
+  const cores10 = top10e.map(e=>regCores[e.uf]||'rgba(245,158,11,.6)');
+  mkChart('cMlEstados','bar',top10e.map(e=>e.uf),[
+    {label:'Receita',data:top10e.map(e=>e.receita),backgroundColor:cores10,borderRadius:4}],
+    {hbar:true,extra:{indexAxis:'y',plugins:{legend:{display:false}}}});
+
+  // Regiões (pizza)
+  const regColors = ['#f59e0b','#a78bfa','#38bdf8','#00C9A7','#FF6B6B'];
+  mkChart('cMlRegioes','pie',g.regioes.map(r=>r.regiao+' ('+r.pct+'%)'),[
+    {data:g.regioes.map(r=>r.receita),backgroundColor:regColors,borderWidth:2,borderColor:'#0d0d1a'}],
+    {extra:{plugins:{legend:{position:'right',labels:{color:'#888',font:{size:11},padding:12}}}}});
+
+  // Top 15 cidades (barras horizontais)
+  const top15c = g.cidades.slice(0,15);
+  mkChart('cMlCidades','bar',top15c.map(c=>c.cidade+'/'+c.uf),[
+    {label:'Receita',data:top15c.map(c=>c.receita),backgroundColor:'rgba(56,189,248,.7)',borderRadius:4}],
+    {hbar:true,extra:{indexAxis:'y',plugins:{legend:{display:false}}}});
+
+  // Tabela estados
+  let he='<thead><tr><th>#</th><th>Estado</th><th>Pedidos</th><th>Receita</th><th>% Total</th><th>Ticket Médio</th></tr></thead><tbody>';
+  g.estados.forEach((e,i)=>{
+    const destaque = i<3?'font-weight:600':'';
+    he+=`<tr class="${i===0?'highlight-row':''}"><td class="dim" style="text-align:left">${i+1}º</td><td style="${destaque}">${e.uf}</td><td class="neutral">${e.pedidos}</td><td class="amber">${fmt(e.receita)}</td><td class="dim">${e.pct}%</td><td class="sky">${fmt(e.ticket)}</td></tr>`;
+  });
+  he+=`<tr class="total-row"><td></td><td>TOTAL</td><td class="neutral">${totalP}</td><td class="amber">${fmt(totalR)}</td><td class="dim">100%</td><td class="sky">–</td></tr></tbody>`;
+  document.getElementById('ml-estados-tbl').innerHTML=he;
+
+  // Tabela cidades
+  let hc='<thead><tr><th>#</th><th>Cidade</th><th>UF</th><th>Pedidos</th><th>Receita</th><th>Ticket</th></tr></thead><tbody>';
+  g.cidades.forEach((c,i)=>{
+    hc+=`<tr class="${i===0?'highlight-row':''}"><td class="dim" style="text-align:left">${i+1}º</td><td style="${i<3?'font-weight:600':''}">${c.cidade}</td><td class="dim">${c.uf}</td><td class="neutral">${c.pedidos}</td><td class="amber">${fmt(c.receita)}</td><td class="sky">${fmt(c.ticket)}</td></tr>`;
+  });
+  document.getElementById('ml-cidades-tbl').innerHTML=hc+'</tbody>';
 }
 
 function renderCancelDevolucoes(){
