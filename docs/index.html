@@ -387,29 +387,57 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
   </div>
 
   <!-- FILTROS VIDAL -->
-  <div class="filter-bar" style="margin-bottom:20px">
-    <span class="filter-label">Mês:</span>
-    <div style="display:flex;gap:6px;flex-wrap:wrap">
-      <button id="vd-f-jun" class="mes-btn sel-vidal" onclick="vdToggleMes('Jun')">Jun</button>
-      <button id="vd-f-jul" class="mes-btn sel-vidal" onclick="vdToggleMes('Jul')">Jul</button>
-      <button id="vd-f-ago" class="mes-btn sel-vidal" onclick="vdToggleMes('Ago')">Ago</button>
-      <button id="vd-f-set" class="mes-btn sel-vidal" onclick="vdToggleMes('Set')">Set</button>
+  <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+
+    <!-- Linha 1: Período + Granularidade -->
+    <div class="filter-bar" style="flex-wrap:wrap;gap:10px">
+      <span class="filter-label">Período:</span>
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+        <input type="date" id="vd-dt-ini" value="2026-06-01"
+          style="background:#1a1a2e;color:#e2e8f0;border:1px solid rgba(108,99,255,.35);border-radius:7px;padding:5px 10px;font-size:12px;outline:none;cursor:pointer"
+          onchange="vdAplicarPeriodo()">
+        <span style="color:#555;font-size:12px">até</span>
+        <input type="date" id="vd-dt-fim" value="2026-09-30"
+          style="background:#1a1a2e;color:#e2e8f0;border:1px solid rgba(108,99,255,.35);border-radius:7px;padding:5px 10px;font-size:12px;outline:none;cursor:pointer"
+          onchange="vdAplicarPeriodo()">
+        <button class="mes-btn sel-vidal" style="font-size:11px;padding:4px 10px" onclick="vdPeriodoPreset('jun-set')">Jun–Set</button>
+        <button class="mes-btn" id="vd-preset-jul-set" style="font-size:11px;padding:4px 10px" onclick="vdPeriodoPreset('jul-set')">Jul–Set</button>
+        <button class="mes-btn" id="vd-preset-ago-set" style="font-size:11px;padding:4px 10px" onclick="vdPeriodoPreset('ago-set')">Ago–Set</button>
+      </div>
+      <div style="width:1px;background:rgba(255,255,255,.08);margin:0 4px;align-self:stretch"></div>
+      <span class="filter-label">Ver por:</span>
+      <div style="display:flex;gap:6px">
+        <button id="vd-gran-dia"    class="mes-btn" onclick="vdSetGran('dia')">Dia</button>
+        <button id="vd-gran-semana" class="mes-btn sel-vidal" onclick="vdSetGran('semana')">Semana</button>
+        <button id="vd-gran-mes"    class="mes-btn" onclick="vdSetGran('mes')">Mês</button>
+      </div>
     </div>
-    <div style="width:1px;background:rgba(255,255,255,.08);margin:0 8px;align-self:stretch"></div>
-    <span class="filter-label">Exibir:</span>
-    <div style="display:flex;gap:6px;flex-wrap:wrap">
-      <button id="vd-v-receita"  class="mes-btn sel-vidal" onclick="vdToggleView('receita')">R$</button>
-      <button id="vd-v-pedidos"  class="mes-btn sel-vidal" onclick="vdToggleView('pedidos')">Pedidos</button>
-      <button id="vd-v-ticket"   class="mes-btn sel-vidal" onclick="vdToggleView('ticket')">Ticket</button>
-      <button id="vd-v-diario"   class="mes-btn sel-vidal" onclick="vdToggleView('diario')">Diário</button>
-      <button id="vd-v-semanal"  class="mes-btn sel-vidal" onclick="vdToggleView('semanal')">Semanal</button>
-      <button id="vd-v-produtos" class="mes-btn sel-vidal" onclick="vdToggleView('produtos')">Produtos</button>
-      <button id="vd-v-geo"      class="mes-btn sel-vidal" onclick="vdToggleView('geo')">📍 Geo</button>
-      <button id="vd-v-cancel"   class="mes-btn sel-vidal" onclick="vdToggleView('cancel')">⚠️ Cancel.</button>
-    </div>
-    <div class="filter-actions">
-      <button class="filter-action" onclick="vdFilterAll()">Todos</button>
-      <button class="filter-action" onclick="vdFilterClear()">Limpar</button>
+
+    <!-- Linha 2: Mês + Exibir -->
+    <div class="filter-bar" style="flex-wrap:wrap">
+      <span class="filter-label">Mês:</span>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button id="vd-f-jun" class="mes-btn sel-vidal" onclick="vdToggleMes('Jun')">Jun</button>
+        <button id="vd-f-jul" class="mes-btn sel-vidal" onclick="vdToggleMes('Jul')">Jul</button>
+        <button id="vd-f-ago" class="mes-btn sel-vidal" onclick="vdToggleMes('Ago')">Ago</button>
+        <button id="vd-f-set" class="mes-btn sel-vidal" onclick="vdToggleMes('Set')">Set</button>
+      </div>
+      <div style="width:1px;background:rgba(255,255,255,.08);margin:0 8px;align-self:stretch"></div>
+      <span class="filter-label">Exibir:</span>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button id="vd-v-receita"  class="mes-btn sel-vidal" onclick="vdToggleView('receita')">R$</button>
+        <button id="vd-v-pedidos"  class="mes-btn sel-vidal" onclick="vdToggleView('pedidos')">Pedidos</button>
+        <button id="vd-v-ticket"   class="mes-btn sel-vidal" onclick="vdToggleView('ticket')">Ticket</button>
+        <button id="vd-v-diario"   class="mes-btn sel-vidal" onclick="vdToggleView('diario')">Diário</button>
+        <button id="vd-v-semanal"  class="mes-btn sel-vidal" onclick="vdToggleView('semanal')">Semanal</button>
+        <button id="vd-v-produtos" class="mes-btn sel-vidal" onclick="vdToggleView('produtos')">Produtos</button>
+        <button id="vd-v-geo"      class="mes-btn sel-vidal" onclick="vdToggleView('geo')">📍 Geo</button>
+        <button id="vd-v-cancel"   class="mes-btn sel-vidal" onclick="vdToggleView('cancel')">⚠️ Cancel.</button>
+      </div>
+      <div class="filter-actions">
+        <button class="filter-action" onclick="vdFilterAll()">Todos</button>
+        <button class="filter-action" onclick="vdFilterClear()">Limpar</button>
+      </div>
     </div>
   </div>
 
@@ -1206,6 +1234,45 @@ function mlInitFilters(){
 // ── VENDAS VIDAL ───────────────────────────────────────────────────────────────
 let vdMesesSel = new Set(['Jun','Jul','Ago','Set']);
 let vdViewSel  = new Set(['receita','pedidos','ticket','diario','semanal','produtos','geo','cancel']);
+let vdGran = 'semana'; // 'dia' | 'semana' | 'mes'
+let vdDtIni = new Date('2026-06-01');
+let vdDtFim = new Date('2026-09-30');
+
+function vdSetGran(g){
+  vdGran=g;
+  ['dia','semana','mes'].forEach(x=>{
+    const el=document.getElementById('vd-gran-'+x);
+    if(el) el.classList.toggle('sel-vidal', x===g);
+  });
+  vdRenderFiltrado();
+}
+
+function vdAplicarPeriodo(){
+  const ini=document.getElementById('vd-dt-ini').value;
+  const fim=document.getElementById('vd-dt-fim').value;
+  if(!ini||!fim) return;
+  vdDtIni=new Date(ini+'T00:00:00');
+  vdDtFim=new Date(fim+'T23:59:59');
+  // Atualiza meses selecionados conforme período
+  vdMesesSel=new Set();
+  const map={6:'Jun',7:'Jul',8:'Ago',9:'Set'};
+  for(let m=vdDtIni.getMonth()+1;m<=vdDtFim.getMonth()+1;m++) if(map[m]) vdMesesSel.add(map[m]);
+  if(vdMesesSel.size===0) vdMesesSel=new Set(['Jun','Jul','Ago','Set']);
+  vdSyncMesBtns();
+  vdRenderFiltrado();
+}
+
+function vdPeriodoPreset(p){
+  const presets={
+    'jun-set':['2026-06-01','2026-09-30'],
+    'jul-set':['2026-07-01','2026-09-30'],
+    'ago-set':['2026-08-01','2026-09-30']
+  };
+  const [ini,fim]=presets[p]||['2026-06-01','2026-09-30'];
+  document.getElementById('vd-dt-ini').value=ini;
+  document.getElementById('vd-dt-fim').value=fim;
+  vdAplicarPeriodo();
+}
 const VD_MES_MAP  = {Jun:'vd-f-jun',Jul:'vd-f-jul',Ago:'vd-f-ago',Set:'vd-f-set'};
 const VD_VIEW_MAP = {receita:'vd-v-receita',pedidos:'vd-v-pedidos',ticket:'vd-v-ticket',
                      diario:'vd-v-diario',semanal:'vd-v-semanal',produtos:'vd-v-produtos',
@@ -1300,11 +1367,12 @@ function vdRenderFiltrado(){
   const tbl=document.getElementById('vd-mensal-tbl');
   if(tbl) tbl.innerHTML=h;
 
-  // Semanal filtrado
   const mesIdxs = meses.map(m=>VD_MES_IDX[m]);
+
+  // ── Semanal filtrado por data ──
   const semanal = VENDAS_VIDAL.semanal.filter(r=>{
-    const mo = new Date(r.semana_ts+'T12:00:00').getMonth()+1;
-    return mesIdxs.includes(mo);
+    const d=new Date(r.semana_ts+'T12:00:00');
+    return d>=vdDtIni && d<=vdDtFim;
   });
   mkChart('cVdSemanal','bar',semanal.map(r=>r.semana),[
     {label:'Receita',data:semanal.map(r=>r.receita),backgroundColor:'rgba(108,99,255,0.7)',borderColor:'#6C63FF',borderWidth:1}
@@ -1323,13 +1391,36 @@ function vdRenderFiltrado(){
   const stbl=document.getElementById('vd-semanal-tbl');
   if(stbl) stbl.innerHTML=hs;
 
-  // Diário filtrado
+  // ── Diário filtrado por data ──
   const diario = VENDAS_VIDAL.diario.filter(r=>{
     const parts=r.data.split('/');
-    return mesIdxs.includes(parseInt(parts[1]));
+    const d=new Date(2026,parseInt(parts[1])-1,parseInt(parts[0]));
+    return d>=vdDtIni && d<=vdDtFim;
   });
   mkChart('cVdDiario','bar',diario.map(r=>r.data),[
     {label:'Receita',data:diario.map(r=>r.total),backgroundColor:'rgba(108,99,255,0.6)',borderColor:'#6C63FF',borderWidth:1}
+  ],{plugins:{tooltip:{callbacks:{label:c=>' '+fmt(c.raw)}}}});
+
+  // ── Gráfico unificado por granularidade ──
+  let granLabels=[], granData=[], granTitle='';
+  if(vdGran==='mes'){
+    granLabels=mensal.map(r=>r.mes);
+    granData=mensal.map(r=>r.receita);
+    granTitle='Receita por Mês';
+  } else if(vdGran==='semana'){
+    granLabels=semanal.map(r=>r.semana);
+    granData=semanal.map(r=>r.receita);
+    granTitle='Receita por Semana';
+  } else {
+    granLabels=diario.map(r=>r.data);
+    granData=diario.map(r=>r.total);
+    granTitle='Receita por Dia';
+  }
+  // Atualiza título do gráfico mensal para refletir granularidade
+  const titleEl=document.querySelector('#page-vendas-vidal .chart-box .chart-title');
+  if(titleEl) titleEl.textContent=granTitle;
+  mkChart('cVdMensal','bar',granLabels,[
+    {label:'Receita',data:granData,backgroundColor:'rgba(108,99,255,0.8)',borderColor:'#6C63FF',borderWidth:2}
   ],{plugins:{tooltip:{callbacks:{label:c=>' '+fmt(c.raw)}}}});
 }
 
