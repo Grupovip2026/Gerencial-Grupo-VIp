@@ -226,29 +226,57 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
   </div>
 
   <!-- FILTROS -->
-  <div class="filter-bar" style="margin-bottom:20px">
-    <span class="filter-label">Mês:</span>
-    <div style="display:flex;gap:6px;flex-wrap:wrap">
-      <button id="ml-f-jun" class="mes-btn sel-ml" onclick="mlToggleMes('Jun')">Jun</button>
-      <button id="ml-f-jul" class="mes-btn sel-ml" onclick="mlToggleMes('Jul')">Jul</button>
-      <button id="ml-f-ago" class="mes-btn sel-ml" onclick="mlToggleMes('Ago')">Ago</button>
-      <button id="ml-f-set" class="mes-btn sel-ml" onclick="mlToggleMes('Set')">Set</button>
+  <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+
+    <!-- Linha 1: Período + Granularidade -->
+    <div class="filter-bar" style="flex-wrap:wrap;gap:10px">
+      <span class="filter-label">Período:</span>
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+        <input type="date" id="ml-dt-ini" value="2026-06-01"
+          style="background:#1a1a2e;color:#e2e8f0;border:1px solid rgba(245,158,11,.35);border-radius:7px;padding:5px 10px;font-size:12px;outline:none;cursor:pointer"
+          onchange="mlAplicarPeriodo()">
+        <span style="color:#555;font-size:12px">até</span>
+        <input type="date" id="ml-dt-fim" value="2026-09-30"
+          style="background:#1a1a2e;color:#e2e8f0;border:1px solid rgba(245,158,11,.35);border-radius:7px;padding:5px 10px;font-size:12px;outline:none;cursor:pointer"
+          onchange="mlAplicarPeriodo()">
+        <button class="mes-btn sel-ml" style="font-size:11px;padding:4px 10px" onclick="mlPeriodoPreset('jun-set')">Jun–Set</button>
+        <button class="mes-btn" id="ml-preset-jul-set" style="font-size:11px;padding:4px 10px" onclick="mlPeriodoPreset('jul-set')">Jul–Set</button>
+        <button class="mes-btn" id="ml-preset-ago-set" style="font-size:11px;padding:4px 10px" onclick="mlPeriodoPreset('ago-set')">Ago–Set</button>
+      </div>
+      <div style="width:1px;background:rgba(255,255,255,.08);margin:0 4px;align-self:stretch"></div>
+      <span class="filter-label">Ver por:</span>
+      <div style="display:flex;gap:6px">
+        <button id="ml-gran-dia"    class="mes-btn" onclick="mlSetGran('dia')">Dia</button>
+        <button id="ml-gran-semana" class="mes-btn sel-ml" onclick="mlSetGran('semana')">Semana</button>
+        <button id="ml-gran-mes"    class="mes-btn" onclick="mlSetGran('mes')">Mês</button>
+      </div>
     </div>
-    <div style="width:1px;background:rgba(255,255,255,.08);margin:0 8px;align-self:stretch"></div>
-    <span class="filter-label">Exibir:</span>
-    <div style="display:flex;gap:6px;flex-wrap:wrap">
-      <button id="ml-v-receita"  class="mes-btn sel-ml" onclick="mlToggleView('receita')" title="Receita R$">R$</button>
-      <button id="ml-v-pedidos"  class="mes-btn sel-ml" onclick="mlToggleView('pedidos')" title="Qtd. Pedidos">Pedidos</button>
-      <button id="ml-v-ticket"   class="mes-btn sel-ml" onclick="mlToggleView('ticket')"  title="Ticket Médio">Ticket</button>
-      <button id="ml-v-diario"   class="mes-btn sel-ml" onclick="mlToggleView('diario')"  title="Gráfico Diário">Diário</button>
-      <button id="ml-v-semanal"  class="mes-btn sel-ml" onclick="mlToggleView('semanal')" title="Gráfico Semanal">Semanal</button>
-      <button id="ml-v-produtos" class="mes-btn sel-ml" onclick="mlToggleView('produtos')" title="Top Produtos">Produtos</button>
-      <button id="ml-v-geo"      class="mes-btn sel-ml" onclick="mlToggleView('geo')"      title="Localização">📍 Geo</button>
-      <button id="ml-v-cancel"   class="mes-btn sel-ml" onclick="mlToggleView('cancel')"   title="Cancelamentos">⚠️ Cancel.</button>
-    </div>
-    <div class="filter-actions">
-      <button class="filter-action" onclick="mlFilterAll()">Todos</button>
-      <button class="filter-action" onclick="mlFilterClear()">Limpar</button>
+
+    <!-- Linha 2: Mês + Exibir -->
+    <div class="filter-bar" style="flex-wrap:wrap">
+      <span class="filter-label">Mês:</span>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button id="ml-f-jun" class="mes-btn sel-ml" onclick="mlToggleMes('Jun')">Jun</button>
+        <button id="ml-f-jul" class="mes-btn sel-ml" onclick="mlToggleMes('Jul')">Jul</button>
+        <button id="ml-f-ago" class="mes-btn sel-ml" onclick="mlToggleMes('Ago')">Ago</button>
+        <button id="ml-f-set" class="mes-btn sel-ml" onclick="mlToggleMes('Set')">Set</button>
+      </div>
+      <div style="width:1px;background:rgba(255,255,255,.08);margin:0 8px;align-self:stretch"></div>
+      <span class="filter-label">Exibir:</span>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button id="ml-v-receita"  class="mes-btn sel-ml" onclick="mlToggleView('receita')" title="Receita R$">R$</button>
+        <button id="ml-v-pedidos"  class="mes-btn sel-ml" onclick="mlToggleView('pedidos')" title="Qtd. Pedidos">Pedidos</button>
+        <button id="ml-v-ticket"   class="mes-btn sel-ml" onclick="mlToggleView('ticket')"  title="Ticket Médio">Ticket</button>
+        <button id="ml-v-diario"   class="mes-btn sel-ml" onclick="mlToggleView('diario')"  title="Gráfico Diário">Diário</button>
+        <button id="ml-v-semanal"  class="mes-btn sel-ml" onclick="mlToggleView('semanal')" title="Gráfico Semanal">Semanal</button>
+        <button id="ml-v-produtos" class="mes-btn sel-ml" onclick="mlToggleView('produtos')" title="Top Produtos">Produtos</button>
+        <button id="ml-v-geo"      class="mes-btn sel-ml" onclick="mlToggleView('geo')"      title="Localização">📍 Geo</button>
+        <button id="ml-v-cancel"   class="mes-btn sel-ml" onclick="mlToggleView('cancel')"   title="Cancelamentos">⚠️ Cancel.</button>
+      </div>
+      <div class="filter-actions">
+        <button class="filter-action" onclick="mlFilterAll()">Todos</button>
+        <button class="filter-action" onclick="mlFilterClear()">Limpar</button>
+      </div>
     </div>
   </div>
 
@@ -1039,6 +1067,44 @@ function renderCancelDevolucoes(){
 // Estado dos filtros
 let mlMesesSel = new Set(['Jun','Jul','Ago','Set']);
 let mlViewSel  = new Set(['receita','pedidos','ticket','diario','semanal','produtos','geo','cancel']);
+let mlGran = 'semana';
+let mlDtIni = new Date('2026-06-01');
+let mlDtFim = new Date('2026-09-30');
+
+function mlSetGran(g){
+  mlGran=g;
+  ['dia','semana','mes'].forEach(x=>{
+    const el=document.getElementById('ml-gran-'+x);
+    if(el) el.classList.toggle('sel-ml', x===g);
+  });
+  mlRenderFiltrado();
+}
+
+function mlAplicarPeriodo(){
+  const ini=document.getElementById('ml-dt-ini').value;
+  const fim=document.getElementById('ml-dt-fim').value;
+  if(!ini||!fim) return;
+  mlDtIni=new Date(ini+'T00:00:00');
+  mlDtFim=new Date(fim+'T23:59:59');
+  mlMesesSel=new Set();
+  const map={6:'Jun',7:'Jul',8:'Ago',9:'Set'};
+  for(let m=mlDtIni.getMonth()+1;m<=mlDtFim.getMonth()+1;m++) if(map[m]) mlMesesSel.add(map[m]);
+  if(mlMesesSel.size===0) mlMesesSel=new Set(['Jun','Jul','Ago','Set']);
+  mlSyncMesBtns();
+  mlRenderFiltrado();
+}
+
+function mlPeriodoPreset(p){
+  const presets={
+    'jun-set':['2026-06-01','2026-09-30'],
+    'jul-set':['2026-07-01','2026-09-30'],
+    'ago-set':['2026-08-01','2026-09-30']
+  };
+  const [ini,fim]=presets[p]||['2026-06-01','2026-09-30'];
+  document.getElementById('ml-dt-ini').value=ini;
+  document.getElementById('ml-dt-fim').value=fim;
+  mlAplicarPeriodo();
+}
 
 // Mapa: id do botão → chave do estado
 const ML_MES_MAP  = {Jun:'ml-f-jun', Jul:'ml-f-jul', Ago:'ml-f-ago', Set:'ml-f-set'};
@@ -1143,10 +1209,23 @@ function mlRenderFiltrado(){
     ${mFilt.length>=2?`<div class="kpi"><div class="kpi-label">Var. ${mFilt[mFilt.length-1].mes} vs ${mFilt[mFilt.length-2].mes}</div><div class="kpi-value ${cSetAgo>=0?'pos':'neg'}">${fmtP(cSetAgo)}</div></div>`:''}
     <div class="kpi"><div class="kpi-label">Melhor Semana</div><div class="kpi-value amber">${melhorSemana.semana} · ${fmt(melhorSemana.receita)}</div></div>`;
 
-  // ── Gráfico mensal receita ──
-  const coloresMes = mFilt.map((_,i)=>`rgba(245,158,11,${0.5+(0.5*i/(mFilt.length||1))})`);
-  mkChart('cMlMensal','bar',mFilt.map(m=>m.mes),[
-    {label:'Receita',data:mFilt.map(m=>m.receita),backgroundColor:coloresMes,borderRadius:6}],
+  // ── Gráfico principal por granularidade ──
+  let granLabels=[], granData=[];
+  if(mlGran==='mes'){
+    granLabels=mFilt.map(m=>m.mes);
+    granData=mFilt.map(m=>m.receita);
+  } else if(mlGran==='semana'){
+    const semG=v.semanal.filter(w=>{const d=new Date(w.semana_ts+'T12:00:00');return d>=mlDtIni&&d<=mlDtFim;});
+    granLabels=semG.map(w=>w.semana);
+    granData=semG.map(w=>w.receita);
+  } else {
+    const diarG=v.diario.filter(r=>{const pts=r.data.split('/');const d=new Date(2026,parseInt(pts[1])-1,parseInt(pts[0]));return d>=mlDtIni&&d<=mlDtFim;});
+    granLabels=diarG.map(r=>r.data);
+    granData=diarG.map(r=>r.total);
+  }
+  const coloresMes = granData.map((_,i)=>`rgba(245,158,11,${0.5+(0.5*i/(granData.length||1))})`);
+  mkChart('cMlMensal','bar',granLabels,[
+    {label:'Receita',data:granData,backgroundColor:coloresMes,borderRadius:6}],
     {extra:{plugins:{legend:{display:false}}}});
 
   // ── Gráfico pedidos ──
