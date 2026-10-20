@@ -1,6 +1,6 @@
 {
-  "gerado_em": "19/10/2026 23:12",
-  "fonte": "Resultado Gerencial 2026.xlsx",
+  "gerado_em": "Out/2026",
+  "fonte": "Resultado_Gerencial_2026_4.xlsx",
   "dre": {
     "VIP": {
       "color": "#00C9A7",
@@ -149,9 +149,51 @@
           "dTaxas": 98967.57,
           "dFinanc": 6602.0,
           "dOutras": 1890.0,
-          "ebitda": 85725.057,
+          "ebitda": 49945.43,
           "depreciacao": 1500.0,
-          "ebit": 84225.057,
+          "ebit": 48445.43,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Ago",
+          "mes_num": 8,
+          "ano": 2026,
+          "order": 202608,
+          "rBruta": 443219.91,
+          "devolucoes": 45430.04,
+          "impostos": 41175.13,
+          "rLiquida": 356614.74,
+          "cmv": 199448.96,
+          "lucroBruto": 157165.78,
+          "dPessoal": 8441.46,
+          "dMarketing": 780.0,
+          "dTaxas": 49045.22,
+          "dFinanc": 6602.0,
+          "dOutras": 1890.0,
+          "ebitda": 90407.1,
+          "depreciacao": 1500.0,
+          "ebit": 88907.1,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Set",
+          "mes_num": 9,
+          "ano": 2026,
+          "order": 202609,
+          "rBruta": 340375.31,
+          "devolucoes": 34888.47,
+          "impostos": 31620.87,
+          "rLiquida": 273865.97,
+          "cmv": 153168.89,
+          "lucroBruto": 120697.08,
+          "dPessoal": 8441.46,
+          "dMarketing": 780.0,
+          "dTaxas": 36894.04,
+          "dFinanc": 6602.0,
+          "dOutras": 1890.0,
+          "ebitda": 66089.58,
+          "depreciacao": 1500.0,
+          "ebit": 64589.58,
           "lucroLiquido": 0.0
         }
       ]
@@ -292,20 +334,62 @@
           "mes_num": 7,
           "ano": 2026,
           "order": 202607,
-          "rBruta": 0.0,
-          "devolucoes": 0.0,
-          "impostos": 0.0,
-          "rLiquida": 0.0,
-          "cmv": 0.0,
-          "lucroBruto": 0.0,
-          "dPessoal": 0.0,
+          "rBruta": 258689.12,
+          "devolucoes": 21988.58,
+          "impostos": 10839.07,
+          "rLiquida": 225861.47,
+          "cmv": 116410.1,
+          "lucroBruto": 109451.37,
+          "dPessoal": 19753.78,
           "dMarketing": 0.0,
-          "dTaxas": 0.0,
+          "dTaxas": 41773.07,
           "dFinanc": 0.0,
-          "dOutras": 0.0,
-          "ebitda": 0.0,
+          "dOutras": 6911.91,
+          "ebitda": 41012.61,
           "depreciacao": 0.0,
-          "ebit": 0.0,
+          "ebit": 41012.61,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Ago",
+          "mes_num": 8,
+          "ano": 2026,
+          "order": 202608,
+          "rBruta": 281032.88,
+          "devolucoes": 23887.79,
+          "impostos": 11775.28,
+          "rLiquida": 245369.81,
+          "cmv": 126464.8,
+          "lucroBruto": 118905.01,
+          "dPessoal": 19753.78,
+          "dMarketing": 0.0,
+          "dTaxas": 50976.03,
+          "dFinanc": 0.0,
+          "dOutras": 6911.91,
+          "ebitda": 41263.29,
+          "depreciacao": 0.0,
+          "ebit": 41263.29,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Set",
+          "mes_num": 9,
+          "ano": 2026,
+          "order": 202609,
+          "rBruta": 250324.58,
+          "devolucoes": 21277.59,
+          "impostos": 10488.6,
+          "rLiquida": 218558.39,
+          "cmv": 112646.06,
+          "lucroBruto": 105912.33,
+          "dPessoal": 19753.78,
+          "dMarketing": 0.0,
+          "dTaxas": 37717.19,
+          "dFinanc": 0.0,
+          "dOutras": 6911.91,
+          "ebitda": 41529.45,
+          "depreciacao": 0.0,
+          "ebit": 41529.45,
           "lucroLiquido": 0.0
         }
       ]
@@ -1420,11 +1504,15 @@
         "Dez": 55264.48
       },
       "GRUPO": {
-        "Ago": 189907.02,
-        "Set": 280175.71,
+        "Ago": 200439.84,
+        "Set": 286173.83,
         "Out": 196376.26,
         "Nov": 134655.46,
         "Dez": 55264.48
+      },
+      "VIDAL": {
+        "Ago": 10532.82,
+        "Set": 5998.12
       }
     }
   },
@@ -1435,15 +1523,31 @@
         "valor": 17000.0
       },
       {
-        "label": "Consultoria Financeira",
+        "label": "CEO",
+        "valor": 6200.0
+      },
+      {
+        "label": "Consultoria Financeira / Contábil",
+        "valor": 1840.0
+      },
+      {
+        "label": "Despesas Gerais",
+        "valor": 9000.0
+      },
+      {
+        "label": "Tecnologia",
         "valor": 1000.0
       },
       {
-        "label": "Consultoria Contabil",
-        "valor": 640.0
+        "label": "Marketing Fixo",
+        "valor": 780.0
       },
       {
-        "label": "Aluguel + Condominio",
+        "label": "Financiamento Pronamp",
+        "valor": 6602.0
+      },
+      {
+        "label": "Aluguel + Condomínio",
         "valor": 2150.0
       },
       {
@@ -1451,55 +1555,43 @@
         "valor": 850.0
       },
       {
-        "label": "Agua",
+        "label": "Água",
         "valor": 250.0
       },
       {
         "label": "Bling",
         "valor": 450.0
-      },
-      {
-        "label": "Marketing",
-        "valor": 780.0
-      },
-      {
-        "label": "Despesas de venda",
-        "valor": 2000.0
-      },
-      {
-        "label": "Financiamento Pronamp",
-        "valor": 6602.0
       }
     ],
     "variavel": [
       {
-        "label": "Cartão de credito",
-        "valor": 5000.0
+        "label": "Matéria Prima",
+        "valor": 370239.48
       },
       {
-        "label": "Materia prima",
-        "valor": 370000.0
-      },
-      {
-        "label": "Marketing",
-        "valor": 3000.0
+        "label": "Taxas das Plataformas",
+        "valor": 76953.36
       },
       {
         "label": "Impostos",
-        "valor": 56000.0
+        "valor": 27230.02
       },
       {
-        "label": "Taxas das plataformas",
-        "valor": 155000.0
+        "label": "Cancelamentos e Reembolsos",
+        "valor": 35700.0
       },
       {
-        "label": "Cancelamentos e reembolsos",
-        "valor": 55000.0
+        "label": "Marketing Variável",
+        "valor": 3500.0
+      },
+      {
+        "label": "Cartão de Crédito",
+        "valor": 3377.14
       }
     ],
-    "total_fixo": 31722.0,
-    "total_variavel": 644000.0,
-    "total": 675722.0
+    "total_fixo": 46122.0,
+    "total_variavel": 517000.0,
+    "total": 563122.0
   },
   "orcamento_2027": [
     {
