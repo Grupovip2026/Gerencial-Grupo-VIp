@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard Financeiro – Grupo VIP 2026</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -2017,8 +2018,15 @@ function renderOrc2027(){
       <div class="fc-field"><label>Valor (R$)</label><input type="number" id="fc-valor" step="0.01" placeholder="0,00" min="0"></div>
       <div class="fc-field"><label>Categoria</label><input type="text" id="fc-cat" placeholder="Ex: Fornecedores"></div>
     </div>
-    <div style="margin-top:12px;display:flex;gap:10px;align-items:center">
+    <div style="margin-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
       <button class="fc-btn fc-btn-add" onclick="fcAddLancamento()">Adicionar</button>
+      <div style="width:1px;height:28px;background:rgba(255,255,255,.1);margin:0 4px"></div>
+      <label class="fc-btn" style="background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3);cursor:pointer;display:inline-flex;align-items:center;gap:6px">
+        📥 Importar Excel
+        <input type="file" id="fc-xlsx-input" accept=".xlsx,.xls" style="display:none" onchange="fcImportarExcel(this)">
+      </label>
+      <button class="fc-btn" style="background:rgba(255,107,107,.1);color:#FF6B6B;border:1px solid rgba(255,107,107,.25)" onclick="fcLimparTudo()">🗑 Limpar tudo</button>
+      <button class="fc-btn" style="background:rgba(0,201,167,.1);color:#00C9A7;border:1px solid rgba(0,201,167,.25)" onclick="fcBaixarModelo()">📄 Baixar modelo .xlsx</button>
       <span id="fc-msg" style="font-size:12px;color:#00C9A7;display:none"></span>
     </div>
   </div>
@@ -2150,6 +2158,123 @@ function renderOrc2027(){
   window.fcDelLancamento=function(id){
     const arr=loadLancamentos().filter(l=>l.id!==id);
     saveLancamentos(arr); refreshFluxo();
+  };
+
+  // ── Importar Excel ───────────────────────────────
+  window.fcImportarExcel=function(input){
+    const file=input.files[0]; if(!file)return;
+    const msg=document.getElementById('fc-msg');
+    msg.textContent='⏳ Lendo arquivo...'; msg.style.color='#f59e0b'; msg.style.display='inline';
+    const reader=new FileReader();
+    reader.onload=function(e){
+      try{
+        const wb2=XLSX.read(e.target.result,{type:'array',cellDates:true});
+        // Procura aba chamada "Lançamentos" ou pega a primeira
+        const sheetName=wb2.SheetNames.find(n=>n.toLowerCase().includes('lan'))||wb2.SheetNames[0];
+        const ws2=wb2.Sheets[sheetName];
+        const rows=XLSX.utils.sheet_to_json(ws2,{defval:''});
+        // Mapeia colunas flexível (aceita variações de nome)
+        const normalize=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').trim();
+        let importados=0, erros=0;
+        const novos=[];
+        rows.forEach((row,idx)=>{
+          // Pula linhas de legenda/exemplo (sem data válida)
+          const keys=Object.keys(row);
+          // encontra cada campo pelo nome aproximado
+          const findVal=(...nomes)=>{
+            for(const n of nomes){
+              const k=keys.find(k=>normalize(k).includes(normalize(n)));
+              if(k&&row[k]!=='')return row[k];
+            }
+            return '';
+          };
+          let data=findVal('data','date');
+          let desc=findVal('descri','desc','historico','memo');
+          let tipo=findVal('tipo','type');
+          let conta=findVal('conta','bank','account');
+          let valor=findVal('valor','value','amount','vl');
+          let cat=findVal('categ','cat','grupo','group');
+
+          // Normaliza data
+          if(data instanceof Date){
+            data=isoDate(data);
+          } else if(typeof data==='number'){
+            // serial Excel
+            const d=new Date(Math.round((data-25569)*86400*1000));
+            data=isoDate(d);
+          } else if(typeof data==='string'&&data){
+            // DD/MM/YYYY → YYYY-MM-DD
+            const m=data.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+            if(m) data=`${m[3]}-${m[2]}-${m[1]}`;
+          }
+          // Valida data dentro do período
+          if(!data||data<'2026-11-01'||data>'2027-12-31'){erros++;return;}
+          // Normaliza tipo
+          const tipoN=normalize(tipo);
+          if(tipoN.includes('entr')) tipo='ENTRADA';
+          else if(tipoN.includes('sa')||tipoN.includes('paid')||tipoN.includes('debit')) tipo='SAÍDA';
+          else{erros++;return;}
+          // Normaliza conta
+          const contaN=normalize(conta);
+          if(contaN.includes('itau')||contaN.includes('itaú')) conta='Itaú';
+          else if(contaN.includes('sic')) conta='Sicoob';
+          else{erros++;return;}
+          // Valor
+          valor=parseFloat(String(valor).replace(/[R$\s.]/g,'').replace(',','.'))||0;
+          if(valor<=0){erros++;return;}
+          // Descrição
+          desc=String(desc||'').trim();
+          if(!desc) desc='Importado';
+
+          novos.push({id:Date.now()+idx, data, desc, tipo, conta, valor, cat:String(cat||'')});
+          importados++;
+        });
+
+        if(importados===0){
+          msg.textContent=`⚠ Nenhum lançamento válido encontrado. Verifique se as colunas são: Data, Descrição, Tipo, Conta, Valor, Categoria.`;
+          msg.style.color='#FF6B6B'; return;
+        }
+        // Merge: mantém existentes + adiciona novos (sem duplicar por id)
+        const existentes=loadLancamentos();
+        saveLancamentos([...existentes,...novos]);
+        msg.textContent=`✅ ${importados} lançamentos importados!${erros?' ('+erros+' linhas ignoradas)':''}`;
+        msg.style.color='#00C9A7';
+        refreshFluxo();
+      }catch(err){
+        msg.textContent='❌ Erro ao ler arquivo: '+err.message;
+        msg.style.color='#FF6B6B';
+      }
+      input.value=''; // reset input
+      setTimeout(()=>msg.style.display='none',5000);
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
+  // ── Baixar modelo .xlsx ──────────────────────────
+  window.fcBaixarModelo=function(){
+    if(typeof XLSX==='undefined'){alert('Biblioteca não carregada ainda, tente em instantes.');return;}
+    const wb2=XLSX.utils.book_new();
+    const dados=[
+      ['Data','Descrição','Tipo','Conta','Valor','Categoria'],
+      ['01/11/2026','Exemplo Entrada Itaú','ENTRADA','Itaú',5000,'Vendas'],
+      ['05/11/2026','Exemplo Saída Sicoob','SAÍDA','Sicoob',1200.50,'Fornecedores'],
+      ['10/11/2026','Exemplo Entrada Sicoob','ENTRADA','Sicoob',3000,'Transferência'],
+    ];
+    const ws2=XLSX.utils.aoa_to_sheet(dados);
+    ws2['!cols']=[{wch:14},{wch:36},{wch:10},{wch:10},{wch:14},{wch:20}];
+    XLSX.utils.book_append_sheet(wb2,ws2,'Lançamentos');
+    XLSX.writeFile(wb2,'modelo_fluxo_caixa.xlsx');
+  };
+
+  // ── Limpar todos os lançamentos ──────────────────
+  window.fcLimparTudo=function(){
+    if(!confirm('Tem certeza? Isso apaga TODOS os lançamentos salvos.'))return;
+    saveLancamentos([]);
+    const msg=document.getElementById('fc-msg');
+    msg.textContent='🗑 Todos os lançamentos foram apagados.';
+    msg.style.color='#FF6B6B'; msg.style.display='inline';
+    setTimeout(()=>msg.style.display='none',3000);
+    refreshFluxo();
   };
 
   function refreshFluxo(){
