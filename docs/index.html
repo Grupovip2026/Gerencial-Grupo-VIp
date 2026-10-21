@@ -84,6 +84,7 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
   <button class="nav-tab" onclick="setPage('orc2027')">🎯 Orçamento 2027</button>
   <button class="nav-tab" onclick="setPage('vendas')">🛒 Vendas VIP</button>
   <button class="nav-tab" onclick="setPage('vendas-vidal')">🛒 Vendas Vidal</button>
+  <button class="nav-tab" onclick="setPage('fluxo')">💵 Fluxo de Caixa</button>
 </div>
 
 <!-- GERENCIAL -->
@@ -525,6 +526,8 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
 
 <div class="footer" id="footer"></div>
 
+<div id="page-fluxo" class="page"></div>
+
 <script>
 // ── DADOS VENDAS ML ──────────────────────────────────────────────────────────
 const VENDAS_ML = {
@@ -819,12 +822,13 @@ async function loadData(){
 }
 
 function setPage(p){
-  document.querySelectorAll('.nav-tab').forEach((t,i)=>{t.classList.toggle('active',['gerencial','dre','divida','custos','orc2027','vendas','vendas-vidal'][i]===p)});
+  document.querySelectorAll('.nav-tab').forEach((t,i)=>{t.classList.toggle('active',['gerencial','dre','divida','custos','orc2027','vendas','vendas-vidal','fluxo'][i]===p)});
   document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
   document.getElementById('page-'+p).classList.add('active');
   if(p==='orc2027') renderOrc2027();
   if(p==='vendas') renderVendasML();
   if(p==='vendas-vidal') renderVendasVidal();
+  if(p==='fluxo') renderFluxo();
 }
 
 function mkChart(id,type,labels,datasets,opts={}){
@@ -1806,6 +1810,554 @@ function renderOrc2027(){
   linhas.forEach(l=>{if(l.sec){html+=`<tr class="section-head"><td colspan="${months.length+2}">${l.l}</td></tr>`;return;}const vals=months.map(m=>m[l.f]||0);const tot=vals.reduce((s,v)=>s+v,0);const st=l.bold?'font-weight:700':'';html+=`<tr><td style="${st}">${l.l}</td>${vals.map(v=>`<td class="${l.cls}">${fmt(v)}</td>`).join('')}<td class="${l.cls}" style="${st}">${fmt(tot)}</td></tr>`;});
   document.getElementById('orc-tbl').innerHTML=html+'</tbody>';
 }
+
+/* ═══════════════════════════════════════════════════
+   FLUXO DE CAIXA — lógica completa
+═══════════════════════════════════════════════════ */
+(function(){
+  // ── armazenamento local ──────────────────────────
+  const STORE_KEY = 'fluxo_lancamentos_v1';
+  const SALDO_KEY = 'fluxo_saldos_v1';
+
+  function loadLancamentos(){
+    try{ return JSON.parse(localStorage.getItem(STORE_KEY)||'[]'); }catch(e){return [];}
+  }
+  function saveLancamentos(arr){
+    try{ localStorage.setItem(STORE_KEY, JSON.stringify(arr)); }catch(e){}
+  }
+  function loadSaldos(){
+    try{ return JSON.parse(localStorage.getItem(SALDO_KEY)||'{"itau":0,"sicoob":0}'); }catch(e){return {itau:0,sicoob:0};}
+  }
+  function saveSaldos(s){
+    try{ localStorage.setItem(SALDO_KEY, JSON.stringify(s)); }catch(e){}
+  }
+
+  // ── utilitários ──────────────────────────────────
+  function fmtR(v){
+    if(v===null||v===undefined||v==='')return '—';
+    const n=parseFloat(v);
+    if(isNaN(n))return '—';
+    return n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+  }
+  function parseMoeda(s){
+    if(!s)return 0;
+    const n=parseFloat(String(s).replace(/[R$\s.]/g,'').replace(',','.'));
+    return isNaN(n)?0:n;
+  }
+  function dateExcel(str){ // "YYYY-MM-DD" → Date
+    const [y,m,d]=str.split('-').map(Number);
+    return new Date(y,m-1,d);
+  }
+  function isoDate(d){ // Date → "YYYY-MM-DD"
+    return d.toISOString().slice(0,10);
+  }
+  function brDate(iso){ // "YYYY-MM-DD" → "DD/MM/YYYY"
+    if(!iso)return '';
+    const [y,m,d]=iso.split('-');
+    return `${d}/${m}/${y}`;
+  }
+  function mesAno(iso){ // "YYYY-MM-DD" → "Nov/2026"
+    const NOMES=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    const [y,m]=iso.split('-');
+    return NOMES[parseInt(m,10)-1]+'/'+y;
+  }
+
+  // ── gera lista de dias Nov/2026–Dez/2027 ─────────
+  function gerarDias(){
+    const dias=[];
+    let d=new Date(2026,10,1); // Nov = 10
+    const fim=new Date(2027,11,31);
+    while(d<=fim){
+      dias.push(isoDate(d));
+      d=new Date(d.getFullYear(),d.getMonth(),d.getDate()+1);
+    }
+    return dias;
+  }
+
+  // ── calcula saldo acumulado por dia ───────────────
+  function calcSaldos(lancamentos, saldoInicialItau, saldoInicialSicoob){
+    const dias = gerarDias();
+    // índice por data
+    const entItau={}, saiItau={}, entSic={}, saiSic={};
+    lancamentos.forEach(l=>{
+      if(!l.data||!l.valor||!l.tipo||!l.conta)return;
+      const v=parseMoeda(l.valor);
+      const dt=l.data;
+      if(l.tipo==='ENTRADA'&&l.conta==='Itaú'){entItau[dt]=(entItau[dt]||0)+v;}
+      if(l.tipo==='SAÍDA'  &&l.conta==='Itaú'){saiItau[dt]=(saiItau[dt]||0)+v;}
+      if(l.tipo==='ENTRADA'&&l.conta==='Sicoob'){entSic[dt]=(entSic[dt]||0)+v;}
+      if(l.tipo==='SAÍDA'  &&l.conta==='Sicoob'){saiSic[dt]=(saiSic[dt]||0)+v;}
+    });
+    let sItau=saldoInicialItau, sSic=saldoInicialSicoob;
+    return dias.map(dt=>{
+      const ei=entItau[dt]||0, si=saiItau[dt]||0;
+      const es=entSic[dt]||0, ss=saiSic[dt]||0;
+      sItau=sItau+ei-si;
+      sSic=sSic+es-ss;
+      return {dt, ei, si, sItau, es, ss, sSic};
+    });
+  }
+
+  // ── resumo mensal ─────────────────────────────────
+  function calcMensal(lancamentos){
+    const map={};
+    lancamentos.forEach(l=>{
+      if(!l.data||!l.valor||!l.tipo||!l.conta)return;
+      const k=l.data.slice(0,7); // "YYYY-MM"
+      if(!map[k])map[k]={ei:0,si:0,es:0,ss:0};
+      const v=parseMoeda(l.valor);
+      if(l.tipo==='ENTRADA'&&l.conta==='Itaú') map[k].ei+=v;
+      if(l.tipo==='SAÍDA'  &&l.conta==='Itaú') map[k].si+=v;
+      if(l.tipo==='ENTRADA'&&l.conta==='Sicoob') map[k].es+=v;
+      if(l.tipo==='SAÍDA'  &&l.conta==='Sicoob') map[k].ss+=v;
+    });
+    // todos os meses do período
+    const meses=[];
+    let d=new Date(2026,10,1);
+    const fim=new Date(2027,11,1);
+    while(d<=fim){
+      const k=isoDate(d).slice(0,7);
+      meses.push({k, label:mesAno(isoDate(d)), ...(map[k]||{ei:0,si:0,es:0,ss:0})});
+      d=new Date(d.getFullYear(), d.getMonth()+1, 1);
+    }
+    return meses;
+  }
+
+  // ── render principal ─────────────────────────────
+  window.renderFluxo = function(){
+    const pg = document.getElementById('page-fluxo');
+    if(!pg._built) buildFluxoPage(pg);
+    refreshFluxo();
+  };
+
+  function buildFluxoPage(pg){
+    pg._built=true;
+    pg.innerHTML=`
+<style>
+.fc-view-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.fc-vtab{padding:8px 18px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:transparent;color:#888;font-size:13px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+.fc-vtab:hover{color:#ccc;border-color:rgba(255,255,255,.2)}
+.fc-vtab.fc-active{background:rgba(56,189,248,.12);border-color:#38bdf8;color:#38bdf8;font-weight:600}
+.fc-section{display:none}.fc-section.fc-show{display:block}
+.fc-saldo-inputs{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.fc-saldo-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 18px;min-width:200px;flex:1}
+.fc-saldo-label{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.fc-saldo-input{background:rgba(255,255,255,.07);border:1px solid rgba(56,189,248,.3);border-radius:6px;color:#fff;font-size:15px;font-family:'DM Mono',monospace;font-weight:700;width:100%;padding:8px 10px;outline:none}
+.fc-saldo-input:focus{border-color:#38bdf8}
+.fc-form{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:20px;margin-bottom:20px}
+.fc-form-title{font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:.8px;font-weight:600;margin-bottom:14px}
+.fc-form-row{display:grid;grid-template-columns:140px 1fr 100px 100px 140px 1fr;gap:10px;align-items:end;flex-wrap:wrap}
+@media(max-width:900px){.fc-form-row{grid-template-columns:1fr 1fr 1fr}}
+.fc-field label{font-size:11px;color:#666;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.fc-field input,.fc-field select{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:6px;color:#fff;font-size:13px;font-family:'Inter',sans-serif;padding:8px 10px;width:100%;outline:none}
+.fc-field input:focus,.fc-field select:focus{border-color:#38bdf8}
+.fc-field select option{background:#1a1a2e;color:#fff}
+.fc-btn{padding:9px 22px;border-radius:7px;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+.fc-btn-add{background:#38bdf8;color:#0d0d1a}
+.fc-btn-add:hover{background:#7dd3fc}
+.fc-btn-del{background:rgba(255,107,107,.15);color:#FF6B6B;border:1px solid rgba(255,107,107,.3);padding:4px 10px;font-size:11px;border-radius:5px}
+.fc-btn-del:hover{background:rgba(255,107,107,.3)}
+.fc-kpis{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.fc-kpi{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:16px 20px;min-width:150px;flex:1}
+.fc-kpi-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:5px}
+.fc-kpi-val{font-size:20px;font-weight:700;font-family:'DM Mono',monospace}
+.fc-neg{color:#FF6B6B}.fc-pos{color:#00C9A7}.fc-sky{color:#38bdf8}
+.fc-tbl-wrap{overflow-x:auto;border-radius:10px;border:1px solid rgba(255,255,255,.07)}
+.fc-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.fc-tbl th{padding:8px 10px;text-align:right;color:#666;font-weight:500;font-size:11px;letter-spacing:.5px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08);white-space:nowrap;background:rgba(255,255,255,.03)}
+.fc-tbl th:first-child{text-align:left}
+.fc-tbl td{padding:9px 10px;text-align:right;border-bottom:1px solid rgba(255,255,255,.04);font-family:'DM Mono',monospace;font-size:12px}
+.fc-tbl td:first-child{text-align:left;font-family:'Inter',sans-serif;font-weight:500}
+.fc-tbl tr.fc-neg-row td.fc-saldo{color:#FF6B6B;font-weight:700}
+.fc-tbl tr.fc-mes-head td{background:rgba(56,189,248,.06);color:#38bdf8;font-family:'Inter',sans-serif;font-weight:700;font-size:11px;letter-spacing:.5px;text-transform:uppercase}
+.fc-tbl tr.fc-total-row td{background:rgba(255,255,255,.04);font-weight:700;border-top:1px solid rgba(255,255,255,.12)}
+.fc-search{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:6px;color:#fff;font-size:13px;padding:8px 12px;width:280px;outline:none;font-family:'Inter',sans-serif}
+.fc-search:focus{border-color:#38bdf8}
+.fc-filter-bar{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+.fc-chart-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+@media(max-width:700px){.fc-chart-row{grid-template-columns:1fr}}
+.fc-chart-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:18px 16px}
+.fc-chart-title{font-size:11px;color:#aaa;margin-bottom:12px;font-weight:600;letter-spacing:.8px;text-transform:uppercase}
+.fc-chart-wrap{position:relative;height:220px}
+</style>
+
+<div class="fc-view-tabs">
+  <button class="fc-vtab fc-active" onclick="fcSetView('lancamentos')">📝 Lançamentos</button>
+  <button class="fc-vtab" onclick="fcSetView('dia')">📅 Saldo Dia a Dia</button>
+  <button class="fc-vtab" onclick="fcSetView('mensal')">📆 Resumo Mensal</button>
+  <button class="fc-vtab" onclick="fcSetView('grafico')">📈 Gráficos</button>
+</div>
+
+<!-- ── Saldo inicial ── -->
+<div class="fc-saldo-inputs">
+  <div class="fc-saldo-card">
+    <div class="fc-saldo-label">💰 Saldo Inicial Itaú (R$)</div>
+    <input class="fc-saldo-input" id="fc-si-itau" type="number" step="0.01" placeholder="0,00" oninput="fcSaveSaldos()">
+  </div>
+  <div class="fc-saldo-card">
+    <div class="fc-saldo-label">💰 Saldo Inicial Sicoob (R$)</div>
+    <input class="fc-saldo-input" id="fc-si-sicoob" type="number" step="0.01" placeholder="0,00" oninput="fcSaveSaldos()">
+  </div>
+  <div class="fc-saldo-card" style="flex:2;background:rgba(56,189,248,.05);border-color:rgba(56,189,248,.15)">
+    <div class="fc-saldo-label">ℹ️ Referência</div>
+    <div style="font-size:12px;color:#666;line-height:1.6">Período: <span style="color:#38bdf8">Nov/2026 — Dez/2027</span><br>
+    Saldo negativo aparece em <span style="color:#FF6B6B">vermelho</span> na aba Dia a Dia</div>
+  </div>
+</div>
+
+<!-- ══ VIEW: LANÇAMENTOS ══ -->
+<div class="fc-section fc-show" id="fc-view-lancamentos">
+  <div class="fc-form">
+    <div class="fc-form-title">+ Novo Lançamento</div>
+    <div class="fc-form-row">
+      <div class="fc-field"><label>Data</label><input type="date" id="fc-data" min="2026-11-01" max="2027-12-31"></div>
+      <div class="fc-field"><label>Descrição</label><input type="text" id="fc-desc" placeholder="Ex: Pagamento Fornecedor X"></div>
+      <div class="fc-field"><label>Tipo</label><select id="fc-tipo"><option value="ENTRADA">ENTRADA</option><option value="SAÍDA">SAÍDA</option></select></div>
+      <div class="fc-field"><label>Conta</label><select id="fc-conta"><option value="Itaú">Itaú</option><option value="Sicoob">Sicoob</option></select></div>
+      <div class="fc-field"><label>Valor (R$)</label><input type="number" id="fc-valor" step="0.01" placeholder="0,00" min="0"></div>
+      <div class="fc-field"><label>Categoria</label><input type="text" id="fc-cat" placeholder="Ex: Fornecedores"></div>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:10px;align-items:center">
+      <button class="fc-btn fc-btn-add" onclick="fcAddLancamento()">Adicionar</button>
+      <span id="fc-msg" style="font-size:12px;color:#00C9A7;display:none"></span>
+    </div>
+  </div>
+  <div class="fc-kpis" id="fc-kpis-lanc"></div>
+  <div class="fc-filter-bar">
+    <input class="fc-search" id="fc-search" placeholder="🔍  Buscar descrição, conta ou categoria..." oninput="fcRenderLancamentos()">
+    <select class="fc-field" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:6px;color:#fff;font-size:13px;padding:8px 10px;outline:none" id="fc-filtro-conta" onchange="fcRenderLancamentos()">
+      <option value="">Todas as contas</option>
+      <option value="Itaú">Itaú</option>
+      <option value="Sicoob">Sicoob</option>
+    </select>
+    <select class="fc-field" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:6px;color:#fff;font-size:13px;padding:8px 10px;outline:none" id="fc-filtro-tipo" onchange="fcRenderLancamentos()">
+      <option value="">Todos os tipos</option>
+      <option value="ENTRADA">ENTRADA</option>
+      <option value="SAÍDA">SAÍDA</option>
+    </select>
+  </div>
+  <div class="fc-tbl-wrap"><table class="fc-tbl" id="fc-tbl-lanc"></table></div>
+</div>
+
+<!-- ══ VIEW: SALDO DIA A DIA ══ -->
+<div class="fc-section" id="fc-view-dia">
+  <div class="fc-filter-bar" style="margin-bottom:14px">
+    <span style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:1px">Filtrar mês:</span>
+    <select style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:6px;color:#fff;font-size:13px;padding:7px 10px;outline:none" id="fc-filtro-mes" onchange="fcRenderDia()">
+      <option value="">Todos</option>
+    </select>
+    <label style="font-size:12px;color:#888;margin-left:8px">
+      <input type="checkbox" id="fc-so-negativo" onchange="fcRenderDia()" style="margin-right:4px">
+      Mostrar só dias negativos
+    </label>
+  </div>
+  <div class="fc-tbl-wrap"><table class="fc-tbl" id="fc-tbl-dia"></table></div>
+</div>
+
+<!-- ══ VIEW: RESUMO MENSAL ══ -->
+<div class="fc-section" id="fc-view-mensal">
+  <div class="fc-tbl-wrap"><table class="fc-tbl" id="fc-tbl-mensal"></table></div>
+</div>
+
+<!-- ══ VIEW: GRÁFICOS ══ -->
+<div class="fc-section" id="fc-view-grafico">
+  <div class="fc-chart-row">
+    <div class="fc-chart-box">
+      <div class="fc-chart-title">Entradas vs Saídas por Mês</div>
+      <div class="fc-chart-wrap"><canvas id="fc-chart-mensal"></canvas></div>
+    </div>
+    <div class="fc-chart-box">
+      <div class="fc-chart-title">Saldo Acumulado Itaú + Sicoob</div>
+      <div class="fc-chart-wrap"><canvas id="fc-chart-saldo"></canvas></div>
+    </div>
+  </div>
+  <div class="fc-chart-row">
+    <div class="fc-chart-box">
+      <div class="fc-chart-title">Distribuição por Categoria (Saídas)</div>
+      <div class="fc-chart-wrap"><canvas id="fc-chart-cat"></canvas></div>
+    </div>
+    <div class="fc-chart-box">
+      <div class="fc-chart-title">Itaú vs Sicoob — Saldo Mensal</div>
+      <div class="fc-chart-wrap"><canvas id="fc-chart-contas"></canvas></div>
+    </div>
+  </div>
+</div>`;
+
+    // preenche selos de mês no filtro
+    const sel = pg.querySelector('#fc-filtro-mes');
+    let d2=new Date(2026,10,1);
+    const NOMES=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    while(d2<=new Date(2027,11,1)){
+      const v=isoDate(d2).slice(0,7);
+      const opt=document.createElement('option');
+      opt.value=v; opt.textContent=NOMES[d2.getMonth()]+'/'+d2.getFullYear();
+      sel.appendChild(opt); d2=new Date(d2.getFullYear(),d2.getMonth()+1,1);
+    }
+
+    // preenche saldos salvos
+    const sl=loadSaldos();
+    pg.querySelector('#fc-si-itau').value=sl.itau||0;
+    pg.querySelector('#fc-si-sicoob').value=sl.sicoob||0;
+
+    // define data padrão como hoje se dentro do período
+    const hoje=isoDate(new Date());
+    const inp=pg.querySelector('#fc-data');
+    if(hoje>='2026-11-01'&&hoje<='2027-12-31') inp.value=hoje;
+    else inp.value='2026-11-01';
+  }
+
+  window.fcSaveSaldos=function(){
+    const itau=parseFloat(document.getElementById('fc-si-itau').value)||0;
+    const sicoob=parseFloat(document.getElementById('fc-si-sicoob').value)||0;
+    saveSaldos({itau,sicoob});
+    refreshFluxo();
+  };
+
+  window.fcSetView=function(v){
+    document.querySelectorAll('.fc-vtab').forEach((t,i)=>t.classList.toggle('fc-active',['lancamentos','dia','mensal','grafico'][i]===v));
+    document.querySelectorAll('.fc-section').forEach(s=>s.classList.remove('fc-show'));
+    document.getElementById('fc-view-'+v).classList.add('fc-show');
+    if(v==='dia') fcRenderDia();
+    if(v==='mensal') fcRenderMensal();
+    if(v==='grafico') fcRenderGraficos();
+  };
+
+  window.fcAddLancamento=function(){
+    const data  =document.getElementById('fc-data').value;
+    const desc  =document.getElementById('fc-desc').value.trim();
+    const tipo  =document.getElementById('fc-tipo').value;
+    const conta =document.getElementById('fc-conta').value;
+    const valor =parseFloat(document.getElementById('fc-valor').value);
+    const cat   =document.getElementById('fc-cat').value.trim();
+    if(!data||!desc||!valor||valor<=0){
+      const msg=document.getElementById('fc-msg');
+      msg.textContent='⚠ Preencha data, descrição e valor.';
+      msg.style.color='#FF6B6B'; msg.style.display='inline';
+      setTimeout(()=>msg.style.display='none',3000); return;
+    }
+    const arr=loadLancamentos();
+    arr.push({id:Date.now(), data, desc, tipo, conta, valor, cat});
+    saveLancamentos(arr);
+    document.getElementById('fc-desc').value='';
+    document.getElementById('fc-valor').value='';
+    document.getElementById('fc-cat').value='';
+    const msg=document.getElementById('fc-msg');
+    msg.textContent='✅ Lançamento adicionado!'; msg.style.color='#00C9A7'; msg.style.display='inline';
+    setTimeout(()=>msg.style.display='none',2500);
+    refreshFluxo();
+  };
+
+  window.fcDelLancamento=function(id){
+    const arr=loadLancamentos().filter(l=>l.id!==id);
+    saveLancamentos(arr); refreshFluxo();
+  };
+
+  function refreshFluxo(){
+    fcRenderKpis();
+    fcRenderLancamentos();
+    // re-render seção ativa
+    const ativa=document.querySelector('.fc-section.fc-show');
+    if(!ativa)return;
+    const vid=ativa.id.replace('fc-view-','');
+    if(vid==='dia') fcRenderDia();
+    if(vid==='mensal') fcRenderMensal();
+    if(vid==='grafico') fcRenderGraficos();
+  }
+
+  function fcRenderKpis(){
+    const arr=loadLancamentos();
+    const sl=loadSaldos();
+    const entItau=arr.filter(l=>l.tipo==='ENTRADA'&&l.conta==='Itaú').reduce((s,l)=>s+parseMoeda(l.valor),0);
+    const saiItau=arr.filter(l=>l.tipo==='SAÍDA'  &&l.conta==='Itaú').reduce((s,l)=>s+parseMoeda(l.valor),0);
+    const entSic =arr.filter(l=>l.tipo==='ENTRADA'&&l.conta==='Sicoob').reduce((s,l)=>s+parseMoeda(l.valor),0);
+    const saiSic =arr.filter(l=>l.tipo==='SAÍDA'  &&l.conta==='Sicoob').reduce((s,l)=>s+parseMoeda(l.valor),0);
+    const sItau=(sl.itau||0)+entItau-saiItau;
+    const sSic =(sl.sicoob||0)+entSic-saiSic;
+    const kc=document.getElementById('fc-kpis-lanc');
+    if(!kc)return;
+    kc.innerHTML=[
+      {label:'Saldo Itaú', val:sItau},
+      {label:'Saldo Sicoob', val:sSic},
+      {label:'Saldo Total', val:sItau+sSic},
+      {label:'Total Entradas', val:entItau+entSic, cls:'fc-pos'},
+      {label:'Total Saídas', val:saiItau+saiSic, cls:'fc-neg'},
+      {label:'Lançamentos', val:arr.length, mono:true, raw:true},
+    ].map(k=>{
+      const cls=k.cls||(k.val<0?'fc-neg':'fc-sky');
+      const vf=k.raw?k.val:fmtR(k.val);
+      return `<div class="fc-kpi"><div class="fc-kpi-label">${k.label}</div>
+        <div class="fc-kpi-val ${k.raw?'':cls}">${vf}</div></div>`;
+    }).join('');
+  }
+
+  window.fcRenderLancamentos=function(){
+    const arr=loadLancamentos();
+    const q=(document.getElementById('fc-search')||{}).value||'';
+    const fc=(document.getElementById('fc-filtro-conta')||{}).value||'';
+    const ft=(document.getElementById('fc-filtro-tipo')||{}).value||'';
+    const tbl=document.getElementById('fc-tbl-lanc');
+    if(!tbl)return;
+    const filtered=arr.filter(l=>{
+      if(fc&&l.conta!==fc)return false;
+      if(ft&&l.tipo!==ft)return false;
+      if(q){const s=q.toLowerCase();if(!(l.desc+l.conta+l.cat).toLowerCase().includes(s))return false;}
+      return true;
+    }).sort((a,b)=>b.data.localeCompare(a.data));
+    let h=`<thead><tr>
+      <th style="text-align:left">Data</th>
+      <th style="text-align:left">Descrição</th>
+      <th>Tipo</th><th>Conta</th><th>Valor</th><th>Categoria</th><th>Ação</th>
+    </tr></thead><tbody>`;
+    if(!filtered.length){h+='<tr><td colspan="7" style="text-align:center;color:#555;padding:30px">Nenhum lançamento encontrado.</td></tr>';}
+    filtered.forEach(l=>{
+      const cls=l.tipo==='ENTRADA'?'fc-pos':'fc-neg';
+      h+=`<tr>
+        <td style="text-align:left;font-family:Inter,sans-serif">${brDate(l.data)}</td>
+        <td style="text-align:left;font-family:Inter,sans-serif;color:#ddd">${l.desc}</td>
+        <td class="${cls}">${l.tipo}</td>
+        <td style="color:#38bdf8">${l.conta}</td>
+        <td class="${cls}">${fmtR(l.valor)}</td>
+        <td style="text-align:left;font-family:Inter,sans-serif;color:#888">${l.cat||'—'}</td>
+        <td><button class="fc-btn-del" onclick="fcDelLancamento(${l.id})">🗑 Del</button></td>
+      </tr>`;
+    });
+    tbl.innerHTML=h+'</tbody>';
+  };
+
+  window.fcRenderDia=function(){
+    const sl=loadSaldos();
+    const saldos=calcSaldos(loadLancamentos(), sl.itau||0, sl.sicoob||0);
+    const filtroMes=(document.getElementById('fc-filtro-mes')||{}).value||'';
+    const soNeg=(document.getElementById('fc-so-negativo')||{}).checked||false;
+    const tbl=document.getElementById('fc-tbl-dia');
+    if(!tbl)return;
+    let filtered=saldos;
+    if(filtroMes) filtered=filtered.filter(r=>r.dt.startsWith(filtroMes));
+    if(soNeg) filtered=filtered.filter(r=>r.sItau<0||r.sSic<0);
+
+    let h=`<thead><tr>
+      <th style="text-align:left">Data</th>
+      <th>Ent. Itaú</th><th>Saí. Itaú</th><th>Saldo Itaú</th>
+      <th>Ent. Sicoob</th><th>Saí. Sicoob</th><th>Saldo Sicoob</th><th>Alerta</th>
+    </tr></thead><tbody>`;
+    let prevMes='';
+    filtered.forEach(r=>{
+      const mes=r.dt.slice(0,7);
+      if(mes!==prevMes){
+        const [y,m]=mes.split('-');
+        const NOMES=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+        h+=`<tr class="fc-mes-head"><td colspan="8">📅 ${NOMES[parseInt(m,10)-1]}/${y}</td></tr>`;
+        prevMes=mes;
+      }
+      const negI=r.sItau<0, negS=r.sSic<0;
+      const alerta=(!negI&&!negS)?'✅':(negI&&negS?'🔴 Ambas':'🔴 '+(negI?'Itaú':'Sicoob'));
+      h+=`<tr>
+        <td style="text-align:left;font-family:Inter,sans-serif;font-weight:${r.dt.endsWith('-01')?'700':'400'};color:${r.dt.endsWith('-01')?'#38bdf8':'#ccc'}">${brDate(r.dt)}</td>
+        <td class="fc-pos">${r.ei?fmtR(r.ei):'—'}</td>
+        <td class="fc-neg">${r.si?fmtR(r.si):'—'}</td>
+        <td class="fc-saldo ${negI?'fc-neg':'fc-sky'}">${fmtR(r.sItau)}</td>
+        <td class="fc-pos">${r.es?fmtR(r.es):'—'}</td>
+        <td class="fc-neg">${r.ss?fmtR(r.ss):'—'}</td>
+        <td class="fc-saldo ${negS?'fc-neg':'fc-sky'}">${fmtR(r.sSic)}</td>
+        <td style="text-align:center">${alerta}</td>
+      </tr>`;
+    });
+    if(!filtered.length) h+='<tr><td colspan="8" style="text-align:center;color:#555;padding:30px">Nenhum dia encontrado.</td></tr>';
+    tbl.innerHTML=h+'</tbody>';
+  };
+
+  window.fcRenderMensal=function(){
+    const mensal=calcMensal(loadLancamentos());
+    const tbl=document.getElementById('fc-tbl-mensal');
+    if(!tbl)return;
+    let totEI=0,totSI=0,totES=0,totSS=0;
+    let h=`<thead><tr>
+      <th style="text-align:left">Mês</th>
+      <th>Ent. Itaú</th><th>Saí. Itaú</th><th>Saldo Itaú</th>
+      <th>Ent. Sicoob</th><th>Saí. Sicoob</th><th>Saldo Sicoob</th><th>Saldo Mês</th>
+    </tr></thead><tbody>`;
+    mensal.forEach(m=>{
+      const sI=m.ei-m.si, sS=m.es-m.ss, sM=sI+sS;
+      totEI+=m.ei;totSI+=m.si;totES+=m.es;totSS+=m.ss;
+      h+=`<tr>
+        <td style="text-align:left;font-family:Inter,sans-serif;font-weight:600;color:#ccc">${m.label}</td>
+        <td class="fc-pos">${fmtR(m.ei)}</td>
+        <td class="fc-neg">${fmtR(m.si)}</td>
+        <td class="${sI<0?'fc-neg':'fc-sky'}">${fmtR(sI)}</td>
+        <td class="fc-pos">${fmtR(m.es)}</td>
+        <td class="fc-neg">${fmtR(m.ss)}</td>
+        <td class="${sS<0?'fc-neg':'fc-sky'}">${fmtR(sS)}</td>
+        <td style="font-weight:700" class="${sM<0?'fc-neg':'fc-pos'}">${fmtR(sM)}</td>
+      </tr>`;
+    });
+    const totSI2=totEI-totSI, totSS2=totES-totSS, totM=totSI2+totSS2;
+    h+=`<tr class="fc-total-row">
+      <td style="text-align:left;font-family:Inter,sans-serif">TOTAL</td>
+      <td class="fc-pos">${fmtR(totEI)}</td>
+      <td class="fc-neg">${fmtR(totSI)}</td>
+      <td class="${totSI2<0?'fc-neg':'fc-sky'}">${fmtR(totSI2)}</td>
+      <td class="fc-pos">${fmtR(totES)}</td>
+      <td class="fc-neg">${fmtR(totSS)}</td>
+      <td class="${totSS2<0?'fc-neg':'fc-sky'}">${fmtR(totSS2)}</td>
+      <td style="font-weight:700" class="${totM<0?'fc-neg':'fc-pos'}">${fmtR(totM)}</td>
+    </tr>`;
+    tbl.innerHTML=h+'</tbody>';
+  };
+
+  window.fcRenderGraficos=function(){
+    const mensal=calcMensal(loadLancamentos());
+    const sl=loadSaldos();
+    const labels=mensal.map(m=>m.label);
+
+    // Entradas vs Saídas
+    if(charts['fc-chart-mensal'])charts['fc-chart-mensal'].destroy();
+    const ctx1=document.getElementById('fc-chart-mensal');
+    if(ctx1) charts['fc-chart-mensal']=new Chart(ctx1.getContext('2d'),{type:'bar',data:{labels,datasets:[
+      {label:'Entradas',data:mensal.map(m=>m.ei+m.es),backgroundColor:'rgba(0,201,167,.6)'},
+      {label:'Saídas',  data:mensal.map(m=>m.si+m.ss),backgroundColor:'rgba(255,107,107,.6)'},
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#888',font:{size:11}}}},
+      scales:{x:{ticks:{color:'#666',font:{size:10}},grid:{color:'rgba(255,255,255,.05)'},border:{display:false}},
+              y:{ticks:{color:'#666',font:{size:10},callback:v=>'R$'+Math.round(v/1000)+'k'},grid:{color:'rgba(255,255,255,.05)'},border:{display:false}}}}});
+
+    // Saldo acumulado total
+    const saldos=calcSaldos(loadLancamentos(), sl.itau||0, sl.sicoob||0);
+    // pega último dia de cada mês
+    const porMes={};
+    saldos.forEach(r=>{porMes[r.dt.slice(0,7)]=r;});
+    const diasFim=Object.values(porMes);
+    const lblS=diasFim.map(r=>mesAno(r.dt));
+    if(charts['fc-chart-saldo'])charts['fc-chart-saldo'].destroy();
+    const ctx2=document.getElementById('fc-chart-saldo');
+    if(ctx2) charts['fc-chart-saldo']=new Chart(ctx2.getContext('2d'),{type:'line',data:{labels:lblS,datasets:[
+      {label:'Total',data:diasFim.map(r=>r.sItau+r.sSic),borderColor:'#38bdf8',backgroundColor:'rgba(56,189,248,.1)',fill:true,tension:.3,pointRadius:3},
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#888',font:{size:11}}}},
+      scales:{x:{ticks:{color:'#666',font:{size:10}},grid:{color:'rgba(255,255,255,.05)'},border:{display:false}},
+              y:{ticks:{color:'#666',font:{size:10},callback:v=>'R$'+Math.round(v/1000)+'k'},grid:{color:'rgba(255,255,255,.05)'},border:{display:false}}}}});
+
+    // Categorias (saídas)
+    const catMap={};
+    loadLancamentos().filter(l=>l.tipo==='SAÍDA').forEach(l=>{
+      const c=l.cat||'Outros'; catMap[c]=(catMap[c]||0)+parseMoeda(l.valor);
+    });
+    const cats=Object.entries(catMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
+    if(charts['fc-chart-cat'])charts['fc-chart-cat'].destroy();
+    const ctx3=document.getElementById('fc-chart-cat');
+    const PALETTE=['#FF6B6B','#F5A623','#38bdf8','#00C9A7','#a78bfa','#f59e0b','#6C63FF','#FF9F43'];
+    if(ctx3) charts['fc-chart-cat']=new Chart(ctx3.getContext('2d'),{type:'doughnut',data:{
+      labels:cats.map(c=>c[0]),datasets:[{data:cats.map(c=>c[1]),backgroundColor:PALETTE,borderWidth:0}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#888',font:{size:10}}}}}});
+
+    // Itaú vs Sicoob saldo mensal
+    if(charts['fc-chart-contas'])charts['fc-chart-contas'].destroy();
+    const ctx4=document.getElementById('fc-chart-contas');
+    if(ctx4) charts['fc-chart-contas']=new Chart(ctx4.getContext('2d'),{type:'bar',data:{labels:lblS,datasets:[
+      {label:'Itaú',   data:diasFim.map(r=>r.sItau),backgroundColor:'rgba(56,189,248,.6)'},
+      {label:'Sicoob', data:diasFim.map(r=>r.sSic), backgroundColor:'rgba(167,139,250,.6)'},
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#888',font:{size:11}}}},
+      scales:{x:{ticks:{color:'#666',font:{size:10}},grid:{color:'rgba(255,255,255,.05)'},border:{display:false}},
+              y:{ticks:{color:'#666',font:{size:10},callback:v=>'R$'+Math.round(v/1000)+'k'},grid:{color:'rgba(255,255,255,.05)'},border:{display:false}}}}});
+  };
+})();
 
 loadData();
 </script>
