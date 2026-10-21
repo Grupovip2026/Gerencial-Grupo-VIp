@@ -225,6 +225,14 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
     <div style="font-size:13px;color:#f59e0b;font-weight:600;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);border-radius:8px;padding:6px 14px">🛒 Mercado Livre · VIP MX</div>
     <div style="font-size:12px;color:#555">Jun – Set 2026 · Apenas vendas concluídas</div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+      <label id="vip-import-btn" style="background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.4);color:#f59e0b;border-radius:7px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .2s"
+        onmouseover="this.style.background='rgba(245,158,11,.28)'" onmouseout="this.style.background='rgba(245,158,11,.15)'">
+        📥 Importar Excel
+        <input type="file" accept=".xlsx,.xls" style="display:none" onchange="vendaVipImportarExcel(this)">
+      </label>
+      <span id="vip-import-status" style="font-size:11px;color:#555"></span>
+    </div>
   </div>
 
   <!-- FILTROS -->
@@ -408,12 +416,17 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
 <!-- ═══════════════════════════════════════════════════════════════════ -->
 <!-- VENDAS VIDAL -->
 <div id="page-vendas-vidal" class="page">
-  <div id="vidal-debug-banner" style="background:#6C63FF;color:white;padding:12px 20px;border-radius:8px;margin-bottom:16px;font-size:14px;font-weight:600">
-    ✅ VERSÃO NOVA CARREGADA — v3 · Vendas Vidal ativa
-  </div>
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
     <div style="font-size:13px;color:#6C63FF;font-weight:600;background:rgba(108,99,255,.1);border:1px solid rgba(108,99,255,.25);border-radius:8px;padding:6px 14px">🛒 Mercado Livre · Vidal MX</div>
     <div style="font-size:12px;color:#555">Jun – Set 2026 · Apenas vendas concluídas</div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+      <label id="vidal-import-btn" style="background:rgba(108,99,255,.15);border:1px solid rgba(108,99,255,.4);color:#8b83ff;border-radius:7px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .2s"
+        onmouseover="this.style.background='rgba(108,99,255,.28)'" onmouseout="this.style.background='rgba(108,99,255,.15)'">
+        📥 Importar Excel
+        <input type="file" accept=".xlsx,.xls" style="display:none" onchange="vendaVidalImportarExcel(this)">
+      </label>
+      <span id="vidal-import-status" style="font-size:11px;color:#555"></span>
+    </div>
   </div>
 
   <!-- FILTROS VIDAL -->
@@ -2482,6 +2495,227 @@ function renderOrc2027(){
       scales:{x:{ticks:{color:'#666',font:{size:10}},grid:{color:'rgba(255,255,255,.05)'},border:{display:false}},
               y:{ticks:{color:'#666',font:{size:10},callback:v=>'R$'+Math.round(v/1000)+'k'},grid:{color:'rgba(255,255,255,.05)'},border:{display:false}}}}});
   };
+})();
+
+/* ═══════════════════════════════════════════════════
+   IMPORTAÇÃO EXCEL — Vendas VIP e Vidal
+   Lê "PLANO ORÇAMENTARIO - VIP" e "PLANO ORÇAMENTARIO - VIDAL"
+   e atualiza data.plano.VIP.months / data.plano.VIDAL.months
+═══════════════════════════════════════════════════ */
+(function(){
+
+  // Mapeamento: número da coluna (1-based, col A=1) → mês/ano
+  // Row 2 da planilha tem as datas: C=Jan/2026, D=Fev... L=Out
+  // col index: C=2, D=3 ... L=11 (0-based após col B)
+  const COL_MESES = [
+    {col:2, mes:'Jan', ano:2026, mes_num:1},
+    {col:3, mes:'Fev', ano:2026, mes_num:2},
+    {col:4, mes:'Mar', ano:2026, mes_num:3},
+    {col:5, mes:'Abr', ano:2026, mes_num:4},
+    {col:6, mes:'Mai', ano:2026, mes_num:5},
+    {col:7, mes:'Jun', ano:2026, mes_num:6},
+    {col:8, mes:'Jul', ano:2026, mes_num:7},
+    {col:9, mes:'Ago', ano:2026, mes_num:8},
+    {col:10, mes:'Set', ano:2026, mes_num:9},
+    {col:11, mes:'Out', ano:2026, mes_num:10},
+  ];
+
+  function parseNum(v){
+    if(v===null||v===undefined||v==='')return 0;
+    if(typeof v==='number') return v;
+    // pode ser string de fórmula "=SUM(...)" — ignoramos
+    if(typeof v==='string' && v.startsWith('=')) return 0;
+    const n=parseFloat(String(v).replace(/[R$\s.]/g,'').replace(',','.'));
+    return isNaN(n)?0:n;
+  }
+
+  function lerAba(wb, nomeAba){
+    const ws = wb.Sheets[nomeAba];
+    if(!ws){
+      const fuzzy = Object.keys(wb.Sheets).find(k=>k.toLowerCase().includes(nomeAba.toLowerCase().split(' - ')[1]||nomeAba.toLowerCase()));
+      if(!fuzzy) return null;
+      return wb.Sheets[fuzzy];
+    }
+    return ws;
+  }
+
+  function extrairMeses(ws, canaisLinhas){
+    // Converte para array de arrays
+    const arr = XLSX.utils.sheet_to_json(ws, {header:1, defval:null, raw:true});
+    // Row 0 = header geral, Row 1 = datas, Row 2 = Receita Bruta (SUM)
+    // Linhas de canais: passadas como {row, nome}
+    const meses = [];
+    COL_MESES.forEach(cm=>{
+      const ci = cm.col; // 0-based col index na array
+      // Receita bruta = soma dos canais (linhas 3,4,5 = row index 3,4,5, 0-based)
+      let rReal = 0;
+      const canais = {};
+      canaisLinhas.forEach(cl=>{
+        const v = arr[cl.row] ? parseNum(arr[cl.row][ci]) : 0;
+        canais[cl.nome] = {prev: 0, real: v};
+        rReal += v;
+      });
+      // Despesas: row 9 (index 9) = (-) Despesas
+      const dReal = arr[9] ? parseNum(arr[9][ci]) : 0;
+      // Resultado: row 23 (index 23)
+      const resReal = arr[23] ? parseNum(arr[23][ci]) : rReal - dReal;
+      meses.push({
+        mes: cm.mes, ano: cm.ano, mes_num: cm.mes_num,
+        order: cm.mes_num,
+        rPrev: 0, rReal,
+        dPrev: 0, dReal: Math.abs(dReal),
+        resPrev: 0, resReal,
+        canais
+      });
+    });
+    return meses;
+  }
+
+  // ── VIP ──────────────────────────────────────────
+  window.vendaVipImportarExcel = function(input){
+    const file = input.files[0];
+    if(!file) return;
+    const status = document.getElementById('vip-import-status');
+    status.textContent = '⏳ Lendo…';
+    const reader = new FileReader();
+    reader.onload = function(e){
+      try{
+        const wb = XLSX.read(new Uint8Array(e.target.result), {type:'array'});
+        const wsVip = lerAba(wb, 'PLANO ORÇAMENTARIO - VIP');
+        if(!wsVip){ status.textContent='❌ Aba VIP não encontrada'; return; }
+        // Canais VIP: row 3=ML(row idx 3), row 4=Amazon(idx 4), row 5=Shopee(idx 5)
+        const canaisVip = [
+          {row:3, nome:'Mercado Livre'},
+          {row:4, nome:'Amazon'},
+          {row:5, nome:'Shopee'},
+        ];
+        const meses = extrairMeses(wsVip, canaisVip);
+        // Atualiza data global
+        if(window.data && window.data.plano && window.data.plano.VIP){
+          // Substitui meses com dados reais; preserva meses que não existem na planilha
+          const existentes = window.data.plano.VIP.months;
+          meses.forEach(nm=>{
+            const idx = existentes.findIndex(m=>m.mes===nm.mes && m.ano===nm.ano);
+            if(idx>=0){
+              // Atualiza apenas campos "real" se houver valor
+              if(nm.rReal) existentes[idx].rReal = nm.rReal;
+              if(nm.dReal) existentes[idx].dReal = nm.dReal;
+              if(nm.resReal) existentes[idx].resReal = nm.resReal;
+              // Mescla canais
+              if(!existentes[idx].canais) existentes[idx].canais = {};
+              Object.entries(nm.canais).forEach(([k,v])=>{
+                if(v.real) existentes[idx].canais[k] = v;
+              });
+            }
+          });
+          status.textContent = `✅ ${meses.filter(m=>m.rReal>0).length} meses importados`;
+          // Re-renderiza a aba vendas se estiver ativa
+          if(typeof renderVendas==='function') renderVendas();
+          if(typeof renderOrc==='function') renderOrc();
+        } else {
+          // Fallback: apenas mostra resumo
+          const total = meses.reduce((s,m)=>s+m.rReal,0);
+          status.textContent = `✅ Lido: ${meses.filter(m=>m.rReal>0).length} meses · R$ ${total.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0})}`;
+        }
+      }catch(err){
+        status.textContent = '❌ Erro: '+err.message;
+        console.error(err);
+      }
+      input.value='';
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
+  // ── VIDAL ─────────────────────────────────────────
+  window.vendaVidalImportarExcel = function(input){
+    const file = input.files[0];
+    if(!file) return;
+    const status = document.getElementById('vidal-import-status');
+    status.textContent = '⏳ Lendo…';
+    const reader = new FileReader();
+    reader.onload = function(e){
+      try{
+        const wb = XLSX.read(new Uint8Array(e.target.result), {type:'array'});
+        const wsVidal = lerAba(wb, 'PLANO ORÇAMENTARIO - VIDAL');
+        if(!wsVidal){ status.textContent='❌ Aba VIDAL não encontrada'; return; }
+        // Canais VIDAL: row 3=Loja Fisica(idx 3), row 4=ML(idx 4), row 5=Shopee(idx 5)
+        const canaisVidal = [
+          {row:3, nome:'Loja Fisica'},
+          {row:4, nome:'Mercado Livre'},
+          {row:5, nome:'Shopee'},
+        ];
+        const meses = extrairMeses(wsVidal, canaisVidal);
+        if(window.data && window.data.plano && window.data.plano.VIDAL){
+          const existentes = window.data.plano.VIDAL.months;
+          meses.forEach(nm=>{
+            const idx = existentes.findIndex(m=>m.mes===nm.mes && m.ano===nm.ano);
+            if(idx>=0){
+              if(nm.rReal) existentes[idx].rReal = nm.rReal;
+              if(nm.dReal) existentes[idx].dReal = nm.dReal;
+              if(nm.resReal) existentes[idx].resReal = nm.resReal;
+              if(!existentes[idx].canais) existentes[idx].canais = {};
+              Object.entries(nm.canais).forEach(([k,v])=>{
+                if(v.real) existentes[idx].canais[k] = v;
+              });
+            }
+          });
+          status.textContent = `✅ ${meses.filter(m=>m.rReal>0).length} meses importados`;
+          if(typeof renderVendasVidal==='function') renderVendasVidal();
+          if(typeof renderOrc==='function') renderOrc();
+        } else {
+          const total = meses.reduce((s,m)=>s+m.rReal,0);
+          status.textContent = `✅ Lido: ${meses.filter(m=>m.rReal>0).length} meses · R$ ${total.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0})}`;
+        }
+      }catch(err){
+        status.textContent = '❌ Erro: '+err.message;
+        console.error(err);
+      }
+      input.value='';
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
+  // ── Importação simultânea das 2 abas (VIP + VIDAL) ─
+  window.vendaImportarAmbos = function(input){
+    const file = input.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e){
+      try{
+        const wb = XLSX.read(new Uint8Array(e.target.result), {type:'array'});
+        // Dispara as importações individuais reutilizando o mesmo wb
+        const mockVip = {files:[file], _wb:wb};
+        const mockVidal = {files:[file], _wb:wb};
+        // Processa VIP
+        const wsVip = lerAba(wb, 'PLANO ORÇAMENTARIO - VIP');
+        const wsVidal = lerAba(wb, 'PLANO ORÇAMENTARIO - VIDAL');
+        let ok = 0;
+        if(wsVip && window.data && window.data.plano && window.data.plano.VIP){
+          const m = extrairMeses(wsVip,[{row:3,nome:'Mercado Livre'},{row:4,nome:'Amazon'},{row:5,nome:'Shopee'}]);
+          window.data.plano.VIP.months.forEach((ex,idx)=>{
+            const nm=m.find(x=>x.mes===ex.mes&&x.ano===ex.ano);
+            if(!nm)return;
+            if(nm.rReal){ex.rReal=nm.rReal;ex.dReal=nm.dReal;ex.resReal=nm.resReal;ex.canais=Object.assign({},ex.canais,nm.canais);ok++;}
+          });
+        }
+        if(wsVidal && window.data && window.data.plano && window.data.plano.VIDAL){
+          const m = extrairMeses(wsVidal,[{row:3,nome:'Loja Fisica'},{row:4,nome:'Mercado Livre'},{row:5,nome:'Shopee'}]);
+          window.data.plano.VIDAL.months.forEach((ex,idx)=>{
+            const nm=m.find(x=>x.mes===ex.mes&&x.ano===ex.ano);
+            if(!nm)return;
+            if(nm.rReal){ex.rReal=nm.rReal;ex.dReal=nm.dReal;ex.resReal=nm.resReal;ex.canais=Object.assign({},ex.canais,nm.canais);ok++;}
+          });
+        }
+        alert(`✅ Importação concluída — ${ok} meses atualizados (VIP + VIDAL)`);
+        if(typeof renderVendas==='function') renderVendas();
+        if(typeof renderVendasVidal==='function') renderVendasVidal();
+        if(typeof renderOrc==='function') renderOrc();
+      }catch(err){ alert('Erro: '+err.message); }
+      input.value='';
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
 })();
 
 loadData();
