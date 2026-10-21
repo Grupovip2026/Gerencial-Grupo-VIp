@@ -90,19 +90,11 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
 
 <!-- GERENCIAL -->
 <div id="page-gerencial" class="page active">
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap">
-    <div class="tabs" style="margin-bottom:0;flex:1">
-      <button class="tab active-vip" onclick="setCompany('VIP')">VIP MX</button>
-      <button class="tab" onclick="setCompany('VIDAL')">VIDAL</button>
-      <button class="tab" onclick="setCompany('V3')">V3</button>
-      <button class="tab" onclick="setCompany('GRUPO')">Grupo VIP</button>
-    </div>
-    <label id="ger-import-btn" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);color:#ccc;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap;transition:background .2s"
-      onmouseover="this.style.background='rgba(255,255,255,.12)'" onmouseout="this.style.background='rgba(255,255,255,.06)'">
-      📥 Importar Planilha
-      <input type="file" accept=".xlsx,.xls" style="display:none" onchange="gerImportarExcel(this)">
-    </label>
-    <span id="ger-import-status" style="font-size:11px;color:#555"></span>
+  <div class="tabs">
+    <button class="tab active-vip" onclick="setCompany('VIP')">VIP MX</button>
+    <button class="tab" onclick="setCompany('VIDAL')">VIDAL</button>
+    <button class="tab" onclick="setCompany('V3')">V3</button>
+    <button class="tab" onclick="setCompany('GRUPO')">Grupo VIP</button>
   </div>
   <div class="filter-bar">
     <span class="filter-label">Filtrar meses:</span>
@@ -121,14 +113,8 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
     <div class="chart-box"><div class="chart-title">Despesas por Categoria</div><div class="chart-wrap"><canvas id="cDespesas"></canvas></div></div>
     <div class="chart-box"><div class="chart-title">Canais de Venda</div><div class="chart-wrap"><canvas id="cCanais"></canvas></div></div>
   </div>
-  <div class="table-box" id="ger-detail-box">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-      <div class="chart-title" style="margin-bottom:0">Detalhamento · Receitas e Despesas</div>
-      <div style="display:flex;gap:6px">
-        <button id="ger-view-resumo" class="mes-btn sel-vip" onclick="gerSetView('resumo')">Resumo</button>
-        <button id="ger-view-detalhe" class="mes-btn" onclick="gerSetView('detalhe')">Linha a Linha</button>
-      </div>
-    </div>
+  <div class="table-box">
+    <div class="chart-title">Receitas e Despesas · Detalhamento Completo</div>
     <table id="ger-tbl"><tbody><tr><td class="loading">Carregando...</td></tr></tbody></table>
   </div>
 </div>
@@ -1659,18 +1645,6 @@ function gerToggle(i){if(gerSel.has(i)){if(gerSel.size===1)return;gerSel.delete(
 function gerAll(){gerSel=new Set((DATA.plano[gerCur]?.months||[]).map((_,i)=>i));buildGerFilter();renderGer()}
 function gerClear(){const m=DATA.plano[gerCur]?.months||[];const lr=m.reduce((l,x,i)=>x.rReal>0?i:l,0);gerSel=new Set([lr]);buildGerFilter();renderGer()}
 
-// gerencial view mode: 'resumo' | 'detalhe'
-let gerView = 'resumo';
-function gerSetView(v){
-  gerView=v;
-  document.getElementById('ger-view-resumo').className='mes-btn'+(v==='resumo'?' sel-vip':'');
-  document.getElementById('ger-view-detalhe').className='mes-btn'+(v==='detalhe'?' sel-vip':'');
-  renderGer();
-}
-
-// cache de detalhes importados da planilha: {VIP:{months:[{mes,linhas:[]}]}, VIDAL:..., V3:...}
-window.GER_DETAIL = {};
-
 function renderGer(){
   const co=DATA.plano[gerCur];if(!co)return;
   const months=(co.months||[]).filter((_,i)=>gerSel.has(i));
@@ -1698,241 +1672,59 @@ function renderGer(){
   const canais=Object.entries(cmap).map(([canal,v])=>({canal,...v})).filter(c=>c.prev>0||c.real>0);
   if(canais.length)mkChart('cCanais','bar',canais.map(c=>c.canal),[{label:'Previsto',data:canais.map(c=>c.prev),backgroundColor:'rgba(255,255,255,.1)',borderRadius:4},{label:'Realizado',data:canais.map(c=>c.real),backgroundColor:color,borderRadius:4}]);
 
-  // ── TABELA ──
-  if(gerView==='resumo'){
-    // Tabela resumida original
-    let html='<thead><tr><th>Mês</th><th>Rec. Prev.</th><th>Rec. Real.</th><th>Δ</th><th>Desp. Prev.</th><th>Desp. Real.</th><th>Res. Prev.</th><th>Res. Real.</th></tr></thead><tbody>';
-    let[srp,srr,sdp,sdr,srrp,srrr]=[0,0,0,0,0,0];
-    months.forEach(m=>{srp+=m.rPrev;srr+=m.rReal;sdp+=m.dPrev;sdr+=m.dReal;srrp+=m.resPrev;srrr+=m.resReal;const dr=pct(m.rReal,m.rPrev);
-      html+=`<tr><td>${m.mes}/${m.ano||26}</td><td class="dim">${fmt(m.rPrev)}</td><td class="neutral">${fmt(m.rReal)}</td><td class="${dr>=0?'pos':'neg'}">${fmtP(dr)}</td><td class="dim">${fmt(m.dPrev)}</td><td class="neutral">${fmt(m.dReal)}</td><td class="dim">${fmt(m.resPrev)}</td><td class="${m.resReal>=0?'pos':'neg'}">${fmt(m.resReal)}</td></tr>`;
-    });
-    html+=`<tr class="total-row"><td>TOTAL</td><td class="dim">${fmt(srp)}</td><td class="neutral">${fmt(srr)}</td><td class="${pct(srr,srp)>=0?'pos':'neg'}">${fmtP(pct(srr,srp))}</td><td class="dim">${fmt(sdp)}</td><td class="neutral">${fmt(sdr)}</td><td class="dim">${fmt(srrp)}</td><td class="${srrr>=0?'pos':'neg'}">${fmt(srrr)}</td></tr></tbody>`;
-    document.getElementById('ger-tbl').innerHTML=html;
-  } else {
-    // Tabela detalhada linha a linha
-    renderGerDetalhe(months, co);
-  }
-}
-
-function renderGerDetalhe(months, co){
-  const detail = window.GER_DETAIL[gerCur];
-  const mLabels = months.map(m=>m.mes+'/'+(m.ano||26));
-  const color = co.color;
-
-  // Se temos dados detalhados importados
-  if(detail && detail.length){
-    const filtrados = detail.filter(d=>months.some(m=>m.mes===d.mes&&(m.ano||2026)===d.ano));
-    if(!filtrados.length){ renderGerDetalheFallback(months,co); return; }
-
-    // Monta header com meses
-    let html=`<thead><tr><th style="text-align:left;min-width:220px">Item</th>`;
-    filtrados.forEach(d=>{ html+=`<th>${d.mes}/${d.ano.toString().slice(2)}</th>`; });
+  // ── TABELA DETALHADA (sempre visível) ──
+  {
+    const cols = months.length;
+    let html = `<thead><tr><th style="text-align:left;min-width:220px">Item</th>`;
+    months.forEach(m=>{ html+=`<th>${m.mes}/${(m.ano||2026).toString().slice(2)}</th>`; });
     html+=`<th>TOTAL</th></tr></thead><tbody>`;
 
-    // Linhas de receita
-    html+=`<tr class="section-head"><td colspan="${filtrados.length+2}">📈 RECEITA BRUTA</td></tr>`;
-    const recLinhas = filtrados[0].receitas.map(r=>r.nome);
-    recLinhas.forEach(nome=>{
-      const vals = filtrados.map(d=>(d.receitas.find(r=>r.nome===nome)||{val:0}).val);
-      const tot = vals.reduce((s,v)=>s+v,0);
-      if(!tot) return;
-      html+=`<tr style="font-size:12px">
-        <td style="padding-left:20px;color:#aaa">${nome}</td>
-        ${vals.map(v=>`<td class="${v>0?'pos':'dim'}">${v?fmt(v):'—'}</td>`).join('')}
-        <td class="pos" style="font-weight:600">${fmt(tot)}</td>
-      </tr>`;
-    });
-    // Total receita
-    const totRec = filtrados.map(d=>d.receitas.reduce((s,r)=>s+r.val,0));
-    html+=`<tr class="total-row"><td>Total Receita</td>${totRec.map(v=>`<td class="pos">${fmt(v)}</td>`).join('')}<td class="pos">${fmt(totRec.reduce((s,v)=>s+v,0))}</td></tr>`;
+    // ── RECEITA BRUTA ──
+    html+=`<tr class="section-head"><td colspan="${cols+2}">📈 RECEITA BRUTA</td></tr>`;
+    const todosCanais=[...new Set(months.flatMap(m=>Object.keys(m.canais||{})))];
+    let totRecArr = months.map(m=>m.rReal);
+    if(todosCanais.length){
+      todosCanais.forEach(canal=>{
+        const vals=months.map(m=>(m.canais?.[canal]?.real)||0);
+        const tot=vals.reduce((s,v)=>s+v,0);
+        if(!tot)return;
+        html+=`<tr style="font-size:12px"><td style="padding-left:20px;color:#aaa">${canal}</td>${vals.map(v=>`<td class="${v?'pos':'dim'}">${v?fmt(v):'—'}</td>`).join('')}<td class="pos" style="font-weight:600">${fmt(tot)}</td></tr>`;
+      });
+    }
+    const totRecSum=totRecArr.reduce((s,v)=>s+v,0);
+    html+=`<tr class="total-row"><td>Total Receita</td>${totRecArr.map(v=>`<td class="pos">${fmt(v)}</td>`).join('')}<td class="pos">${fmt(totRecSum)}</td></tr>`;
 
-    // Linhas de despesa
-    html+=`<tr class="section-head"><td colspan="${filtrados.length+2}">📉 DESPESAS</td></tr>`;
-    const despLinhas = filtrados[0].despesas.map(d=>d.nome);
-    despLinhas.forEach(nome=>{
-      const vals = filtrados.map(d=>(d.despesas.find(x=>x.nome===nome)||{val:0}).val);
-      const tot = vals.reduce((s,v)=>s+v,0);
-      if(!tot) return;
-      html+=`<tr style="font-size:12px">
-        <td style="padding-left:20px;color:#aaa">${nome}</td>
-        ${vals.map(v=>`<td class="${v>0?'neg':'dim'}">${v?fmt(v):'—'}</td>`).join('')}
-        <td class="neg" style="font-weight:600">${fmt(tot)}</td>
-      </tr>`;
-    });
-    // Total despesa
-    const totDesp = filtrados.map(d=>d.despesas.reduce((s,x)=>s+x.val,0));
-    html+=`<tr class="total-row"><td>Total Despesas</td>${totDesp.map(v=>`<td class="neg">${fmt(v)}</td>`).join('')}<td class="neg">${fmt(totDesp.reduce((s,v)=>s+v,0))}</td></tr>`;
+    // ── DESPESAS ──
+    html+=`<tr class="section-head"><td colspan="${cols+2}">📉 DESPESAS</td></tr>`;
+    // Coleta todas as categorias presentes em m.despesas
+    const todasCats=[...new Set(months.flatMap(m=>Object.keys(m.despesas||{})))];
+    let totDespArr=months.map(()=>0);
+    if(todasCats.length){
+      todasCats.forEach(cat=>{
+        const vals=months.map(m=>(m.despesas?.[cat])||0);
+        const tot=vals.reduce((s,v)=>s+v,0);
+        if(!tot)return;
+        vals.forEach((v,i)=>totDespArr[i]+=v);
+        html+=`<tr style="font-size:12px"><td style="padding-left:20px;color:#aaa">${cat}</td>${vals.map(v=>`<td class="${v?'neg':'dim'}">${v?fmt(v):'—'}</td>`).join('')}<td class="neg" style="font-weight:600">${fmt(tot)}</td></tr>`;
+      });
+    } else {
+      // Fallback: sem despesas detalhadas, mostra total
+      totDespArr=months.map(m=>m.dReal);
+      const tot=totDespArr.reduce((s,v)=>s+v,0);
+      html+=`<tr style="font-size:12px"><td style="padding-left:20px;color:#aaa">Total Despesas</td>${totDespArr.map(v=>`<td class="neg">${fmt(v)}</td>`).join('')}<td class="neg">${fmt(tot)}</td></tr>`;
+    }
+    const totDespSum=totDespArr.reduce((s,v)=>s+v,0);
+    html+=`<tr class="total-row"><td>Total Despesas</td>${totDespArr.map(v=>`<td class="neg">${fmt(v)}</td>`).join('')}<td class="neg">${fmt(totDespSum)}</td></tr>`;
 
-    // Resultado
-    html+=`<tr class="section-head"><td colspan="${filtrados.length+2}">💰 RESULTADO</td></tr>`;
-    const totRes = filtrados.map((d,i)=>totRec[i]-totDesp[i]);
-    html+=`<tr class="total-row highlight-row"><td>Resultado</td>${totRes.map(v=>`<td class="${v>=0?'pos':'neg'}" style="font-weight:700">${fmt(v)}</td>`).join('')}<td class="${totRes.reduce((s,v)=>s+v,0)>=0?'pos':'neg'}" style="font-weight:700">${fmt(totRes.reduce((s,v)=>s+v,0))}</td></tr>`;
+    // ── RESULTADO ──
+    html+=`<tr class="section-head"><td colspan="${cols+2}">💰 RESULTADO</td></tr>`;
+    const totResArr=months.map((m,i)=>m.resReal||(totRecArr[i]-totDespArr[i]));
+    const totResSum=totResArr.reduce((s,v)=>s+v,0);
+    html+=`<tr class="total-row highlight-row"><td>Resultado</td>${totResArr.map(v=>`<td class="${v>=0?'pos':'neg'}" style="font-weight:700">${fmt(v)}</td>`).join('')}<td class="${totResSum>=0?'pos':'neg'}" style="font-weight:700">${fmt(totResSum)}</td></tr>`;
     html+=`</tbody>`;
     document.getElementById('ger-tbl').innerHTML=html;
-  } else {
-    // Fallback: usa dados do data.json com canais
-    renderGerDetalheFallback(months, co);
   }
 }
-
-function renderGerDetalheFallback(months, co){
-  // Detalhe com canais do data.json + categorias da DRE quando disponíveis
-  const dreMonths=(DATA.dre[gerCur]?.months||[]);
-  const mLabels = months.map(m=>m.mes+'/'+(m.ano||26));
-  let html=`<thead><tr><th style="text-align:left;min-width:220px">Item</th>`;
-  mLabels.forEach(l=>{ html+=`<th>${l}</th>`; });
-  html+=`<th>TOTAL</th></tr></thead><tbody>`;
-
-  // RECEITAS
-  html+=`<tr class="section-head"><td colspan="${months.length+2}">📈 RECEITA BRUTA</td></tr>`;
-
-  // Canais de venda
-  const todosCanais=[...new Set(months.flatMap(m=>Object.keys(m.canais||{})))];
-  if(todosCanais.length){
-    todosCanais.forEach(canal=>{
-      const vals=months.map(m=>(m.canais?.[canal]?.real)||0);
-      const tot=vals.reduce((s,v)=>s+v,0);
-      if(!tot)return;
-      html+=`<tr style="font-size:12px"><td style="padding-left:20px;color:#aaa">${canal}</td>${vals.map(v=>`<td class="${v?'pos':'dim'}">${v?fmt(v):'—'}</td>`).join('')}<td class="pos" style="font-weight:600">${fmt(tot)}</td></tr>`;
-    });
-  }
-  const totRec=months.map(m=>m.rReal);
-  html+=`<tr class="total-row"><td>Total Receita</td>${totRec.map(v=>`<td class="pos">${fmt(v)}</td>`).join('')}<td class="pos">${fmt(totRec.reduce((s,v)=>s+v,0))}</td></tr>`;
-
-  // DESPESAS por categoria da DRE (se existir) ou genérico
-  html+=`<tr class="section-head"><td colspan="${months.length+2}">📉 DESPESAS</td></tr>`;
-  const despCats=[
-    {label:'Matéria Prima / CMV',  fields:['cmv','dMateria']},
-    {label:'Taxas de Plataforma',  fields:['dTaxas']},
-    {label:'Impostos',             fields:['impostos','dImpostos']},
-    {label:'Pessoal',              fields:['dPessoal']},
-    {label:'Devoluções / Cancel.', fields:['devolucoes','dCancelamentos']},
-    {label:'Marketing',            fields:['dMarketing']},
-    {label:'Financiamentos',       fields:['dFinanc','dFinanciamentos']},
-    {label:'Despesas Gerais',      fields:['dGerais','dOutras']},
-    {label:'Tecnologia',           fields:['dTec','dTecnologia']},
-    {label:'Consultorias',         fields:['dConsult']},
-  ];
-  let totDespArr=months.map(()=>0);
-  despCats.forEach(({label,fields})=>{
-    // Busca primeiro na DRE, depois no plano
-    const getVal=(m,mi)=>{
-      const dm=dreMonths.find(d=>d.mes===m.mes);
-      for(const f of fields){
-        const v=(dm&&dm[f])||m[f]||0;
-        if(v) return v;
-      }
-      return 0;
-    };
-    const vals=months.map((m,i)=>getVal(m,i));
-    const tot=vals.reduce((s,v)=>s+v,0);
-    if(!tot)return;
-    vals.forEach((v,i)=>totDespArr[i]+=v);
-    html+=`<tr style="font-size:12px"><td style="padding-left:20px;color:#aaa">${label}</td>${vals.map(v=>`<td class="${v?'neg':'dim'}">${v?fmt(v):'—'}</td>`).join('')}<td class="neg" style="font-weight:600">${fmt(tot)}</td></tr>`;
-  });
-  // Se não encontrou nenhuma categoria detalhada, mostra total simples
-  const somaDespCat=totDespArr.reduce((s,v)=>s+v,0);
-  if(!somaDespCat){
-    const vals=months.map(m=>m.dReal);
-    totDespArr=vals;
-    html+=`<tr style="font-size:12px"><td style="padding-left:20px;color:#aaa">Total Despesas</td>${vals.map(v=>`<td class="neg">${fmt(v)}</td>`).join('')}<td class="neg">${fmt(vals.reduce((s,v)=>s+v,0))}</td></tr>`;
-  }
-  html+=`<tr class="total-row"><td>Total Despesas</td>${totDespArr.map(v=>`<td class="neg">${fmt(v)}</td>`).join('')}<td class="neg">${fmt(totDespArr.reduce((s,v)=>s+v,0))}</td></tr>`;
-
-  // RESULTADO
-  html+=`<tr class="section-head"><td colspan="${months.length+2}">💰 RESULTADO</td></tr>`;
-  const totRes=months.map((m,i)=>m.resReal||(totRec[i]-totDespArr[i]));
-  html+=`<tr class="total-row highlight-row"><td>Resultado</td>${totRes.map(v=>`<td class="${v>=0?'pos':'neg'}" style="font-weight:700">${fmt(v)}</td>`).join('')}<td class="${totRes.reduce((s,v)=>s+v,0)>=0?'pos':'neg'}" style="font-weight:700">${fmt(totRes.reduce((s,v)=>s+v,0))}</td></tr>`;
-  html+=`</tbody>`;
-  document.getElementById('ger-tbl').innerHTML=html;
-}
-
-// ── Importar planilha no Gerencial ────────────────────────────────────────────
-window.gerImportarExcel = function(input){
-  const file = input.files[0];
-  if(!file) return;
-  const status = document.getElementById('ger-import-status');
-  status.textContent = '⏳ Lendo…';
-  const reader = new FileReader();
-  reader.onload = function(e){
-    try{
-      const wb = XLSX.read(new Uint8Array(e.target.result), {type:'array'});
-      const ABAS = {
-        VIP:   {nome:'PLANO ORÇAMENTARIO - VIP',
-                receitas:['VENDAS MERCADO LIVRE  - VIP MX','VENDAS AMAZON - VIP MX','VENDAS SHOPEE  - VIP MX','RENDIMENTOS'],
-                despesas:['Despesas de pessoal','Consultorias e acessorias','Despesas gerais','Tecnologia','Despesas de materia prima','Despesas de vendas','Despesas de marketing','Impostos Retido de Terceiro','Impostos','Despesas financeiras','Taxas plataforma','Cancelamentos e Remmbolso','Financiamentos ']},
-        VIDAL: {nome:'PLANO ORÇAMENTARIO - VIDAL',
-                receitas:['VENDAS LOJA FISICA ','VENDAS MERCADO LIVRE - VIDAL ','VENDAS SHOPEE - VIDAL ','RENDIMENTOS'],
-                despesas:['Despesas de pessoal','Consultorias e acessorias','Despesas gerais','Tecnologia','Despesas de materia prima','Despesas de vendas','Despesas de marketing','Impostos Retido de Terceiro','Impostos','Despesas financeiras','Taxas plataforma','Cancelamentos e Remmbolso','Financiamentos ']},
-        V3:    {nome:'PLANO ORÇAMENTARIO - V3',
-                receitas:['VENDAS MERCADO LIVRE - V3','RENDIMENTOS'],
-                despesas:['Despesas de pessoal','Consultorias e acessorias','Despesas gerais','Tecnologia','Despesas de materia prima','Despesas de vendas','Despesas de marketing','Impostos Retido de Terceiro','Impostos','Despesas financeiras','Taxas plataforma','Cancelamentos e Remmbolso','Financiamentos ']}
-      };
-      const MESES_MAP=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-      window.GER_DETAIL = {};
-      let totalAbas = 0;
-
-      Object.entries(ABAS).forEach(([empresa,cfg])=>{
-        const wsKey = Object.keys(wb.Sheets).find(k=>k.toLowerCase().replace(/\s+/g,' ').includes(cfg.nome.toLowerCase().split(' - ')[1].toLowerCase()));
-        if(!wsKey) return;
-        const ws = wb.Sheets[wsKey];
-        const arr = XLSX.utils.sheet_to_json(ws,{header:1,defval:null,raw:true});
-
-        // Row 1 (index 1) = datas nas colunas C+ (índice 2+)
-        const dataCols = [];
-        const row1 = arr[1]||[];
-        for(let ci=2;ci<row1.length;ci++){
-          const d=row1[ci];
-          if(!d)continue;
-          let dt; if(d instanceof Date)dt=d; else if(typeof d==='number')dt=new Date((d-25569)*86400000); else if(typeof d==='string')dt=new Date(d);
-          if(!dt||isNaN(dt.getTime()))continue;
-          dataCols.push({ci, mes:MESES_MAP[dt.getMonth()], ano:dt.getFullYear()});
-        }
-
-        // Mapeia nome de linha → índice de row
-        const rowMap={};
-        arr.forEach((row,ri)=>{ if(row&&row[0])rowMap[row[0].toString().trim()]=ri; });
-
-        const parseV=v=>{
-          if(v===null||v===undefined)return 0;
-          if(typeof v==='number')return v;
-          if(typeof v==='string'&&v.startsWith('='))return 0; // fórmula não calculada
-          const n=parseFloat(String(v).replace(/[R$\s]/g,'').replace(',','.'));
-          return isNaN(n)?0:n;
-        };
-
-        window.GER_DETAIL[empresa]=dataCols.map(dc=>{
-          const getRow=(nome)=>{
-            // Busca exata ou fuzzy
-            const exact=rowMap[nome.trim()];
-            if(exact!==undefined)return arr[exact]||[];
-            // fuzzy
-            const key=Object.keys(rowMap).find(k=>k.toLowerCase().includes(nome.toLowerCase().replace(/\s+/g,' ').trim().slice(0,12)));
-            return key!==undefined?(arr[rowMap[key]]||[]):[];
-          };
-          const receitas=cfg.receitas.map(nome=>{
-            const row=getRow(nome);
-            return {nome:nome.replace(/ - VIP MX| - VIDAL | - V3/g,'').replace(/  +/g,' ').trim(), val:Math.abs(parseV(row[dc.ci]))};
-          }).filter(r=>r.val>0);
-          const despesas=cfg.despesas.map(nome=>{
-            const row=getRow(nome);
-            return {nome:nome.trim(), val:Math.abs(parseV(row[dc.ci]))};
-          }).filter(d=>d.val>0);
-          return {mes:dc.mes, ano:dc.ano, receitas, despesas};
-        });
-        totalAbas++;
-      });
-
-      status.textContent = `✅ ${totalAbas} empresas carregadas`;
-      gerSetView('detalhe');
-    }catch(err){
-      status.textContent='❌ Erro: '+err.message;
-      console.error(err);
-    }
-    input.value='';
-  };
-  reader.readAsArrayBuffer(file);
-};
 
 // ── DRE ───────────────────────────────────────────────────────────────────────
 function setDre(k){
