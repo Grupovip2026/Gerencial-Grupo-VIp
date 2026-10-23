@@ -1,0 +1,2182 @@
+{
+  "gerado_em": "23/10/2026 17:58",
+  "fonte": "Resultado Gerencial 2026.xlsx",
+  "dre": {
+    "VIP": {
+      "color": "#00C9A7",
+      "accent": "#00856E",
+      "label": "VIP MX",
+      "months": [
+        {
+          "mes": "Jan",
+          "mes_num": 1,
+          "ano": 2026,
+          "order": 202601,
+          "rBruta": 435355.47,
+          "devolucoes": 35767.6,
+          "impostos": 33357.43,
+          "rLiquida": 366230.44,
+          "cmv": 195909.9615,
+          "lucroBruto": 170320.4785,
+          "dPessoal": 7653.709999999999,
+          "dMarketing": 0.0,
+          "dTaxas": 100405.73,
+          "dFinanc": 6602.0,
+          "dOutras": 1850.0,
+          "ebitda": 53809.03850000001,
+          "depreciacao": 1500.0,
+          "ebit": 52309.03850000001,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Fev",
+          "mes_num": 2,
+          "ano": 2026,
+          "order": 202602,
+          "rBruta": 363193.79000000004,
+          "devolucoes": 32416.02,
+          "impostos": 26547.95,
+          "rLiquida": 304229.82,
+          "cmv": 163437.2055,
+          "lucroBruto": 140792.6145,
+          "dPessoal": 7018.77,
+          "dMarketing": 0.0,
+          "dTaxas": 85892.13,
+          "dFinanc": 6602.0,
+          "dOutras": 2390.0,
+          "ebitda": 38889.7145,
+          "depreciacao": 1500.0,
+          "ebit": 37389.7145,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Mar",
+          "mes_num": 3,
+          "ano": 2026,
+          "order": 202603,
+          "rBruta": 446257.54000000004,
+          "devolucoes": 37449.16,
+          "impostos": 35210.91,
+          "rLiquida": 373597.47,
+          "cmv": 200815.893,
+          "lucroBruto": 172781.57699999996,
+          "dPessoal": 7455.63,
+          "dMarketing": 0.0,
+          "dTaxas": 105426.96,
+          "dFinanc": 6602.0,
+          "dOutras": 1850.0,
+          "ebitda": 51446.98699999995,
+          "depreciacao": 1500.0,
+          "ebit": 49946.98699999995,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Abr",
+          "mes_num": 4,
+          "ano": 2026,
+          "order": 202604,
+          "rBruta": 545913.33,
+          "devolucoes": 48939.5,
+          "impostos": 40028.439999999995,
+          "rLiquida": 456945.38999999996,
+          "cmv": 245660.9985,
+          "lucroBruto": 211284.39149999997,
+          "dPessoal": 8585.04,
+          "dMarketing": 0.0,
+          "dTaxas": 78212.99,
+          "dFinanc": 6602.0,
+          "dOutras": 1890.0,
+          "ebitda": 115994.36149999996,
+          "depreciacao": 1500.0,
+          "ebit": 114494.36149999996,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Mai",
+          "mes_num": 5,
+          "ano": 2026,
+          "order": 202605,
+          "rBruta": 415605.02999999997,
+          "devolucoes": 36483.87,
+          "impostos": 35000.0,
+          "rLiquida": 344121.16,
+          "cmv": 187022.2635,
+          "lucroBruto": 157098.89649999997,
+          "dPessoal": 8585.04,
+          "dMarketing": 0.0,
+          "dTaxas": 94505.92000000001,
+          "dFinanc": 6602.0,
+          "dOutras": 1890.0,
+          "ebitda": 45515.93649999995,
+          "depreciacao": 1500.0,
+          "ebit": 44015.93649999995,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Jun",
+          "mes_num": 6,
+          "ano": 2026,
+          "order": 202606,
+          "rBruta": 404628.91,
+          "devolucoes": 41482.2,
+          "impostos": 37601.78,
+          "rLiquida": 325544.92999999993,
+          "cmv": 182083.0095,
+          "lucroBruto": 143461.92049999995,
+          "dPessoal": 8441.460000000001,
+          "dMarketing": 780.0,
+          "dTaxas": 88248.43,
+          "dFinanc": 6602.0,
+          "dOutras": 1890.0,
+          "ebitda": 38280.030499999964,
+          "depreciacao": 1500.0,
+          "ebit": 36780.030499999964,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Jul",
+          "mes_num": 7,
+          "ano": 2026,
+          "order": 202607,
+          "rBruta": 447245.34,
+          "devolucoes": 45344.68,
+          "impostos": 35779.6272,
+          "rLiquida": 366121.03280000004,
+          "cmv": 201260.40300000002,
+          "lucroBruto": 164860.62980000002,
+          "dPessoal": 7455.63,
+          "dMarketing": 780.0,
+          "dTaxas": 98967.57,
+          "dFinanc": 6602.0,
+          "dOutras": 1890.0,
+          "ebitda": 49945.42980000001,
+          "depreciacao": 1500.0,
+          "ebit": 48445.42980000001,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Ago",
+          "mes_num": 8,
+          "ano": 2026,
+          "order": 202608,
+          "rBruta": 443219.91,
+          "devolucoes": 68856.0,
+          "impostos": 35457.5928,
+          "rLiquida": 338906.3172,
+          "cmv": 199448.9595,
+          "lucroBruto": 139457.3577,
+          "dPessoal": 8441.460000000001,
+          "dMarketing": 780.0,
+          "dTaxas": 100972.8,
+          "dFinanc": 6602.0,
+          "dOutras": 1890.0,
+          "ebitda": 21551.097699999984,
+          "depreciacao": 1500.0,
+          "ebit": 20051.097699999984,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Set",
+          "mes_num": 9,
+          "ano": 2026,
+          "order": 202609,
+          "rBruta": 340375.31,
+          "devolucoes": 45524.0,
+          "impostos": 27230.0248,
+          "rLiquida": 267621.2852,
+          "cmv": 153168.8895,
+          "lucroBruto": 114452.3957,
+          "dPessoal": 8441.460000000001,
+          "dMarketing": 780.0,
+          "dTaxas": 76953.36,
+          "dFinanc": 6602.0,
+          "dOutras": 1890.0,
+          "ebitda": 20565.575699999987,
+          "depreciacao": 1500.0,
+          "ebit": 19065.575699999987,
+          "lucroLiquido": 0.0
+        }
+      ]
+    },
+    "VIDAL": {
+      "color": "#6C63FF",
+      "accent": "#4B44CC",
+      "label": "VIDAL",
+      "months": [
+        {
+          "mes": "Jan",
+          "mes_num": 1,
+          "ano": 2026,
+          "order": 202601,
+          "rBruta": 196570.68000000002,
+          "devolucoes": 16052.56,
+          "impostos": 8842.69,
+          "rLiquida": 171675.43000000002,
+          "cmv": 88456.80600000001,
+          "lucroBruto": 83218.62400000001,
+          "dPessoal": 17178.31,
+          "dMarketing": 0.0,
+          "dTaxas": 22834.91,
+          "dFinanc": 0.0,
+          "dOutras": 6253.0,
+          "ebitda": 36952.40400000001,
+          "depreciacao": 0.0,
+          "ebit": 36952.40400000001,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Fev",
+          "mes_num": 2,
+          "ano": 2026,
+          "order": 202602,
+          "rBruta": 167144.25999999998,
+          "devolucoes": 15713.91,
+          "impostos": 8921.699999999999,
+          "rLiquida": 142508.64999999997,
+          "cmv": 75214.91699999999,
+          "lucroBruto": 67293.73299999998,
+          "dPessoal": 17178.31,
+          "dMarketing": 0.0,
+          "dTaxas": 32636.18,
+          "dFinanc": 0.0,
+          "dOutras": 9273.0,
+          "ebitda": 8206.24299999998,
+          "depreciacao": 0.0,
+          "ebit": 8206.24299999998,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Mar",
+          "mes_num": 3,
+          "ano": 2026,
+          "order": 202603,
+          "rBruta": 229018.47,
+          "devolucoes": 16504.29,
+          "impostos": 10958.27,
+          "rLiquida": 201555.91,
+          "cmv": 103058.3115,
+          "lucroBruto": 98497.59850000001,
+          "dPessoal": 17978.31,
+          "dMarketing": 0.0,
+          "dTaxas": 39540.71,
+          "dFinanc": 0.0,
+          "dOutras": 5722.0,
+          "ebitda": 35256.57850000001,
+          "depreciacao": 0.0,
+          "ebit": 35256.57850000001,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Abr",
+          "mes_num": 4,
+          "ano": 2026,
+          "order": 202604,
+          "rBruta": 251047.64,
+          "devolucoes": 22130.3,
+          "impostos": 11197.46,
+          "rLiquida": 217719.88000000003,
+          "cmv": 112971.43800000001,
+          "lucroBruto": 104748.44200000002,
+          "dPessoal": 18276.91,
+          "dMarketing": 0.0,
+          "dTaxas": 45916.149999999994,
+          "dFinanc": 0.0,
+          "dOutras": 7330.0,
+          "ebitda": 33225.38200000003,
+          "depreciacao": 0.0,
+          "ebit": 33225.38200000003,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Mai",
+          "mes_num": 5,
+          "ano": 2026,
+          "order": 202605,
+          "rBruta": 249143.27,
+          "devolucoes": 20306.36,
+          "impostos": 12220.29,
+          "rLiquida": 216616.61999999997,
+          "cmv": 112114.4715,
+          "lucroBruto": 104502.14849999997,
+          "dPessoal": 19613.31,
+          "dMarketing": 0.0,
+          "dTaxas": 45920.21,
+          "dFinanc": 0.0,
+          "dOutras": 7265.5599999999995,
+          "ebitda": 31703.068499999972,
+          "depreciacao": 0.0,
+          "ebit": 31703.068499999972,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Jun",
+          "mes_num": 6,
+          "ano": 2026,
+          "order": 202606,
+          "rBruta": 209719.42,
+          "devolucoes": 17831.35,
+          "impostos": 8786.62,
+          "rLiquida": 183101.45,
+          "cmv": 94373.739,
+          "lucroBruto": 88727.71100000001,
+          "dPessoal": 19753.78,
+          "dMarketing": 0.0,
+          "dTaxas": 31871.32,
+          "dFinanc": 0.0,
+          "dOutras": 6911.91,
+          "ebitda": 30190.701000000012,
+          "depreciacao": 0.0,
+          "ebit": 30190.701000000012,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Jul",
+          "mes_num": 7,
+          "ano": 2026,
+          "order": 202607,
+          "rBruta": 258689.12,
+          "devolucoes": 17138.28,
+          "impostos": 14859.2992,
+          "rLiquida": 226691.5408,
+          "cmv": 116410.104,
+          "lucroBruto": 110281.43679999998,
+          "dPessoal": 19009.309999999998,
+          "dMarketing": 0.0,
+          "dTaxas": 42097.61,
+          "dFinanc": 0.0,
+          "dOutras": 8161.91,
+          "ebitda": 41012.60679999998,
+          "depreciacao": 0.0,
+          "ebit": 41012.60679999998,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Ago",
+          "mes_num": 8,
+          "ano": 2026,
+          "order": 202608,
+          "rBruta": 281032.88,
+          "devolucoes": 20859.8566,
+          "impostos": 17864.948,
+          "rLiquida": 242308.0754,
+          "cmv": 126464.796,
+          "lucroBruto": 115843.2794,
+          "dPessoal": 19009.309999999998,
+          "dMarketing": 0.0,
+          "dTaxas": 47408.765,
+          "dFinanc": 0.0,
+          "dOutras": 8161.91,
+          "ebitda": 41263.2944,
+          "depreciacao": 0.0,
+          "ebit": 41263.2944,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Set",
+          "mes_num": 9,
+          "ano": 2026,
+          "order": 202609,
+          "rBruta": 250324.58,
+          "devolucoes": 16539.5923,
+          "impostos": 14848.2728,
+          "rLiquida": 218936.7149,
+          "cmv": 112646.061,
+          "lucroBruto": 106290.65389999999,
+          "dPessoal": 19009.309999999998,
+          "dMarketing": 0.0,
+          "dTaxas": 37589.9825,
+          "dFinanc": 0.0,
+          "dOutras": 8161.91,
+          "ebitda": 41529.45139999999,
+          "depreciacao": 0.0,
+          "ebit": 41529.45139999999,
+          "lucroLiquido": 0.0
+        }
+      ]
+    },
+    "V3": {
+      "color": "#FF6B6B",
+      "accent": "#CC4444",
+      "label": "V3",
+      "months": [
+        {
+          "mes": "Jan",
+          "mes_num": 1,
+          "ano": 2026,
+          "order": 202601,
+          "rBruta": 2706.0,
+          "devolucoes": 0.0,
+          "impostos": 0.0,
+          "rLiquida": 2706.0,
+          "cmv": 1217.7,
+          "lucroBruto": 1488.3,
+          "dPessoal": 0.0,
+          "dMarketing": 0.0,
+          "dTaxas": 578.0,
+          "dFinanc": 0.0,
+          "dOutras": 0.0,
+          "ebitda": 910.3,
+          "depreciacao": 0.0,
+          "ebit": 910.3,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Fev",
+          "mes_num": 2,
+          "ano": 2026,
+          "order": 202602,
+          "rBruta": 3774.1,
+          "devolucoes": 330.47,
+          "impostos": 0.0,
+          "rLiquida": 3443.63,
+          "cmv": 1698.345,
+          "lucroBruto": 1745.285,
+          "dPessoal": 0.0,
+          "dMarketing": 0.0,
+          "dTaxas": 671.91,
+          "dFinanc": 0.0,
+          "dOutras": 0.0,
+          "ebitda": 1073.375,
+          "depreciacao": 0.0,
+          "ebit": 1073.375,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Mar",
+          "mes_num": 3,
+          "ano": 2026,
+          "order": 202603,
+          "rBruta": 3913.0,
+          "devolucoes": 0.0,
+          "impostos": 0.0,
+          "rLiquida": 3913.0,
+          "cmv": 1760.8500000000001,
+          "lucroBruto": 2152.1499999999996,
+          "dPessoal": 0.0,
+          "dMarketing": 0.0,
+          "dTaxas": 1205.54,
+          "dFinanc": 0.0,
+          "dOutras": 0.0,
+          "ebitda": 946.6099999999997,
+          "depreciacao": 0.0,
+          "ebit": 946.6099999999997,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Abr",
+          "mes_num": 4,
+          "ano": 2026,
+          "order": 202604,
+          "rBruta": 3918.0,
+          "devolucoes": 286.5,
+          "impostos": 0.0,
+          "rLiquida": 3631.5,
+          "cmv": 1763.1000000000001,
+          "lucroBruto": 1868.3999999999999,
+          "dPessoal": 0.0,
+          "dMarketing": 0.0,
+          "dTaxas": 1118.0,
+          "dFinanc": 0.0,
+          "dOutras": 0.0,
+          "ebitda": 750.3999999999999,
+          "depreciacao": 0.0,
+          "ebit": 750.3999999999999,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Mai",
+          "mes_num": 5,
+          "ano": 2026,
+          "order": 202605,
+          "rBruta": 4883.87,
+          "devolucoes": 638.74,
+          "impostos": 0.0,
+          "rLiquida": 4245.13,
+          "cmv": 2197.7415,
+          "lucroBruto": 2047.3885,
+          "dPessoal": 0.0,
+          "dMarketing": 0.0,
+          "dTaxas": 1509.68,
+          "dFinanc": 0.0,
+          "dOutras": 0.0,
+          "ebitda": 537.7085,
+          "depreciacao": 0.0,
+          "ebit": 537.7085,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Jun",
+          "mes_num": 6,
+          "ano": 2026,
+          "order": 202606,
+          "rBruta": 2998.14,
+          "devolucoes": 801.85,
+          "impostos": 0.0,
+          "rLiquida": 2196.29,
+          "cmv": 1349.163,
+          "lucroBruto": 847.127,
+          "dPessoal": 0.0,
+          "dMarketing": 0.0,
+          "dTaxas": 850.98,
+          "dFinanc": 0.0,
+          "dOutras": 0.0,
+          "ebitda": -3.8530000000000655,
+          "depreciacao": 0.0,
+          "ebit": -3.8530000000000655,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Jul",
+          "mes_num": 7,
+          "ano": 2026,
+          "order": 202607,
+          "rBruta": 3806.95,
+          "devolucoes": 526.15,
+          "impostos": 0.0,
+          "rLiquida": 3280.7999999999997,
+          "cmv": 1713.1275,
+          "lucroBruto": 1567.6724999999997,
+          "dPessoal": 0.0,
+          "dMarketing": 0.0,
+          "dTaxas": 1309.18,
+          "dFinanc": 0.0,
+          "dOutras": 0.0,
+          "ebitda": 258.4924999999996,
+          "depreciacao": 0.0,
+          "ebit": 258.4924999999996,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Ago",
+          "mes_num": 8,
+          "ano": 2026,
+          "order": 202608,
+          "rBruta": 6840.84,
+          "devolucoes": 1390.14,
+          "impostos": 0.0,
+          "rLiquida": 5450.7,
+          "cmv": 3078.378,
+          "lucroBruto": 2372.3219999999997,
+          "dPessoal": 0.0,
+          "dMarketing": 0.0,
+          "dTaxas": 1715.37,
+          "dFinanc": 0.0,
+          "dOutras": 0.0,
+          "ebitda": 656.9519999999998,
+          "depreciacao": 0.0,
+          "ebit": 656.9519999999998,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Set",
+          "mes_num": 9,
+          "ano": 2026,
+          "order": 202609,
+          "rBruta": 5797.08,
+          "devolucoes": 53.16,
+          "impostos": 0.0,
+          "rLiquida": 5743.92,
+          "cmv": 2608.686,
+          "lucroBruto": 3135.234,
+          "dPessoal": 0.0,
+          "dMarketing": 0.0,
+          "dTaxas": 1542.46,
+          "dFinanc": 0.0,
+          "dOutras": 0.0,
+          "ebitda": 1592.774,
+          "depreciacao": 0.0,
+          "ebit": 1592.774,
+          "lucroLiquido": 0.0
+        }
+      ]
+    },
+    "GRUPO": {
+      "color": "#F5A623",
+      "accent": "#C47D0E",
+      "label": "Grupo VIP",
+      "months": [
+        {
+          "mes": "Jan",
+          "mes_num": 1,
+          "ano": 2026,
+          "order": 202601,
+          "rBruta": 634632.15,
+          "devolucoes": 51820.159999999996,
+          "impostos": 42200.12,
+          "rLiquida": 540611.87,
+          "cmv": 285584.4675,
+          "lucroBruto": 255027.4025,
+          "dPessoal": 24832.02,
+          "dMarketing": 0.0,
+          "dTaxas": 123818.64,
+          "dFinanc": 6602.0,
+          "dOutras": 8103.0,
+          "ebitda": 91671.74250000002,
+          "depreciacao": 1500.0,
+          "ebit": 90171.74250000002,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Fev",
+          "mes_num": 2,
+          "ano": 2026,
+          "order": 202602,
+          "rBruta": 534112.15,
+          "devolucoes": 48460.4,
+          "impostos": 35469.65,
+          "rLiquida": 450182.1,
+          "cmv": 240350.4675,
+          "lucroBruto": 209831.63249999998,
+          "dPessoal": 24197.08,
+          "dMarketing": 0.0,
+          "dTaxas": 119200.22,
+          "dFinanc": 6602.0,
+          "dOutras": 11663.0,
+          "ebitda": 48169.33249999998,
+          "depreciacao": 1500.0,
+          "ebit": 46669.33249999998,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Mar",
+          "mes_num": 3,
+          "ano": 2026,
+          "order": 202603,
+          "rBruta": 679189.01,
+          "devolucoes": 53953.450000000004,
+          "impostos": 46169.18000000001,
+          "rLiquida": 579066.38,
+          "cmv": 305635.05449999997,
+          "lucroBruto": 273431.3255,
+          "dPessoal": 25433.940000000002,
+          "dMarketing": 0.0,
+          "dTaxas": 146173.21000000002,
+          "dFinanc": 6602.0,
+          "dOutras": 7572.0,
+          "ebitda": 87650.17549999997,
+          "depreciacao": 1500.0,
+          "ebit": 86150.17549999997,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Abr",
+          "mes_num": 4,
+          "ano": 2026,
+          "order": 202604,
+          "rBruta": 800878.97,
+          "devolucoes": 71356.3,
+          "impostos": 51225.899999999994,
+          "rLiquida": 678296.77,
+          "cmv": 360395.5365,
+          "lucroBruto": 317901.23350000003,
+          "dPessoal": 26861.95,
+          "dMarketing": 0.0,
+          "dTaxas": 125247.14,
+          "dFinanc": 6602.0,
+          "dOutras": 9220.0,
+          "ebitda": 149970.14349999998,
+          "depreciacao": 1500.0,
+          "ebit": 148470.14349999998,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Mai",
+          "mes_num": 5,
+          "ano": 2026,
+          "order": 202605,
+          "rBruta": 669632.1699999999,
+          "devolucoes": 57428.97,
+          "impostos": 47220.29,
+          "rLiquida": 564982.9099999999,
+          "cmv": 301334.4765,
+          "lucroBruto": 263648.4334999999,
+          "dPessoal": 28198.350000000002,
+          "dMarketing": 0.0,
+          "dTaxas": 141935.81,
+          "dFinanc": 6602.0,
+          "dOutras": 9155.56,
+          "ebitda": 77756.71349999991,
+          "depreciacao": 1500.0,
+          "ebit": 76256.71349999991,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Jun",
+          "mes_num": 6,
+          "ano": 2026,
+          "order": 202606,
+          "rBruta": 617346.47,
+          "devolucoes": 60115.399999999994,
+          "impostos": 46388.4,
+          "rLiquida": 510842.6699999999,
+          "cmv": 277805.9115,
+          "lucroBruto": 233036.75849999997,
+          "dPessoal": 28195.239999999998,
+          "dMarketing": 780.0,
+          "dTaxas": 120970.73,
+          "dFinanc": 6602.0,
+          "dOutras": 8801.91,
+          "ebitda": 68466.87849999998,
+          "depreciacao": 1500.0,
+          "ebit": 66966.87849999998,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Jul",
+          "mes_num": 7,
+          "ano": 2026,
+          "order": 202607,
+          "rBruta": 709741.4099999999,
+          "devolucoes": 63009.11,
+          "impostos": 50638.926400000004,
+          "rLiquida": 596093.3736,
+          "cmv": 319383.63450000004,
+          "lucroBruto": 276709.7391,
+          "dPessoal": 26464.94,
+          "dMarketing": 780.0,
+          "dTaxas": 142374.36,
+          "dFinanc": 6602.0,
+          "dOutras": 10051.91,
+          "ebitda": 91216.52909999999,
+          "depreciacao": 1500.0,
+          "ebit": 89716.52909999999,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Ago",
+          "mes_num": 8,
+          "ano": 2026,
+          "order": 202608,
+          "rBruta": 731093.63,
+          "devolucoes": 91105.9966,
+          "impostos": 53322.5408,
+          "rLiquida": 586665.0926,
+          "cmv": 328992.1335,
+          "lucroBruto": 257672.95909999998,
+          "dPessoal": 27450.769999999997,
+          "dMarketing": 780.0,
+          "dTaxas": 150096.935,
+          "dFinanc": 6602.0,
+          "dOutras": 10051.91,
+          "ebitda": 63471.34409999998,
+          "depreciacao": 1500.0,
+          "ebit": 61971.34409999998,
+          "lucroLiquido": 0.0
+        },
+        {
+          "mes": "Set",
+          "mes_num": 9,
+          "ano": 2026,
+          "order": 202609,
+          "rBruta": 596496.97,
+          "devolucoes": 62116.75230000001,
+          "impostos": 42078.2976,
+          "rLiquida": 492301.92009999993,
+          "cmv": 268423.63649999996,
+          "lucroBruto": 223878.28359999997,
+          "dPessoal": 27450.769999999997,
+          "dMarketing": 780.0,
+          "dTaxas": 116085.8025,
+          "dFinanc": 6602.0,
+          "dOutras": 10051.91,
+          "ebitda": 63687.801099999975,
+          "depreciacao": 1500.0,
+          "ebit": 62187.801099999975,
+          "lucroLiquido": 0.0
+        }
+      ]
+    }
+  },
+  "plano": {
+    "VIP": {
+      "color": "#00C9A7",
+      "accent": "#00856E",
+      "label": "VIP MX",
+      "months": [
+        {
+          "mes": "Jan",
+          "ano": 2026,
+          "mes_num": 1,
+          "order": 202601,
+          "rPrev": 0,
+          "rReal": 435355.47,
+          "dPrev": 0,
+          "dReal": 439765.25,
+          "resPrev": 0,
+          "resReal": -4409.780000000028,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 0,
+              "real": 413271.86
+            },
+            "Shopee": {
+              "prev": 0,
+              "real": 11860.57
+            },
+            "Amazon": {
+              "prev": 0,
+              "real": 10223.04
+            }
+          }
+        },
+        {
+          "mes": "Fev",
+          "ano": 2026,
+          "mes_num": 2,
+          "order": 202602,
+          "rPrev": 0,
+          "rReal": 363193.79000000004,
+          "dPrev": 0,
+          "dReal": 389391.98,
+          "resPrev": 0,
+          "resReal": -26198.189999999944,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 0,
+              "real": 347450.9
+            },
+            "Shopee": {
+              "prev": 0,
+              "real": 15742.89
+            }
+          }
+        },
+        {
+          "mes": "Mar",
+          "ano": 2026,
+          "mes_num": 3,
+          "order": 202603,
+          "rPrev": 0,
+          "rReal": 446257.54000000004,
+          "dPrev": 0,
+          "dReal": 464461.03,
+          "resPrev": 0,
+          "resReal": -18203.48999999999,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 0,
+              "real": 412851.33
+            },
+            "Shopee": {
+              "prev": 0,
+              "real": 33406.21
+            }
+          }
+        },
+        {
+          "mes": "Abr",
+          "ano": 2026,
+          "mes_num": 4,
+          "order": 202604,
+          "rPrev": 0,
+          "rReal": 545913.33,
+          "dPrev": 0,
+          "dReal": 409521.58999999997,
+          "resPrev": 0,
+          "resReal": 136391.74,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 0,
+              "real": 507580.01
+            },
+            "Shopee": {
+              "prev": 0,
+              "real": 38333.32
+            }
+          }
+        },
+        {
+          "mes": "Mai",
+          "ano": 2026,
+          "mes_num": 5,
+          "order": 202605,
+          "rPrev": 0,
+          "rReal": 415605.02999999997,
+          "dPrev": 0,
+          "dReal": 500479.44999999995,
+          "resPrev": 0,
+          "resReal": -84874.41999999998,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 0,
+              "real": 390663.79
+            },
+            "Shopee": {
+              "prev": 0,
+              "real": 24941.24
+            }
+          }
+        },
+        {
+          "mes": "Jun",
+          "ano": 2026,
+          "mes_num": 6,
+          "order": 202606,
+          "rPrev": 0,
+          "rReal": 404628.91,
+          "dPrev": 0,
+          "dReal": 510166.12,
+          "resPrev": 0,
+          "resReal": -105537.21000000002,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 0,
+              "real": 384556.12
+            },
+            "Shopee": {
+              "prev": 0,
+              "real": 20072.79
+            }
+          }
+        },
+        {
+          "mes": "Jul",
+          "ano": 2026,
+          "mes_num": 7,
+          "order": 202607,
+          "rPrev": 0,
+          "rReal": 447245.34,
+          "dPrev": 0,
+          "dReal": 565521.6172,
+          "resPrev": 0,
+          "resReal": -118276.27719999995,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 0,
+              "real": 418079.38
+            },
+            "Shopee": {
+              "prev": 0,
+              "real": 29165.96
+            }
+          }
+        },
+        {
+          "mes": "Ago",
+          "ano": 2026,
+          "mes_num": 8,
+          "order": 202608,
+          "rPrev": 0,
+          "rReal": 443219.91,
+          "dPrev": 0,
+          "dReal": 580450.3028,
+          "resPrev": 0,
+          "resReal": -137230.39279999997,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 0,
+              "real": 420720.0
+            },
+            "Shopee": {
+              "prev": 0,
+              "real": 22499.91
+            }
+          }
+        },
+        {
+          "mes": "Set",
+          "ano": 2026,
+          "mes_num": 9,
+          "order": 202609,
+          "rPrev": 0,
+          "rReal": 340375.31,
+          "dPrev": 0,
+          "dReal": 538541.4948,
+          "resPrev": 0,
+          "resReal": -198166.1848,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 0,
+              "real": 320639.0
+            },
+            "Shopee": {
+              "prev": 0,
+              "real": 19736.31
+            }
+          }
+        }
+      ]
+    },
+    "VIDAL": {
+      "color": "#6C63FF",
+      "accent": "#4B44CC",
+      "label": "VIDAL",
+      "months": [
+        {
+          "mes": "Jan",
+          "ano": 2026,
+          "mes_num": 1,
+          "order": 202601,
+          "rPrev": 0,
+          "rReal": 196570.68000000002,
+          "dPrev": 0,
+          "dReal": 71161.33,
+          "resPrev": 0,
+          "resReal": 125409.35000000002,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 0,
+              "real": 138853.28
+            },
+            "Shopee": {
+              "prev": 0,
+              "real": 13695.54
+            },
+            "Loja Fisica": {
+              "prev": 0,
+              "real": 44021.86
+            }
+          }
+        },
+        {
+          "mes": "Fev",
+          "ano": 2026,
+          "mes_num": 2,
+          "order": 202602,
+          "rPrev": 0,
+          "rReal": 167144.25999999998,
+          "dPrev": 0,
+          "dReal": 86782.26000000001,
+          "resPrev": 0,
+          "resReal": 80361.99999999997,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 0,
+              "real": 120539.51
+            },
+            "Shopee": {
+              "prev": 0,
+              "real": 16807.43
+            },
+            "Loja Fisica": {
+              "prev": 0,
+              "real": 29797.32
+            }
+          }
+        },
+        {
+          "mes": "Mar",
+          "ano": 2026,
+          "mes_num": 3,
+          "order": 202603,
+          "rPrev": 0,
+          "rReal": 229018.47,
+          "dPrev": 0,
+          "dReal": 101713.57,
+          "resPrev": 0,
+          "resReal": 127304.9,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 0,
+              "real": 144159.46
+            },
+            "Shopee": {
+              "prev": 0,
+              "real": 28130.09
+            },
+            "Loja Fisica": {
+              "prev": 0,
+              "real": 56728.92
+            }
+          }
+        },
+        {
+          "mes": "Abr",
+          "ano": 2026,
+          "mes_num": 4,
+          "order": 202604,
+          "rPrev": 0,
+          "rReal": 251047.64,
+          "dPrev": 0,
+          "dReal": 136146.61,
+          "resPrev": 0,
+          "resReal": 114901.03000000003,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 0,
+              "real": 170208.59
+            },
+            "Shopee": {
+              "prev": 0,
+              "real": 22690.82
+            },
+            "Loja Fisica": {
+              "prev": 0,
+              "real": 58148.23
+            }
+          }
+        },
+        {
+          "mes": "Mai",
+          "ano": 2026,
+          "mes_num": 5,
+          "order": 202605,
+          "rPrev": 0,
+          "rReal": 249143.27,
+          "dPrev": 0,
+          "dReal": 158927.44,
+          "resPrev": 0,
+          "resReal": 90215.82999999999,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 0,
+              "real": 177146.34
+            },
+            "Shopee": {
+              "prev": 0,
+              "real": 31525.22
+            },
+            "Loja Fisica": {
+              "prev": 0,
+              "real": 40471.71
+            }
+          }
+        },
+        {
+          "mes": "Jun",
+          "ano": 2026,
+          "mes_num": 6,
+          "order": 202606,
+          "rPrev": 0,
+          "rReal": 209719.42,
+          "dPrev": 0,
+          "dReal": 129631.92000000001,
+          "resPrev": 0,
+          "resReal": 80087.5,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 0,
+              "real": 128866.0
+            },
+            "Shopee": {
+              "prev": 0,
+              "real": 36966.34
+            },
+            "Loja Fisica": {
+              "prev": 0,
+              "real": 43887.08
+            }
+          }
+        },
+        {
+          "mes": "Jul",
+          "ano": 2026,
+          "mes_num": 7,
+          "order": 202607,
+          "rPrev": 0,
+          "rReal": 258689.12,
+          "dPrev": 0,
+          "dReal": 138187.5292,
+          "resPrev": 0,
+          "resReal": 120501.5908,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 0,
+              "real": 167599.27
+            },
+            "Shopee": {
+              "prev": 0,
+              "real": 18141.97
+            },
+            "Loja Fisica": {
+              "prev": 0,
+              "real": 72947.88
+            }
+          }
+        },
+        {
+          "mes": "Ago",
+          "ano": 2026,
+          "mes_num": 8,
+          "order": 202608,
+          "rPrev": 0,
+          "rReal": 281032.88,
+          "dPrev": 0,
+          "dReal": 298079.5696,
+          "resPrev": 0,
+          "resReal": -17046.689599999983,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 0,
+              "real": 189635.06
+            },
+            "Shopee": {
+              "prev": 0,
+              "real": 33676.79
+            },
+            "Loja Fisica": {
+              "prev": 0,
+              "real": 57721.03
+            }
+          }
+        },
+        {
+          "mes": "Set",
+          "ano": 2026,
+          "mes_num": 9,
+          "order": 202609,
+          "rPrev": 0,
+          "rReal": 250324.58,
+          "dPrev": 0,
+          "dReal": 211895.12759999998,
+          "resPrev": 0,
+          "resReal": 38429.45240000001,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 0,
+              "real": 150359.93
+            },
+            "Shopee": {
+              "prev": 0,
+              "real": 35243.48
+            },
+            "Loja Fisica": {
+              "prev": 0,
+              "real": 64721.17
+            }
+          }
+        }
+      ]
+    },
+    "V3": {
+      "color": "#FF6B6B",
+      "accent": "#CC4444",
+      "label": "V3",
+      "months": [
+        {
+          "mes": "Jan",
+          "ano": 2026,
+          "mes_num": 1,
+          "order": 202601,
+          "rPrev": 0,
+          "rReal": 2706.0,
+          "dPrev": 0,
+          "dReal": 578.0,
+          "resPrev": 0,
+          "resReal": 2128.0,
+          "canais": {}
+        },
+        {
+          "mes": "Fev",
+          "ano": 2026,
+          "mes_num": 2,
+          "order": 202602,
+          "rPrev": 0,
+          "rReal": 3774.1,
+          "dPrev": 0,
+          "dReal": 1002.38,
+          "resPrev": 0,
+          "resReal": 2771.72,
+          "canais": {}
+        },
+        {
+          "mes": "Mar",
+          "ano": 2026,
+          "mes_num": 3,
+          "order": 202603,
+          "rPrev": 0,
+          "rReal": 3913.0,
+          "dPrev": 0,
+          "dReal": 1205.54,
+          "resPrev": 0,
+          "resReal": 2707.46,
+          "canais": {}
+        },
+        {
+          "mes": "Abr",
+          "ano": 2026,
+          "mes_num": 4,
+          "order": 202604,
+          "rPrev": 0,
+          "rReal": 3918.0,
+          "dPrev": 0,
+          "dReal": 1404.5,
+          "resPrev": 0,
+          "resReal": 2513.5,
+          "canais": {}
+        },
+        {
+          "mes": "Mai",
+          "ano": 2026,
+          "mes_num": 5,
+          "order": 202605,
+          "rPrev": 0,
+          "rReal": 4883.87,
+          "dPrev": 0,
+          "dReal": 2148.42,
+          "resPrev": 0,
+          "resReal": 2735.45,
+          "canais": {}
+        },
+        {
+          "mes": "Jun",
+          "ano": 2026,
+          "mes_num": 6,
+          "order": 202606,
+          "rPrev": 0,
+          "rReal": 2998.14,
+          "dPrev": 0,
+          "dReal": 1652.83,
+          "resPrev": 0,
+          "resReal": 1345.31,
+          "canais": {}
+        },
+        {
+          "mes": "Jul",
+          "ano": 2026,
+          "mes_num": 7,
+          "order": 202607,
+          "rPrev": 0,
+          "rReal": 3806.95,
+          "dPrev": 0,
+          "dReal": 1835.33,
+          "resPrev": 0,
+          "resReal": 1971.62,
+          "canais": {}
+        },
+        {
+          "mes": "Ago",
+          "ano": 2026,
+          "mes_num": 8,
+          "order": 202608,
+          "rPrev": 0,
+          "rReal": 6840.84,
+          "dPrev": 0,
+          "dReal": 3105.51,
+          "resPrev": 0,
+          "resReal": 3735.33,
+          "canais": {}
+        },
+        {
+          "mes": "Set",
+          "ano": 2026,
+          "mes_num": 9,
+          "order": 202609,
+          "rPrev": 0,
+          "rReal": 5797.08,
+          "dPrev": 0,
+          "dReal": 1595.6200000000001,
+          "resPrev": 0,
+          "resReal": 4201.46,
+          "canais": {}
+        }
+      ]
+    },
+    "GRUPO": {
+      "color": "#F5A623",
+      "accent": "#C47D0E",
+      "label": "Grupo VIP",
+      "months": [
+        {
+          "mes": "Jan",
+          "ano": 2026,
+          "mes_num": 1,
+          "order": 202601,
+          "rPrev": 0,
+          "rReal": 634632.15,
+          "dPrev": 0,
+          "dReal": 511504.58,
+          "resPrev": 0,
+          "resReal": 123127.56999999999,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 0,
+              "real": 552125.14
+            },
+            "Shopee": {
+              "prev": 0,
+              "real": 25556.11
+            },
+            "Amazon": {
+              "prev": 0,
+              "real": 10223.04
+            },
+            "Loja Fisica": {
+              "prev": 0,
+              "real": 44021.86
+            }
+          }
+        },
+        {
+          "mes": "Fev",
+          "ano": 2026,
+          "mes_num": 2,
+          "order": 202602,
+          "rPrev": 0,
+          "rReal": 534112.15,
+          "dPrev": 0,
+          "dReal": 477176.62,
+          "resPrev": 0,
+          "resReal": 56935.53000000003,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 0,
+              "real": 467990.41000000003
+            },
+            "Shopee": {
+              "prev": 0,
+              "real": 32550.32
+            },
+            "Loja Fisica": {
+              "prev": 0,
+              "real": 29797.32
+            }
+          }
+        },
+        {
+          "mes": "Mar",
+          "ano": 2026,
+          "mes_num": 3,
+          "order": 202603,
+          "rPrev": 0,
+          "rReal": 679189.01,
+          "dPrev": 0,
+          "dReal": 567380.1400000001,
+          "resPrev": 0,
+          "resReal": 111808.87000000001,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 0,
+              "real": 557010.79
+            },
+            "Shopee": {
+              "prev": 0,
+              "real": 61536.3
+            },
+            "Loja Fisica": {
+              "prev": 0,
+              "real": 56728.92
+            }
+          }
+        },
+        {
+          "mes": "Abr",
+          "ano": 2026,
+          "mes_num": 4,
+          "order": 202604,
+          "rPrev": 0,
+          "rReal": 800878.97,
+          "dPrev": 0,
+          "dReal": 547072.7,
+          "resPrev": 0,
+          "resReal": 253806.27000000002,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 0,
+              "real": 677788.6
+            },
+            "Shopee": {
+              "prev": 0,
+              "real": 61024.14
+            },
+            "Loja Fisica": {
+              "prev": 0,
+              "real": 58148.23
+            }
+          }
+        },
+        {
+          "mes": "Mai",
+          "ano": 2026,
+          "mes_num": 5,
+          "order": 202605,
+          "rPrev": 0,
+          "rReal": 669632.1699999999,
+          "dPrev": 0,
+          "dReal": 661555.3099999999,
+          "resPrev": 0,
+          "resReal": 8076.860000000003,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 0,
+              "real": 567810.13
+            },
+            "Shopee": {
+              "prev": 0,
+              "real": 56466.46000000001
+            },
+            "Loja Fisica": {
+              "prev": 0,
+              "real": 40471.71
+            }
+          }
+        },
+        {
+          "mes": "Jun",
+          "ano": 2026,
+          "mes_num": 6,
+          "order": 202606,
+          "rPrev": 0,
+          "rReal": 617346.47,
+          "dPrev": 0,
+          "dReal": 641450.87,
+          "resPrev": 0,
+          "resReal": -24104.40000000002,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 0,
+              "real": 513422.12
+            },
+            "Shopee": {
+              "prev": 0,
+              "real": 57039.13
+            },
+            "Loja Fisica": {
+              "prev": 0,
+              "real": 43887.08
+            }
+          }
+        },
+        {
+          "mes": "Jul",
+          "ano": 2026,
+          "mes_num": 7,
+          "order": 202607,
+          "rPrev": 0,
+          "rReal": 709741.4099999999,
+          "dPrev": 0,
+          "dReal": 705544.4763999999,
+          "resPrev": 0,
+          "resReal": 4196.933600000052,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 0,
+              "real": 585678.65
+            },
+            "Shopee": {
+              "prev": 0,
+              "real": 47307.93
+            },
+            "Loja Fisica": {
+              "prev": 0,
+              "real": 72947.88
+            }
+          }
+        },
+        {
+          "mes": "Ago",
+          "ano": 2026,
+          "mes_num": 8,
+          "order": 202608,
+          "rPrev": 0,
+          "rReal": 731093.63,
+          "dPrev": 0,
+          "dReal": 881635.3824,
+          "resPrev": 0,
+          "resReal": -150541.75239999997,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 0,
+              "real": 610355.06
+            },
+            "Shopee": {
+              "prev": 0,
+              "real": 56176.7
+            },
+            "Loja Fisica": {
+              "prev": 0,
+              "real": 57721.03
+            }
+          }
+        },
+        {
+          "mes": "Set",
+          "ano": 2026,
+          "mes_num": 9,
+          "order": 202609,
+          "rPrev": 0,
+          "rReal": 596496.97,
+          "dPrev": 0,
+          "dReal": 752032.2424,
+          "resPrev": 0,
+          "resReal": -155535.2724,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 0,
+              "real": 470998.93
+            },
+            "Shopee": {
+              "prev": 0,
+              "real": 54979.79000000001
+            },
+            "Loja Fisica": {
+              "prev": 0,
+              "real": 64721.17
+            }
+          }
+        }
+      ]
+    }
+  },
+  "divida": {
+    "pagas": {
+      "VIP": {
+        "Jan": 252772.95,
+        "Fev": 228525.11,
+        "Mar": 268703.5,
+        "Abr": 223982.07,
+        "Mai": 319945.38,
+        "Jun": 323838.7,
+        "Jul": 367858.41,
+        "Ago": 162702.7
+      },
+      "VIDAL": {
+        "Fev": 3059.0,
+        "Mar": 10570.07,
+        "Abr": 30495.45,
+        "Mai": 52752.71,
+        "Jun": 18754.78,
+        "Jul": 36921.12
+      },
+      "GRUPO": {
+        "Mar": 279273.57,
+        "Jun": 342593.48,
+        "Ago": 162702.7,
+        "Jul": 404779.52999999997,
+        "Abr": 254477.52000000002,
+        "Jan": 252772.95,
+        "Fev": 231584.11,
+        "Mai": 372698.09
+      }
+    },
+    "a_pagar": {
+      "VIP": {
+        "Ago": 189907.02,
+        "Set": 280175.71,
+        "Out": 196376.26,
+        "Nov": 134655.46,
+        "Dez": 55264.48
+      },
+      "GRUPO": {
+        "Ago": 189907.02,
+        "Set": 280175.71,
+        "Out": 196376.26,
+        "Nov": 134655.46,
+        "Dez": 55264.48
+      }
+    }
+  },
+  "custos": {
+    "fixo": [
+      {
+        "label": "Despesas Pessoal",
+        "valor": 8441.460000000001
+      },
+      {
+        "label": "Retirada (prolabore)",
+        "valor": 17000.0
+      },
+      {
+        "label": "CEFO",
+        "valor": 6200.0
+      },
+      {
+        "label": "Consultoria Contabil",
+        "valor": 640.0
+      },
+      {
+        "label": "Aluguel + Condominio",
+        "valor": 2150.0
+      },
+      {
+        "label": "Luz",
+        "valor": 850.0
+      },
+      {
+        "label": "Agua",
+        "valor": 250.0
+      },
+      {
+        "label": "Bling",
+        "valor": 450.0
+      },
+      {
+        "label": "Marketing",
+        "valor": 780.0
+      },
+      {
+        "label": "Despesas de venda",
+        "valor": 2000.0
+      },
+      {
+        "label": "Financiamento Pronamp",
+        "valor": 6602.0
+      }
+    ],
+    "variavel": [
+      {
+        "label": "Cartão de credito",
+        "valor": 5000.0
+      },
+      {
+        "label": "Materia prima",
+        "valor": 240000.0
+      },
+      {
+        "label": "Marketing",
+        "valor": 6000.0
+      },
+      {
+        "label": "Impostos",
+        "valor": 56000.0
+      },
+      {
+        "label": "Taxas das plataformas",
+        "valor": 155000.0
+      },
+      {
+        "label": "Cancelamentos e reembolsos",
+        "valor": 55000.0
+      }
+    ],
+    "total_fixo": 45363.46,
+    "total_variavel": 517000.0,
+    "total": 562363.46
+  },
+  "orcamento_2027": [
+    {
+      "mes": "Jan",
+      "mes_num": 1,
+      "ano": 2027,
+      "order": 202701,
+      "rBruta": 585000.0,
+      "mlVendas": 500000.0,
+      "amazonVendas": 5000.0,
+      "shopeeVendas": 30000.0,
+      "lojaVendas": 50000.0,
+      "rendimentos": 0.0,
+      "despTotal": 583717.0,
+      "dPessoal": 17550.0,
+      "dProlabore": 17000.0,
+      "dCeo": 6200.0,
+      "dConsultoria": 1840.0,
+      "dGerais": 9000.0,
+      "dTecnologia": 1000.0,
+      "dMateria": 292500.0,
+      "dVendas": 3500.0,
+      "dMarketing": 6000.0,
+      "dImpostos": 61425.0,
+      "dFinanceiras": 500.0,
+      "dTaxas": 117000.0,
+      "dCancelamentos": 35100.0,
+      "dFinanciamentos": 15102.0,
+      "dInvestimentos": 0.0,
+      "resultado": 1283.0,
+      "varCeo": 0.0,
+      "resultadoReal": 1283.0,
+      "canais": {
+        "Mercado Livre": 500000.0,
+        "Amazon": 5000.0,
+        "Shopee": 30000.0,
+        "Loja Física": 50000.0
+      }
+    },
+    {
+      "mes": "Fev",
+      "mes_num": 2,
+      "ano": 2027,
+      "order": 202702,
+      "rBruta": 585000.0,
+      "mlVendas": 500000.0,
+      "amazonVendas": 5000.0,
+      "shopeeVendas": 30000.0,
+      "lojaVendas": 50000.0,
+      "rendimentos": 0.0,
+      "despTotal": 584137.0,
+      "dPessoal": 17550.0,
+      "dProlabore": 17000.0,
+      "dCeo": 6200.0,
+      "dConsultoria": 1840.0,
+      "dGerais": 9000.0,
+      "dTecnologia": 1000.0,
+      "dMateria": 292500.0,
+      "dVendas": 3920.0,
+      "dMarketing": 6000.0,
+      "dImpostos": 61425.0,
+      "dFinanceiras": 500.0,
+      "dTaxas": 117000.0,
+      "dCancelamentos": 35100.0,
+      "dFinanciamentos": 15102.0,
+      "dInvestimentos": 0.0,
+      "resultado": 863.0,
+      "varCeo": 773.9,
+      "resultadoReal": 89.10000000000002,
+      "canais": {
+        "Mercado Livre": 500000.0,
+        "Amazon": 5000.0,
+        "Shopee": 30000.0,
+        "Loja Física": 50000.0
+      }
+    },
+    {
+      "mes": "Mar",
+      "mes_num": 3,
+      "ano": 2027,
+      "order": 202703,
+      "rBruta": 585000.0,
+      "mlVendas": 500000.0,
+      "amazonVendas": 5000.0,
+      "shopeeVendas": 30000.0,
+      "lojaVendas": 50000.0,
+      "rendimentos": 0.0,
+      "despTotal": 584607.4,
+      "dPessoal": 17550.0,
+      "dProlabore": 17000.0,
+      "dCeo": 6200.0,
+      "dConsultoria": 1840.0,
+      "dGerais": 9000.0,
+      "dTecnologia": 1000.0,
+      "dMateria": 292500.0,
+      "dVendas": 4390.4,
+      "dMarketing": 6000.0,
+      "dImpostos": 61425.0,
+      "dFinanceiras": 500.0,
+      "dTaxas": 117000.0,
+      "dCancelamentos": 35100.0,
+      "dFinanciamentos": 15102.0,
+      "dInvestimentos": 0.0,
+      "resultado": 392.5999999999767,
+      "varCeo": 769.1959999999998,
+      "resultadoReal": -376.5960000000231,
+      "canais": {
+        "Mercado Livre": 500000.0,
+        "Amazon": 5000.0,
+        "Shopee": 30000.0,
+        "Loja Física": 50000.0
+      }
+    },
+    {
+      "mes": "Abr",
+      "mes_num": 4,
+      "ano": 2027,
+      "order": 202704,
+      "rBruta": 640350.0,
+      "mlVendas": 545000.0,
+      "amazonVendas": 5750.0,
+      "shopeeVendas": 33600.0,
+      "lojaVendas": 56000.0,
+      "rendimentos": 0.0,
+      "despTotal": 622825.498,
+      "dPessoal": 19210.5,
+      "dProlabore": 17000.0,
+      "dCeo": 6200.0,
+      "dConsultoria": 1840.0,
+      "dGerais": 9900.0,
+      "dTecnologia": 1000.0,
+      "dMateria": 320175.0,
+      "dVendas": 4917.248,
+      "dMarketing": 6000.0,
+      "dImpostos": 67236.75,
+      "dFinanceiras": 560.0,
+      "dTaxas": 128070.0,
+      "dCancelamentos": 25614.0,
+      "dFinanciamentos": 15102.0,
+      "dInvestimentos": 0.0,
+      "resultado": 17524.50199999998,
+      "varCeo": 998.6325199999998,
+      "resultadoReal": 16525.86947999998,
+      "canais": {
+        "Mercado Livre": 545000.0,
+        "Amazon": 5750.0,
+        "Shopee": 33600.0,
+        "Loja Física": 56000.0
+      }
+    },
+    {
+      "mes": "Mai",
+      "mes_num": 5,
+      "ano": 2027,
+      "order": 202705,
+      "rBruta": 660600.0,
+      "mlVendas": 560000.0,
+      "amazonVendas": 6200.0,
+      "shopeeVendas": 37200.0,
+      "lojaVendas": 57200.0,
+      "rendimentos": 0.0,
+      "despTotal": 642101.51776,
+      "dPessoal": 19818.0,
+      "dProlabore": 17000.0,
+      "dCeo": 6200.0,
+      "dConsultoria": 1840.0,
+      "dGerais": 10800.0,
+      "dTecnologia": 1000.0,
+      "dMateria": 330300.0,
+      "dVendas": 5507.31776,
+      "dMarketing": 6000.0,
+      "dImpostos": 69363.0,
+      "dFinanceiras": 627.2,
+      "dTaxas": 132120.0,
+      "dCancelamentos": 26424.0,
+      "dFinanciamentos": 15102.0,
+      "dInvestimentos": 0.0,
+      "resultado": 18498.48224000004,
+      "varCeo": 2059.269644800001,
+      "resultadoReal": 16439.21259520004,
+      "canais": {
+        "Mercado Livre": 560000.0,
+        "Amazon": 6200.0,
+        "Shopee": 37200.0,
+        "Loja Física": 57200.0
+      }
+    },
+    {
+      "mes": "Jun",
+      "mes_num": 6,
+      "ano": 2027,
+      "order": 202706,
+      "rBruta": 680850.0,
+      "mlVendas": 575000.0,
+      "amazonVendas": 6650.0,
+      "shopeeVendas": 40800.0,
+      "lojaVendas": 58400.0,
+      "rendimentos": 0.0,
+      "despTotal": 661456.4098912,
+      "dPessoal": 20425.5,
+      "dProlabore": 17000.0,
+      "dCeo": 6200.0,
+      "dConsultoria": 1840.0,
+      "dGerais": 11700.0,
+      "dTecnologia": 1000.0,
+      "dMateria": 340425.0,
+      "dVendas": 6168.1958912,
+      "dMarketing": 6000.0,
+      "dImpostos": 71489.25,
+      "dFinanceiras": 702.464,
+      "dTaxas": 136170.0,
+      "dCancelamentos": 27234.0,
+      "dFinanciamentos": 15102.0,
+      "dInvestimentos": 0.0,
+      "resultado": 19393.59010879998,
+      "varCeo": 2119.6968021759994,
+      "resultadoReal": 17273.89330662398,
+      "canais": {
+        "Mercado Livre": 575000.0,
+        "Amazon": 6650.0,
+        "Shopee": 40800.0,
+        "Loja Física": 58400.0
+      }
+    },
+    {
+      "mes": "Jul",
+      "mes_num": 7,
+      "ano": 2027,
+      "order": 202707,
+      "rBruta": 701100.0,
+      "mlVendas": 590000.0,
+      "amazonVendas": 7100.0,
+      "shopeeVendas": 44400.0,
+      "lojaVendas": 59600.0,
+      "rendimentos": 0.0,
+      "despTotal": 668877.639078144,
+      "dPessoal": 21033.0,
+      "dProlabore": 17000.0,
+      "dCeo": 6200.0,
+      "dConsultoria": 1840.0,
+      "dGerais": 12600.0,
+      "dTecnologia": 1000.0,
+      "dMateria": 350550.0,
+      "dVendas": 6908.379398144,
+      "dMarketing": 8000.0,
+      "dImpostos": 73615.5,
+      "dFinanceiras": 786.7596800000001,
+      "dTaxas": 140220.0,
+      "dCancelamentos": 14022.0,
+      "dFinanciamentos": 15102.0,
+      "dInvestimentos": 0.0,
+      "resultado": 32222.360921856016,
+      "varCeo": 2418.7972184371206,
+      "resultadoReal": 29803.563703418895,
+      "canais": {
+        "Mercado Livre": 590000.0,
+        "Amazon": 7100.0,
+        "Shopee": 44400.0,
+        "Loja Física": 59600.0
+      }
+    },
+    {
+      "mes": "Ago",
+      "mes_num": 8,
+      "ano": 2027,
+      "order": 202708,
+      "rBruta": 731350.0,
+      "mlVendas": 615000.0,
+      "amazonVendas": 7550.0,
+      "shopeeVendas": 48000.0,
+      "lojaVendas": 60800.0,
+      "rendimentos": 0.0,
+      "despTotal": 696564.8057675213,
+      "dPessoal": 21940.5,
+      "dProlabore": 17000.0,
+      "dCeo": 6200.0,
+      "dConsultoria": 1840.0,
+      "dGerais": 13500.0,
+      "dTecnologia": 1000.0,
+      "dMateria": 365675.0,
+      "dVendas": 7737.38492592128,
+      "dMarketing": 8000.0,
+      "dImpostos": 76791.75,
+      "dFinanceiras": 881.1708416000001,
+      "dTaxas": 146270.0,
+      "dCancelamentos": 14627.0,
+      "dFinanciamentos": 15102.0,
+      "dInvestimentos": 0.0,
+      "resultado": 34785.19423247874,
+      "varCeo": 2533.578884649575,
+      "resultadoReal": 32251.615347829164,
+      "canais": {
+        "Mercado Livre": 615000.0,
+        "Amazon": 7550.0,
+        "Shopee": 48000.0,
+        "Loja Física": 60800.0
+      }
+    },
+    {
+      "mes": "Set",
+      "mes_num": 9,
+      "ano": 2027,
+      "order": 202709,
+      "rBruta": 761600.0,
+      "mlVendas": 640000.0,
+      "amazonVendas": 8000.0,
+      "shopeeVendas": 51600.0,
+      "lojaVendas": 62000.0,
+      "rendimentos": 0.0,
+      "despTotal": 724362.7824596239,
+      "dPessoal": 22848.0,
+      "dProlabore": 17000.0,
+      "dCeo": 6200.0,
+      "dConsultoria": 1840.0,
+      "dGerais": 14400.0,
+      "dTecnologia": 1000.0,
+      "dMateria": 380800.0,
+      "dVendas": 8665.871117031835,
+      "dMarketing": 8000.0,
+      "dImpostos": 79968.0,
+      "dFinanceiras": 986.9113425920001,
+      "dTaxas": 152320.0,
+      "dCancelamentos": 15232.0,
+      "dFinanciamentos": 15102.0,
+      "dInvestimentos": 0.0,
+      "resultado": 37237.21754037612,
+      "varCeo": 2646.1443508075226,
+      "resultadoReal": 34591.0731895686,
+      "canais": {
+        "Mercado Livre": 640000.0,
+        "Amazon": 8000.0,
+        "Shopee": 51600.0,
+        "Loja Física": 62000.0
+      }
+    },
+    {
+      "mes": "Out",
+      "mes_num": 10,
+      "ano": 2027,
+      "order": 202710,
+      "rBruta": 806850.0,
+      "mlVendas": 680000.0,
+      "amazonVendas": 8450.0,
+      "shopeeVendas": 55200.0,
+      "lojaVendas": 63200.0,
+      "rendimentos": 0.0,
+      "despTotal": 765109.8663547786,
+      "dPessoal": 24205.5,
+      "dProlabore": 17000.0,
+      "dCeo": 6200.0,
+      "dConsultoria": 1840.0,
+      "dGerais": 15300.0,
+      "dTecnologia": 1000.0,
+      "dMateria": 403425.0,
+      "dVendas": 9705.775651075655,
+      "dMarketing": 8000.0,
+      "dImpostos": 84719.25,
+      "dFinanceiras": 1105.3407037030402,
+      "dTaxas": 161370.0,
+      "dCancelamentos": 16137.0,
+      "dFinanciamentos": 15102.0,
+      "dInvestimentos": 0.0,
+      "resultado": 41740.13364522136,
+      "varCeo": 2831.2276729044274,
+      "resultadoReal": 38908.905972316934,
+      "canais": {
+        "Mercado Livre": 680000.0,
+        "Amazon": 8450.0,
+        "Shopee": 55200.0,
+        "Loja Física": 63200.0
+      }
+    },
+    {
+      "mes": "Nov",
+      "mes_num": 11,
+      "ano": 2027,
+      "order": 202711,
+      "rBruta": 852100.0,
+      "mlVendas": 720000.0,
+      "amazonVendas": 8900.0,
+      "shopeeVendas": 58800.0,
+      "lojaVendas": 64400.0,
+      "rendimentos": 0.0,
+      "despTotal": 805995.9503173521,
+      "dPessoal": 25563.0,
+      "dProlabore": 17000.0,
+      "dCeo": 6200.0,
+      "dConsultoria": 1840.0,
+      "dGerais": 16200.0,
+      "dTecnologia": 1000.0,
+      "dMateria": 426050.0,
+      "dVendas": 10870.468729204735,
+      "dMarketing": 8000.0,
+      "dImpostos": 89470.5,
+      "dFinanceiras": 1237.981588147405,
+      "dTaxas": 170420.0,
+      "dCancelamentos": 17042.0,
+      "dFinanciamentos": 15102.0,
+      "dInvestimentos": 0.0,
+      "resultado": 46104.04968264792,
+      "varCeo": 3013.5309936529584,
+      "resultadoReal": 43090.51868899496,
+      "canais": {
+        "Mercado Livre": 720000.0,
+        "Amazon": 8900.0,
+        "Shopee": 58800.0,
+        "Loja Física": 64400.0
+      }
+    },
+    {
+      "mes": "Dez",
+      "mes_num": 12,
+      "ano": 2027,
+      "order": 202712,
+      "rBruta": 897350.0,
+      "mlVendas": 760000.0,
+      "amazonVendas": 9350.0,
+      "shopeeVendas": 62400.0,
+      "lojaVendas": 65600.0,
+      "rendimentos": 0.0,
+      "despTotal": 847037.7143554344,
+      "dPessoal": 26920.5,
+      "dProlabore": 17000.0,
+      "dCeo": 6200.0,
+      "dConsultoria": 1840.0,
+      "dGerais": 17100.0,
+      "dTecnologia": 1000.0,
+      "dMateria": 448675.0,
+      "dVendas": 12174.924976709302,
+      "dMarketing": 8000.0,
+      "dImpostos": 94221.75,
+      "dFinanceiras": 1386.5393787250937,
+      "dTaxas": 179470.0,
+      "dCancelamentos": 17947.0,
+      "dFinanciamentos": 15102.0,
+      "dInvestimentos": 0.0,
+      "resultado": 50312.28564456559,
+      "varCeo": 3192.720712891312,
+      "resultadoReal": 47119.56493167428,
+      "canais": {
+        "Mercado Livre": 760000.0,
+        "Amazon": 9350.0,
+        "Shopee": 62400.0,
+        "Loja Física": 65600.0
+      }
+    }
+  ]
+}
