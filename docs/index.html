@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Financeiro – Grupo VIP 2026 v2</title>
+<title>Dashboard Financeiro – Grupo VIP 2026</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -824,8 +824,10 @@ async function loadData(){
   try{
     DATA=window.__INLINE_DATA__||null;
     if(!DATA){
-      const res=await fetch('data.json?v='+Date.now());
-      if(res.ok) DATA=await res.json();
+      try{const r=await fetch('data_20261023.json');if(r.ok)DATA=await r.json();}catch(e){}
+    }
+    if(!DATA){
+      try{const r=await fetch('data.json?v='+Date.now());if(r.ok)DATA=await r.json();}catch(e){}
     }
     if(!DATA) throw new Error('Dados não encontrados');
     document.getElementById('badge-update').textContent='Atualizado '+DATA.gerado_em;
