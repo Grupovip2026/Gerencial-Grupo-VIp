@@ -827,7 +827,7 @@ async function loadData(){
       try{const r=await fetch('data_20261023.json');if(r.ok)DATA=await r.json();}catch(e){}
     }
     if(!DATA){
-      try{const r=await fetch('data.json?v='+Date.now());if(r.ok)DATA=await r.json();}catch(e){}
+      try{const r=await fetch('data_20261023.json');if(r.ok)DATA=await r.json();}catch(e){}
     }
     if(!DATA) throw new Error('Dados não encontrados');
     document.getElementById('badge-update').textContent='Atualizado '+DATA.gerado_em;
