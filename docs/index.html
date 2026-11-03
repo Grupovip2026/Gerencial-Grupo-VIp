@@ -2052,6 +2052,26 @@ function renderOrc2027(){
 .fc-tbl td:first-child{text-align:left;font-family:'Inter',sans-serif;font-weight:500}
 .fc-tbl tr.fc-neg-row td.fc-saldo{color:#FF6B6B;font-weight:700}
 .fc-tbl tr.fc-mes-head td{background:rgba(56,189,248,.06);color:#38bdf8;font-family:'Inter',sans-serif;font-weight:700;font-size:11px;letter-spacing:.5px;text-transform:uppercase}
+.fc-relat-toolbar{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:16px 20px;margin-bottom:16px}
+.fc-relat-group{display:flex;flex-direction:column;gap:4px;min-width:160px}
+.fc-relat-lbl{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.6px}
+.fc-relat-input{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:6px;color:#fff;font-size:13px;font-family:'Inter',sans-serif;padding:8px 10px;outline:none}
+.fc-relat-input:focus{border-color:#38bdf8}
+.fc-relat-input option{background:#1a1a2e}
+.fc-btn-print{background:rgba(56,189,248,.15);color:#38bdf8;border:1px solid rgba(56,189,248,.35);padding:9px 20px;font-size:13px;font-weight:600;border-radius:7px;cursor:pointer;font-family:'Inter',sans-serif}
+.fc-btn-print:hover{background:rgba(56,189,248,.28)}
+.fc-relat-resumo{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.fc-relat-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px 18px;min-width:140px;flex:1}
+.fc-relat-card-lbl{font-size:10px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.fc-relat-card-val{font-size:18px;font-weight:700;font-family:'DM Mono',monospace}
+.fc-relat-empty{text-align:center;padding:40px;color:#444;font-size:14px}
+@media print{
+  body > *:not(#page-fluxo){display:none!important}
+  #page-fluxo > *:not(.fc-relat-print-area){display:none!important}
+  .fc-relat-toolbar,.fc-view-tabs,.fc-saldo-inputs,.fc-form,.fc-kpis{display:none!important}
+  .fc-relat-print-area{display:block!important}
+  .fc-relat-print-header{display:flex!important}
+}
 .fc-tbl tr.fc-total-row td{background:rgba(255,255,255,.04);font-weight:700;border-top:1px solid rgba(255,255,255,.12)}
 .fc-search{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:6px;color:#fff;font-size:13px;padding:8px 12px;width:280px;outline:none;font-family:'Inter',sans-serif}
 .fc-search:focus{border-color:#38bdf8}
@@ -2068,6 +2088,7 @@ function renderOrc2027(){
   <button class="fc-vtab" onclick="fcSetView('dia')">📅 Saldo Dia a Dia</button>
   <button class="fc-vtab" onclick="fcSetView('mensal')">📆 Resumo Mensal</button>
   <button class="fc-vtab" onclick="fcSetView('grafico')">📈 Gráficos</button>
+  <button class="fc-vtab" onclick="fcSetView('relatorio')">🖨️ Rel. Pagamentos</button>
 </div>
 
 <!-- ── Saldo inicial ── -->
@@ -2170,9 +2191,36 @@ function renderOrc2027(){
       <div class="fc-chart-wrap"><canvas id="fc-chart-contas"></canvas></div>
     </div>
   </div>
-</div>`;
+</div>
 
-    // preenche selos de mês no filtro
+<!-- ── Relatório de Pagamentos ── -->
+<div class="fc-section" id="fc-view-relatorio">
+  <div class="fc-relat-toolbar">
+    <div class="fc-relat-group">
+      <label class="fc-relat-lbl">📅 Data</label>
+      <input type="date" id="fc-relat-data" class="fc-relat-input" onchange="fcRenderRelatorio()">
+    </div>
+    <div class="fc-relat-group">
+      <label class="fc-relat-lbl">🏦 Conta</label>
+      <select id="fc-relat-conta" class="fc-relat-input" onchange="fcRenderRelatorio()">
+        <option value="">Todas</option>
+        <option value="Itaú">Itaú</option>
+        <option value="Sicoob">Sicoob</option>
+      </select>
+    </div>
+    <div class="fc-relat-group">
+      <label class="fc-relat-lbl">📂 Categoria</label>
+      <select id="fc-relat-cat" class="fc-relat-input" onchange="fcRenderRelatorio()">
+        <option value="">Todas</option>
+      </select>
+    </div>
+    <div class="fc-relat-group" style="align-self:flex-end">
+      <button class="fc-btn fc-btn-print" onclick="fcImprimirRelatorio()">🖨️ Imprimir / PDF</button>
+    </div>
+  </div>
+  <div id="fc-relat-resumo" class="fc-relat-resumo"></div>
+  <div id="fc-relat-corpo"></div>
+</div>`; no filtro
     const sel = pg.querySelector('#fc-filtro-mes');
     let d2=new Date(2026,10,1);
     const NOMES=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
@@ -2203,12 +2251,13 @@ function renderOrc2027(){
   };
 
   window.fcSetView=function(v){
-    document.querySelectorAll('.fc-vtab').forEach((t,i)=>t.classList.toggle('fc-active',['lancamentos','dia','mensal','grafico'][i]===v));
+    document.querySelectorAll('.fc-vtab').forEach((t,i)=>t.classList.toggle('fc-active',['lancamentos','dia','mensal','grafico','relatorio'][i]===v));
     document.querySelectorAll('.fc-section').forEach(s=>s.classList.remove('fc-show'));
     document.getElementById('fc-view-'+v).classList.add('fc-show');
     if(v==='dia') fcRenderDia();
     if(v==='mensal') fcRenderMensal();
     if(v==='grafico') fcRenderGraficos();
+    if(v==='relatorio') fcInitRelatorio();
   };
 
   window.fcAddLancamento=function(){
@@ -2582,6 +2631,144 @@ function renderOrc2027(){
       scales:{x:{ticks:{color:'#666',font:{size:10}},grid:{color:'rgba(255,255,255,.05)'},border:{display:false}},
               y:{ticks:{color:'#666',font:{size:10},callback:v=>'R$'+Math.round(v/1000)+'k'},grid:{color:'rgba(255,255,255,.05)'},border:{display:false}}}}});
   };
+  // ── Relatório de Pagamentos Diários ─────────────────────────────
+  function fcInitRelatorio(){
+    // Define data padrão = hoje se estiver dentro do período
+    const inp = document.getElementById('fc-relat-data');
+    if(!inp.value){
+      const hoje = isoDate(new Date());
+      inp.value = (hoje >= '2026-11-01' && hoje <= '2027-12-31') ? hoje : '2026-11-01';
+    }
+    // Preenche categorias disponíveis
+    const arr = loadLancamentos();
+    const cats = [...new Set(arr.map(l=>l.cat||'').filter(Boolean))].sort();
+    const selCat = document.getElementById('fc-relat-cat');
+    const atual = selCat.value;
+    selCat.innerHTML = '<option value="">Todas</option>' + cats.map(c=>`<option value="${c}"${c===atual?' selected':''}>${c}</option>`).join('');
+    fcRenderRelatorio();
+  }
+
+  window.fcRenderRelatorio = function(){
+    const data   = document.getElementById('fc-relat-data').value;
+    const conta  = document.getElementById('fc-relat-conta').value;
+    const cat    = document.getElementById('fc-relat-cat').value;
+    if(!data) return;
+
+    const arr = loadLancamentos();
+    const filtrados = arr.filter(l=>{
+      if(l.data !== data) return false;
+      if(conta && l.conta !== conta) return false;
+      if(cat   && l.cat   !== cat)   return false;
+      return true;
+    });
+
+    // Resumo
+    const totEnt  = filtrados.filter(l=>l.tipo==='ENTRADA').reduce((s,l)=>s+parseMoeda(l.valor),0);
+    const totSai  = filtrados.filter(l=>l.tipo==='SAÍDA').reduce((s,l)=>s+parseMoeda(l.valor),0);
+    const saldo   = totEnt - totSai;
+    const [yy,mm,dd] = data.split('-');
+    const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    const dataFmt = `${dd}/${mm}/${yy}`;
+    const mesNome = MESES[parseInt(mm,10)-1];
+
+    document.getElementById('fc-relat-resumo').innerHTML =
+      `<div class="fc-relat-card"><div class="fc-relat-card-lbl">📅 Data</div><div class="fc-relat-card-val" style="color:#38bdf8;font-size:15px">${dd} ${mesNome} ${yy}</div></div>`+
+      `<div class="fc-relat-card"><div class="fc-relat-card-lbl">↗ Total Entradas</div><div class="fc-relat-card-val fc-pos">${fmtR(totEnt)}</div></div>`+
+      `<div class="fc-relat-card"><div class="fc-relat-card-lbl">↙ Total Saídas</div><div class="fc-relat-card-val fc-neg">${fmtR(totSai)}</div></div>`+
+      `<div class="fc-relat-card"><div class="fc-relat-card-lbl">⚖ Saldo do Dia</div><div class="fc-relat-card-val ${saldo>=0?'fc-pos':'fc-neg'}">${fmtR(saldo)}</div></div>`+
+      `<div class="fc-relat-card"><div class="fc-relat-card-lbl">📋 Lançamentos</div><div class="fc-relat-card-val" style="color:#fff">${filtrados.length}</div></div>`;
+
+    if(filtrados.length === 0){
+      document.getElementById('fc-relat-corpo').innerHTML =
+        `<div class="fc-relat-empty">Nenhum lançamento encontrado para ${dataFmt}${conta?' — '+conta:''}${cat?' — '+cat:''}</div>`;
+      return;
+    }
+
+    // Agrupa por categoria para subtotais
+    const porCat = {};
+    filtrados.forEach(l=>{
+      const c = l.cat || 'Sem categoria';
+      if(!porCat[c]) porCat[c] = {entradas:[],saidas:[]};
+      if(l.tipo==='ENTRADA') porCat[c].entradas.push(l);
+      else porCat[c].saidas.push(l);
+    });
+
+    // Tabela principal
+    let html2 = `
+<div class="fc-relat-print-area">
+  <div class="fc-relat-print-header" style="display:none;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid #333">
+    <div><strong style="font-size:18px">Relatório de Pagamentos</strong><br><span style="color:#666;font-size:13px">Grupo VIP — ${dataFmt}</span></div>
+    <div style="text-align:right;font-size:12px;color:#666">Emitido em: ${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</div>
+  </div>
+  <div class="fc-tbl-wrap">
+  <table class="fc-tbl" style="min-width:700px">
+    <thead>
+      <tr>
+        <th style="text-align:left;width:90px">Conta</th>
+        <th style="text-align:left">Descrição</th>
+        <th style="text-align:left;width:110px">Categoria</th>
+        <th style="width:80px">Tipo</th>
+        <th style="width:140px">Valor</th>
+      </tr>
+    </thead>
+    <tbody>`;
+
+    Object.entries(porCat).sort(([a],[b])=>a.localeCompare(b)).forEach(([catNome, grp])=>{
+      const todos = [...grp.entradas, ...grp.saidas];
+      const subtotEnt = grp.entradas.reduce((s,l)=>s+parseMoeda(l.valor),0);
+      const subtotSai = grp.saidas.reduce((s,l)=>s+parseMoeda(l.valor),0);
+      html2 += `<tr class="fc-mes-head"><td colspan="5" style="text-align:left">📂 ${catNome}</td></tr>`;
+      todos.sort((a,b)=>a.conta.localeCompare(b.conta)).forEach(l=>{
+        const v = parseMoeda(l.valor);
+        const isEnt = l.tipo==='ENTRADA';
+        html2 += `<tr>
+          <td style="text-align:left">${l.conta}</td>
+          <td style="text-align:left;font-family:'Inter',sans-serif">${l.desc}</td>
+          <td style="text-align:left;font-size:11px;color:#888;font-family:'Inter',sans-serif">${l.cat||'—'}</td>
+          <td style="text-align:center"><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;background:${isEnt?'rgba(0,201,167,.15)':'rgba(255,107,107,.15)'};color:${isEnt?'#00C9A7':'#FF6B6B'}">${l.tipo}</span></td>
+          <td class="${isEnt?'fc-pos':'fc-neg'}" style="font-weight:600">${fmtR(v)}</td>
+        </tr>`;
+      });
+      if(todos.length > 1){
+        html2 += `<tr style="border-top:1px solid rgba(255,255,255,.12)">
+          <td colspan="4" style="text-align:right;font-size:11px;color:#666;font-family:'Inter',sans-serif;padding-right:8px">Subtotal ${catNome}</td>
+          <td style="font-weight:700">`;
+        if(subtotEnt > 0 && subtotSai > 0){
+          html2 += `<span class="fc-pos">${fmtR(subtotEnt)}</span> / <span class="fc-neg">${fmtR(subtotSai)}</span>`;
+        } else if(subtotEnt > 0){
+          html2 += `<span class="fc-pos">${fmtR(subtotEnt)}</span>`;
+        } else {
+          html2 += `<span class="fc-neg">${fmtR(subtotSai)}</span>`;
+        }
+        html2 += `</td></tr>`;
+      }
+    });
+
+    html2 += `
+      <tr style="border-top:2px solid rgba(255,255,255,.15)">
+        <td colspan="4" style="text-align:right;font-weight:700;font-family:'Inter',sans-serif;color:#ccc">TOTAL DO DIA</td>
+        <td style="font-weight:700">
+          ${totEnt>0?`<span class="fc-pos">${fmtR(totEnt)}</span>`:''}
+          ${totEnt>0&&totSai>0?' / ':''}
+          ${totSai>0?`<span class="fc-neg">${fmtR(totSai)}</span>`:''}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</div>`;
+
+    document.getElementById('fc-relat-corpo').innerHTML = html2;
+  };
+
+  window.fcImprimirRelatorio = function(){
+    // Mostra header de impressão
+    const hdr = document.querySelector('.fc-relat-print-header');
+    if(hdr) hdr.style.display = 'flex';
+    window.print();
+    setTimeout(()=>{ if(hdr) hdr.style.display = 'none'; }, 1000);
+  };
+
 })();
 
 /* ═══════════════════════════════════════════════════
