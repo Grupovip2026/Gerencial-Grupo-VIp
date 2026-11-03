@@ -1912,8 +1912,18 @@ function renderOrc2027(){
     return n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
   }
   function parseMoeda(s){
-    if(!s)return 0;
-    const n=parseFloat(String(s).replace(/[R$\s.]/g,'').replace(',','.'));
+    if(s===null||s===undefined||s==='')return 0;
+    if(typeof s==='number') return s;
+    const str=String(s).trim();
+    const temVirgula=str.includes(','), temPonto=str.includes('.');
+    let n;
+    if(temVirgula && temPonto){
+      n=parseFloat(str.replace(/[R$\s]/g,'').replace(/\./g,'').replace(',','.'));
+    } else if(temVirgula && !temPonto){
+      n=parseFloat(str.replace(/[R$\s]/g,'').replace(',','.'));
+    } else {
+      n=parseFloat(str.replace(/[R$\s]/g,''));
+    }
     return isNaN(n)?0:n;
   }
   function dateExcel(str){ // "YYYY-MM-DD" → Date
@@ -2291,7 +2301,26 @@ function renderOrc2027(){
           else if(contaN.includes('sic')) conta='Sicoob';
           else{erros++;return;}
           // Valor
-          valor=parseFloat(String(valor).replace(/[R$\s.]/g,'').replace(',','.'))||0;
+          if(typeof valor==='number'){
+            valor=valor; // já é número puro vindo do Excel
+          } else {
+            const s=String(valor).trim();
+            // Formato BR: 1.234,56 → remove pontos de milhar, troca vírgula por ponto
+            // Formato US/Excel: 1234.56 → usa direto
+            // Detecta: se tem vírgula E ponto, o último é decimal
+            const temVirgula=s.includes(','), temPonto=s.includes('.');
+            if(temVirgula && temPonto){
+              // Ex: "1.234,56" → BR
+              valor=parseFloat(s.replace(/[R$\s]/g,'').replace(/\./g,'').replace(',','.'));
+            } else if(temVirgula && !temPonto){
+              // Ex: "1234,56" → BR sem milhar
+              valor=parseFloat(s.replace(/[R$\s]/g,'').replace(',','.'));
+            } else {
+              // Ex: "1234.56" ou "1234" → já é ponto decimal
+              valor=parseFloat(s.replace(/[R$\s]/g,''));
+            }
+          }
+          valor=isNaN(valor)?0:valor;
           if(valor<=0){erros++;return;}
           // Descrição
           desc=String(desc||'').trim();
