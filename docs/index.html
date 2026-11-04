@@ -3725,95 +3725,100 @@ loadData();
     return null;
   }
 
-  // Parser Sicoob: formato DD/MM   DESCRIÇÃO    VALOR[C/D]
-  // Lê lançamentos do período e captura os 3 campos do bloco RESUMO:
-  //   (+) SALDO EM CONTA           → saldoEmConta
-  //   (+) SALDO EM RDC AUTOMÁTICO  → saldoRDC
-  //   (+) CHEQUE ESPECIAL CONTRATADO → chequeEspecial
-  //   (=) SALDO DISPONÍVEL         → saldoDisponivel = soma dos três
+  // Parser Sicoob — formato real do extrato:
+  //   DD/MM   HISTÓRICO                    8.303,00C
+  //           Recebimento Pix              ← linha continuação (sem data)
+  //           NOME EMPRESA                 ← linha continuação
+  //           DOC.: Pix                    ← linha doc (ignorada)
+  //
+  // Bloco RESUMO (após linha "RESUMO"):
+  //   (+) SALDO EM CONTA:                  3.409,55C
+  //   (+) SALDO EM RDC AUTOMÁTICO:        14.238,87C
+  //   (+) CHEQUE ESPECIAL CONTRATADO:     12.000,00C
+  //   (=) SALDO DISPONÍVEL:               29.648,42C
+  //
   function parseSicoob(linhas){
     const lancamentos = [];
-    let saldoEmConta = 0;
-    let saldoRDC = 0;
-    let chequeEspecial = 0;
-    let saldoDisponivel = null;
+    let saldoEmConta = 0, saldoRDC = 0, chequeEspecial = 0, saldoDisponivel = null;
 
-    // padrão lançamento: DD/MM  DESCRIÇÃO  VALOR  C/D
-    // usa separador de 1+ espaços entre campos (extrato real pode variar)
-    const rLinha = /^(\d{2}\/\d{2})\s+(.+?)\s+([\d.]+,\d{2})\s*([CD*])\s*$/i;
+    // Padrão de lançamento: começa com DD/MM, termina com número seguido de C, D ou *
+    // Exemplos reais:
+    //   "03/11   PIX REC.OUTRA IF MT                         8.303,00C"
+    //   "03/11   DÉB.EMPRÉSTIMO                                981,12D"
+    // O valor e C/D ficam no FINAL da linha
+    const rLanc = /^(\d{2}\/\d{2})\s+(.+?)\s+([\d]{1,3}(?:\.[\d]{3})*,\d{2})\s*([CD*])\s*$/i;
 
-    // helper: extrai o ÚLTIMO valor numérico de uma linha (evita pegar prefixos como "12." isolado)
+    // helper: extrai o ÚLTIMO valor monetário de uma linha
     const extraiValor = (linha) => {
       const matches = [...linha.matchAll(/([\d]{1,3}(?:\.[\d]{3})*,\d{2})/g)];
-      if(!matches.length) return 0;
-      return parseValor(matches[matches.length - 1][1]);
+      return matches.length ? parseValor(matches[matches.length-1][1]) : 0;
     };
 
     let inResumo = false;
+
     for(let i=0; i<linhas.length; i++){
       const l = linhas[i].trim();
       if(!l) continue;
 
-      // detecta início do bloco RESUMO
+      // ── Detecta bloco RESUMO ──
       if(/^RESUMO\s*$/i.test(l)){ inResumo = true; continue; }
 
+      // ── Lê campos do RESUMO ──
       if(inResumo){
-        // (+) SALDO EM CONTA: 3.409,55C
-        if(/SALDO\s+EM\s+CONTA/i.test(l))            saldoEmConta   = extraiValor(l);
-        // (+) SALDO EM RDC AUTOMÁTICO: 14.238,87C
-        else if(/SALDO\s+EM\s+RDC/i.test(l))         saldoRDC       = extraiValor(l);
-        // (+) CHEQUE ESPECIAL CONTRATADO: 12.000,00C
-        else if(/CHEQUE\s+ESPECIAL/i.test(l))         chequeEspecial = extraiValor(l);
-        // (=) SALDO DISPONÍVEL: 29.648,42C
-        else if(/SALDO\s+DISPON/i.test(l)){
-          const mv = l.match(/([\d.]+,\d{2})\s*C/i);
-          if(mv) saldoDisponivel = parseValor(mv[1]);
-        }
+        if(/SALDO\s+EM\s+CONTA/i.test(l) && !/RDC/i.test(l))
+          saldoEmConta = extraiValor(l);
+        else if(/SALDO\s+EM\s+RDC/i.test(l))
+          saldoRDC = extraiValor(l);
+        else if(/CHEQUE\s+ESPECIAL/i.test(l))
+          chequeEspecial = extraiValor(l);
+        else if(/SALDO\s+DISPON/i.test(l))
+          saldoDisponivel = extraiValor(l);
         continue;
       }
 
-      const m = l.match(rLinha);
+      // ── Tenta casar linha de lançamento ──
+      const m = l.match(rLanc);
       if(!m) continue;
-      const [,data, desc, valStr, dc] = m;
 
-      // pula linhas de saldo/resumo no corpo
-      if(/SALDO\s+(ANTERIOR|BLOQ|DO\s+DIA)|ENCARGO|LIMITE|CAPITAL|SAC|OUVIDORIA|JUROS\s+VENCIDO|TARIFA/i.test(desc)) continue;
-      if(dc === '*') continue; // bloqueado
+      const [, data, desc, valStr, dc] = m;
+
+      // Pula linhas especiais
+      if(/SALDO\s+(ANTERIOR|BLOQ|DO\s+DIA)/i.test(desc)) continue;
+      if(dc === '*') continue; // saldo bloqueado
+      if(/^(ENCARGO|LIMITE|CAPITAL|SAC\b|OUVIDORIA|TARIFA)/i.test(desc)) continue;
 
       const valor = parseValor(valStr);
       if(valor <= 0) continue;
       const tipo = dc.toUpperCase() === 'C' ? 'entrada' : 'saida';
 
-      // coleta linhas de detalhe (sem data) — enriquecem descrição
+      // ── Coleta linhas de continuação (sem data) para enriquecer descrição ──
       let descFinal = desc.trim();
       while(i+1 < linhas.length){
         const next = linhas[i+1].trim();
         if(!next){ i++; continue; }
+        // para se a próxima linha começa com data DD/MM
         if(/^\d{2}\/\d{2}\s/.test(next)) break;
-        if(!/^DOC\.\s*:/i.test(next) && !/^\d{2}\.\d{3}\.\d{3}/.test(next) && next.length > 4){
-          descFinal += ' | ' + next;
-        }
+        // ignora linhas de documento e CNPJ/CPF
+        if(/^DOC\.\s*:/i.test(next) || /^\d{2}\.\d{3}\.\d{3}/.test(next)){ i++; continue; }
+        // ignora "Recebimento Pix" e similares que são redundantes
+        if(/^Recebimento\s+Pix$/i.test(next)){ i++; continue; }
+        // adiciona nome da empresa/pessoa se for substancial
+        if(next.length > 3) descFinal += ' | ' + next;
         i++;
       }
-      lancamentos.push({ data, descricao: descFinal.substring(0,100), tipo, valor, saldo: 0 });
+
+      lancamentos.push({ data, descricao: descFinal.substring(0,120), tipo, valor, saldo: 0 });
     }
 
-    // calcula saldo running a partir das transações do dia
     const totalEnt = lancamentos.filter(l=>l.tipo==='entrada').reduce((s,l)=>s+l.valor,0);
     const totalSai = lancamentos.filter(l=>l.tipo==='saida').reduce((s,l)=>s+l.valor,0);
-    // saldo em conta = resultado das transações do dia (entradas - saídas)
-    // saldo disponível = saldo em conta + RDC + cheque especial (lido do RESUMO)
-    let saldoFinal;
-    if(saldoDisponivel !== null){
-      // lido direto do extrato — mais confiável
-      saldoFinal = saldoDisponivel;
-    } else {
-      saldoFinal = saldoEmConta + saldoRDC + chequeEspecial;
-    }
 
-    // calcula saldo running da tabela
-    // saldoEmConta já é o saldo do dia após todas as transações
-    // para reconstruir o saldo progressivo, começa do saldo inicial (antes das transações)
+    // Saldo final = lido diretamente do RESUMO (mais confiável)
+    const saldoFinal = saldoDisponivel !== null
+      ? saldoDisponivel
+      : saldoEmConta + saldoRDC + chequeEspecial;
+
+    // Saldo running: começa do saldo antes das transações do dia
     const saldoInicial = saldoEmConta - totalEnt + totalSai;
     let saldo = saldoInicial;
     for(const l of lancamentos){
