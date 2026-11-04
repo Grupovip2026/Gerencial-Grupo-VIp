@@ -18,11 +18,44 @@ h1{font-size:26px;font-weight:700;color:#fff}
 .subtitle{font-size:11px;color:#666;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
 .period{font-size:13px;color:#555;margin-top:4px;margin-bottom:20px}
 .badge-update{display:inline-block;font-size:10px;color:#444;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:20px;padding:3px 10px;margin-left:10px;vertical-align:middle}
-.nav-tabs{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:12px}
-.nav-tab{padding:9px 20px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:transparent;color:#888;font-weight:400;font-size:13px;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif}
-.nav-tab:hover{color:#ccc;border-color:rgba(255,255,255,.2)}
-.nav-tab.active{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.25);color:#fff;font-weight:600}
+/* ── LAYOUT LATERAL ── */
+body{padding:0!important;display:flex;flex-direction:column;min-height:100vh}
+.app-header{display:flex;align-items:center;gap:16px;padding:14px 24px;background:#0d0d1a;border-bottom:1px solid rgba(255,255,255,.07);position:sticky;top:0;z-index:100}
+.app-header h1{font-size:18px;font-weight:700;color:#fff;margin:0}
+.app-header .badge-update{font-size:10px;color:#444;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:20px;padding:3px 10px;margin-left:4px}
+.app-header .period{font-size:11px;color:#555;margin-left:auto}
+.app-body{display:flex;flex:1;overflow:hidden;height:calc(100vh - 53px)}
+/* ── SIDEBAR ── */
+.sidebar{width:220px;min-width:220px;background:#0a0a16;border-right:1px solid rgba(255,255,255,.07);overflow-y:auto;padding:16px 0;display:flex;flex-direction:column;gap:4px}
+.sidebar-logo{padding:0 16px 16px;border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:8px}
+.sidebar-logo .sub{font-size:10px;color:#444;text-transform:uppercase;letter-spacing:1px}
+.sidebar-logo .title{font-size:13px;font-weight:700;color:#ccc;margin-top:2px}
+.sidebar-section{padding:8px 16px 4px;font-size:9px;font-weight:700;color:#444;text-transform:uppercase;letter-spacing:1.5px;margin-top:4px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;margin:0 8px;border-radius:8px;cursor:pointer;color:#666;font-size:13px;font-weight:500;transition:all .18s;border:none;background:transparent;width:calc(100% - 16px);text-align:left;font-family:'Inter',sans-serif}
+.nav-item:hover{background:rgba(255,255,255,.05);color:#ccc}
+.nav-item.active{background:rgba(56,189,248,.12);color:#38bdf8;font-weight:600}
+.nav-item .nav-icon{font-size:15px;width:20px;text-align:center}
+/* ── CONTENT ── */
+.content-area{flex:1;overflow-y:auto;padding:28px 28px 40px}
 .page{display:none}.page.active{display:block}
+/* topo da página dentro do content */
+.page-header{margin-bottom:22px}
+.page-header h2{font-size:20px;font-weight:700;color:#fff;margin:0 0 4px}
+.page-header p{font-size:12px;color:#555;margin:0}
+/* esconde o antigo header inline */
+.subtitle{display:none}
+.nav-tabs{display:none}
+/* footer */
+#footer{padding:0 28px 20px;font-size:11px;color:#333;border-top:1px solid rgba(255,255,255,.04);margin-top:16px}
+/* mobile */
+@media(max-width:700px){
+  .app-body{flex-direction:column;height:auto}
+  .sidebar{width:100%;min-width:0;flex-direction:row;flex-wrap:wrap;padding:8px;gap:2px;border-right:none;border-bottom:1px solid rgba(255,255,255,.07);height:auto;overflow-x:auto}
+  .sidebar-section{display:none}
+  .sidebar-logo{display:none}
+  .nav-item{width:auto;padding:7px 12px;font-size:11px}
+  .content-area{padding:16px}
+}
 .tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
 .tab{padding:10px 22px;border-radius:8px;border:2px solid rgba(255,255,255,0.1);background:transparent;color:#888;font-weight:400;font-size:14px;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif}
 .tab.active-vip{border-color:#00C9A7;background:rgba(0,201,167,.13);color:#00C9A7;font-weight:700}
@@ -76,20 +109,64 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
 </style>
 </head>
 <body>
-<div class="subtitle">Grupo VIP — Resultado Gerencial 2026</div>
-<h1>Dashboard Financeiro <span class="badge-update" id="badge-update">carregando...</span></h1>
-<div class="period" id="period">Carregando dados...</div>
 
-<div class="nav-tabs">
-  <button class="nav-tab active" onclick="setPage('gerencial')">📊 Gerencial</button>
-  <button class="nav-tab" onclick="setPage('dre')">📋 DRE</button>
-  <button class="nav-tab" onclick="setPage('divida')">💳 Dívidas Fornecedores</button>
-  <button class="nav-tab" onclick="setPage('custos')">💰 Custos</button>
-  <button class="nav-tab" onclick="setPage('orc2027')">🎯 Orçamento 2027</button>
-  <button class="nav-tab" onclick="setPage('vendas')">🛒 Vendas VIP</button>
-  <button class="nav-tab" onclick="setPage('vendas-vidal')">🛒 Vendas Vidal</button>
-  <button class="nav-tab" onclick="setPage('fluxo')">💵 Fluxo de Caixa</button>
+<!-- ── HEADER FIXO ── -->
+<div class="app-header">
+  <h1>Dashboard Financeiro <span class="badge-update" id="badge-update">carregando...</span></h1>
+  <span class="period" id="period">Carregando dados...</span>
 </div>
+
+<div class="app-body">
+
+<!-- ── SIDEBAR ── -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sub">Grupo VIP</div>
+    <div class="title">Painel Gerencial</div>
+  </div>
+
+  <!-- Visão Geral -->
+  <div class="sidebar-section">Visão Geral</div>
+  <button class="nav-item active" onclick="setPage('gerencial')">
+    <span class="nav-icon">📊</span> Gerencial
+  </button>
+  <button class="nav-item" onclick="setPage('orc2027')">
+    <span class="nav-icon">🎯</span> Orçamento 2027
+  </button>
+
+  <!-- Contábil -->
+  <div class="sidebar-section">Contábil</div>
+  <button class="nav-item" onclick="setPage('dre')">
+    <span class="nav-icon">📋</span> DRE
+  </button>
+
+  <!-- Financeiro -->
+  <div class="sidebar-section">Financeiro</div>
+  <button class="nav-item" onclick="setPage('divida')">
+    <span class="nav-icon">💳</span> Dívidas Fornecedores
+  </button>
+  <button class="nav-item" onclick="setPage('custos')">
+    <span class="nav-icon">💰</span> Custos
+  </button>
+  <button class="nav-item" onclick="setPage('fluxo')">
+    <span class="nav-icon">💵</span> Fluxo de Caixa
+  </button>
+
+  <!-- Comercial -->
+  <div class="sidebar-section">Comercial</div>
+  <button class="nav-item" onclick="setPage('vendas')">
+    <span class="nav-icon">🛒</span> Vendas VIP
+  </button>
+  <button class="nav-item" onclick="setPage('vendas-vidal')">
+    <span class="nav-icon">🛒</span> Vendas Vidal
+  </button>
+  <button class="nav-item" style="opacity:.4;cursor:not-allowed" title="Em breve">
+    <span class="nav-icon">🛒</span> Vendas V3
+  </button>
+</nav>
+
+<!-- ── CONTENT ── -->
+<div class="content-area">
 
 <!-- GERENCIAL -->
 <div id="page-gerencial" class="page active">
@@ -845,9 +922,13 @@ async function loadData(){
 }
 
 function setPage(p){
-  document.querySelectorAll('.nav-tab').forEach((t,i)=>{t.classList.toggle('active',['gerencial','dre','divida','custos','orc2027','vendas','vendas-vidal','fluxo'][i]===p)});
+  document.querySelectorAll('.nav-item').forEach(t=>{
+    const oc=t.getAttribute('onclick')||'';
+    t.classList.toggle('active', oc===`setPage('${p}')`);
+  });
   document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
-  document.getElementById('page-'+p).classList.add('active');
+  const pg=document.getElementById('page-'+p);
+  if(pg) pg.classList.add('active');
   if(p==='orc2027') renderOrc2027();
   if(p==='vendas') renderVendasML();
   if(p==='vendas-vidal') renderVendasVidal();
@@ -3023,6 +3104,7 @@ function renderOrc2027(){
 
 loadData();
 </script>
-<script>loadData();</script>
+</div><!-- /content-area -->
+</div><!-- /app-body -->
 </body>
 </html>
