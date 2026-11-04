@@ -37,6 +37,10 @@ body{padding:0!important;display:flex;flex-direction:column;min-height:100vh}
 .nav-item:hover{background:rgba(255,255,255,.05);color:#ccc}
 .nav-item.active{background:rgba(56,189,248,.12);color:#38bdf8;font-weight:600}
 .nav-item .nav-icon{font-size:15px;width:20px;text-align:center}
+.nav-sub-item{display:flex;align-items:center;gap:8px;padding:7px 16px 7px 38px;margin:0 8px;border-radius:7px;cursor:pointer;color:#4a5568;font-size:12px;font-weight:500;transition:all .18s;border:none;background:transparent;width:calc(100% - 16px);text-align:left;font-family:'Inter',sans-serif}
+.nav-sub-item:hover{background:rgba(255,255,255,.04);color:#94a3b8}
+.nav-sub-item.active{background:rgba(56,189,248,.09);color:#38bdf8;font-weight:600}
+.nav-sub-item .nav-icon{font-size:13px;width:16px;text-align:center}
 /* ── CONTENT ── */
 .content-area{flex:1;overflow-y:auto;padding:28px 28px 40px}
 .page{display:none}.page.active{display:block}
@@ -266,6 +270,18 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
   </button>
   <button class="nav-item" onclick="setPage('rh')">
     <span class="nav-icon">👥</span> RH / DP
+  </button>
+  <button class="nav-sub-item" onclick="setPage('rh-funcionarios')">
+    <span class="nav-icon">👤</span> Funcionários
+  </button>
+  <button class="nav-sub-item" onclick="setPage('rh-salarios')">
+    <span class="nav-icon">💰</span> Salários
+  </button>
+  <button class="nav-sub-item" onclick="setPage('rh-ferias')">
+    <span class="nav-icon">🏖️</span> Férias
+  </button>
+  <button class="nav-sub-item" onclick="setPage('rh-dependentes')">
+    <span class="nav-icon">👨‍👩‍👧</span> Dependentes
   </button>
 </nav>
 
@@ -1378,7 +1394,7 @@ async function loadData(){
 }
 
 function setPage(p){
-  document.querySelectorAll('.nav-item').forEach(t=>{
+  document.querySelectorAll('.nav-item,.nav-sub-item').forEach(t=>{
     const oc=t.getAttribute('onclick')||'';
     t.classList.toggle('active', oc===`setPage('${p}')`);
   });
@@ -4876,6 +4892,210 @@ loadData();
   // expõe renderAll para setPage
   window._rhRenderAll = rhRenderAll;
   rhRenderAll();
+
+  // ── Sub-páginas do menu lateral ──
+  window._rhSubPage = function(tab){
+    rhRenderAll();
+    // ativa a aba interna equivalente na página principal rh (para consistência)
+    // e redireciona para a sub-página dedicada
+  };
+})();
+</script>
+
+<!-- ── Sub-página: Funcionários ── -->
+<div id="page-rh-funcionarios" class="page">
+<div class="rh-header">
+  <div class="rh-title">👤 Funcionários <small>RH / DP</small></div>
+  <button class="btn-rh btn-rh-primary" onclick="rhOpenModal()">+ Novo Funcionário</button>
+</div>
+<div class="rh-kpis" id="rh-kpis-func"></div>
+<div class="rh-toolbar">
+  <input class="rh-search" id="rh-search-func" placeholder="🔍 Buscar funcionário..." oninput="rhRenderFuncPage()">
+  <select class="rh-search" id="rh-filtro-status-func" style="width:140px" onchange="rhRenderFuncPage()">
+    <option value="">Todos</option><option value="ativo">Ativos</option>
+    <option value="ferias">Em férias</option><option value="inativo">Inativos</option>
+  </select>
+</div>
+<div class="rh-cards" id="rh-cards-func"></div>
+</div>
+
+<!-- ── Sub-página: Salários ── -->
+<div id="page-rh-salarios" class="page">
+<div class="rh-header">
+  <div class="rh-title">💰 Salários <small>RH / DP</small></div>
+</div>
+<div class="rh-kpis" id="rh-kpis-sal"></div>
+<div style="overflow-x:auto">
+<table class="rh-table">
+  <thead><tr>
+    <th>Funcionário</th><th>Cargo</th><th>Salário Base</th>
+    <th>Benefícios</th><th>VT</th><th>VR/VA</th><th>Plano Saúde</th><th>Total Custo</th><th></th>
+  </tr></thead>
+  <tbody id="rh-tbody-sal-page"></tbody>
+</table>
+</div>
+</div>
+
+<!-- ── Sub-página: Férias ── -->
+<div id="page-rh-ferias" class="page">
+<div class="rh-header">
+  <div class="rh-title">🏖️ Férias <small>RH / DP</small></div>
+</div>
+<div class="rh-kpis" id="rh-kpis-fer"></div>
+<div style="overflow-x:auto">
+<table class="rh-table">
+  <thead><tr>
+    <th>Funcionário</th><th>Admissão</th><th>Próx. Período</th>
+    <th>Início Férias</th><th>Fim Férias</th><th>Dias</th><th>Status</th><th></th>
+  </tr></thead>
+  <tbody id="rh-tbody-fer-page"></tbody>
+</table>
+</div>
+</div>
+
+<!-- ── Sub-página: Dependentes ── -->
+<div id="page-rh-dependentes" class="page">
+<div class="rh-header">
+  <div class="rh-title">👨‍👩‍👧 Dependentes <small>RH / DP</small></div>
+</div>
+<div class="rh-kpis" id="rh-kpis-dep"></div>
+<div style="overflow-x:auto">
+<table class="rh-table">
+  <thead><tr><th>Funcionário</th><th>Cargo</th><th>Dependente</th><th>Parentesco</th><th>Nascimento</th><th>CPF</th></tr></thead>
+  <tbody id="rh-tbody-dep-page"></tbody>
+</table>
+</div>
+</div>
+
+<script>
+(function(){
+  const RH_KEY = 'rh_data_v1';
+  const fmtMoeda = v => 'R$ ' + (Number(v)||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const fmtData  = s => { if(!s) return '—'; const [y,m,d]=s.split('-'); return `${d}/${m}/${y}`; };
+  function getData(){ try{ return JSON.parse(localStorage.getItem(RH_KEY)||'[]'); }catch(e){ return []; } }
+
+  // ── Funcionários page ──
+  window.rhRenderFuncPage = function(){
+    const data = getData();
+    const q  = (document.getElementById('rh-search-func')?.value||'').toLowerCase();
+    const st = document.getElementById('rh-filtro-status-func')?.value||'';
+    const list = data.filter(f=>{
+      const nomeOk = f.nome.toLowerCase().includes(q)||(f.cargo||'').toLowerCase().includes(q);
+      return nomeOk && (!st||f.status===st);
+    });
+    // KPIs
+    const ativos=data.filter(f=>f.status==='ativo').length, ferias=data.filter(f=>f.status==='ferias').length, inat=data.filter(f=>f.status==='inativo').length;
+    const kpi=document.getElementById('rh-kpis-func');
+    if(kpi) kpi.innerHTML=`
+      <div class="rh-kpi"><div class="rh-kpi-label">👤 Ativos</div><div class="rh-kpi-val">${ativos}</div></div>
+      <div class="rh-kpi"><div class="rh-kpi-label">🏖️ Em férias</div><div class="rh-kpi-val" style="color:#fbbf24">${ferias}</div></div>
+      <div class="rh-kpi"><div class="rh-kpi-label">❌ Inativos</div><div class="rh-kpi-val" style="color:#f87171">${inat}</div></div>
+      <div class="rh-kpi"><div class="rh-kpi-label">📋 Total</div><div class="rh-kpi-val">${data.length}</div></div>`;
+    const c=document.getElementById('rh-cards-func');
+    if(!c) return;
+    if(!list.length){ c.innerHTML='<p style="color:#475569;font-size:14px">Nenhum funcionário encontrado.</p>'; return; }
+    c.innerHTML=list.map(f=>{
+      const badge=f.status==='ativo'?`<span class="rh-badge rh-badge-ativo">Ativo</span>`:f.status==='ferias'?`<span class="rh-badge rh-badge-ferias">Férias</span>`:`<span class="rh-badge rh-badge-inativo">Inativo</span>`;
+      return `<div class="rh-card" onclick="rhOpenModal('${f._id}')">
+        <div class="rh-card-name">${f.nome}</div>
+        <div class="rh-card-cargo">${f.cargo||'—'} · ${f.depto||'—'}</div>
+        <div class="rh-card-badges">${badge}${f.admissao?`<span style="font-size:11px;color:#475569">Desde ${fmtData(f.admissao)}</span>`:''}
+        </div></div>`;
+    }).join('');
+  };
+
+  // ── Salários page ──
+  window.rhRenderSalPage = function(){
+    const data = getData();
+    const folha=data.filter(f=>f.status!=='inativo').reduce((s,f)=>(s+(Number(f.salario)||0)+(Number(f.vt)||0)+(Number(f.vr)||0)+(Number(f.saude)||0)+(Number(f.outrosBen)||0)),0);
+    const kpi=document.getElementById('rh-kpis-sal');
+    if(kpi) kpi.innerHTML=`
+      <div class="rh-kpi"><div class="rh-kpi-label">💰 Folha/mês</div><div class="rh-kpi-val" style="font-size:17px">${fmtMoeda(folha)}</div></div>
+      <div class="rh-kpi"><div class="rh-kpi-label">👤 Funcionários</div><div class="rh-kpi-val">${data.filter(f=>f.status!=='inativo').length}</div></div>
+      <div class="rh-kpi"><div class="rh-kpi-label">📊 Média salarial</div><div class="rh-kpi-val" style="font-size:17px">${data.filter(f=>f.status!=='inativo').length?fmtMoeda(folha/data.filter(f=>f.status!=='inativo').length):'R$ 0,00'}</div></div>`;
+    const tbody=document.getElementById('rh-tbody-sal-page');
+    if(!tbody) return;
+    const rows=data.filter(f=>f.status!=='inativo').map(f=>{
+      const total=(Number(f.salario)||0)+(Number(f.vt)||0)+(Number(f.vr)||0)+(Number(f.saude)||0)+(Number(f.outrosBen)||0);
+      return `<tr>
+        <td><strong>${f.nome}</strong></td><td>${f.cargo||'—'}</td>
+        <td>${fmtMoeda(f.salario)}</td>
+        <td>${fmtMoeda((Number(f.vt)||0)+(Number(f.vr)||0)+(Number(f.saude)||0)+(Number(f.outrosBen)||0))}</td>
+        <td>${fmtMoeda(f.vt)}</td><td>${fmtMoeda(f.vr)}</td><td>${fmtMoeda(f.saude)}</td>
+        <td style="color:#38bdf8;font-weight:700">${fmtMoeda(total)}</td>
+        <td><button class="btn-rh-sm btn-edit-rh" onclick="rhOpenModal('${f._id}')">✏️ Editar</button></td>
+      </tr>`;
+    }).join('');
+    tbody.innerHTML=rows||'<tr><td colspan="9" style="color:#475569;text-align:center;padding:20px">Nenhum funcionário ativo.</td></tr>';
+  };
+
+  // ── Férias page ──
+  window.rhRenderFerPage = function(){
+    const data = getData();
+    const hoje=new Date();
+    const emFerias=data.filter(f=>f.status==='ferias').length;
+    const venc30=data.filter(f=>{
+      if(!f.admissao||f.status==='inativo') return false;
+      const adm=new Date(f.admissao); let p=new Date(adm); p.setFullYear(hoje.getFullYear());
+      if(p<=hoje) p.setFullYear(hoje.getFullYear()+1);
+      return Math.ceil((p-hoje)/(864e5))<=30;
+    }).length;
+    const kpi=document.getElementById('rh-kpis-fer');
+    if(kpi) kpi.innerHTML=`
+      <div class="rh-kpi"><div class="rh-kpi-label">🏖️ Em férias</div><div class="rh-kpi-val" style="color:#fbbf24">${emFerias}</div></div>
+      <div class="rh-kpi"><div class="rh-kpi-label">⚠️ Vence em 30d</div><div class="rh-kpi-val" style="color:#f87171">${venc30}</div></div>`;
+    const tbody=document.getElementById('rh-tbody-fer-page');
+    if(!tbody) return;
+    const rows=data.map(f=>{
+      if(!f.admissao) return '';
+      const adm=new Date(f.admissao); let pp=new Date(adm); pp.setFullYear(hoje.getFullYear());
+      if(pp<=hoje) pp.setFullYear(hoje.getFullYear()+1);
+      const dp=Math.ceil((pp-hoje)/(864e5));
+      let stTxt='',stCls='';
+      if(f.status==='ferias'){stTxt='Em férias';stCls='ferias-status-ok';}
+      else if(dp<=30){stTxt=`Vence em ${dp}d`;stCls='ferias-status-venc';}
+      else if(dp<=90){stTxt=`${dp} dias`;stCls='ferias-status-warn';}
+      else{stTxt=`${dp} dias`;stCls='ferias-status-ok';}
+      const dias=f.feriasIni&&f.feriasFim?Math.round((new Date(f.feriasFim)-new Date(f.feriasIni))/(864e5)):'—';
+      return `<tr>
+        <td><strong>${f.nome}</strong></td><td>${fmtData(f.admissao)}</td>
+        <td>${fmtData(pp.toISOString().split('T')[0])}</td>
+        <td>${f.feriasIni?fmtData(f.feriasIni):'—'}</td><td>${f.feriasFim?fmtData(f.feriasFim):'—'}</td>
+        <td>${dias}</td><td class="${stCls}">${stTxt}</td>
+        <td><button class="btn-rh-sm btn-edit-rh" onclick="rhOpenModal('${f._id}')">✏️ Editar</button></td>
+      </tr>`;
+    }).join('');
+    tbody.innerHTML=rows||'<tr><td colspan="8" style="color:#475569;text-align:center;padding:20px">Nenhum funcionário.</td></tr>';
+  };
+
+  // ── Dependentes page ──
+  window.rhRenderDepPage = function(){
+    const data = getData();
+    const totalDeps=data.reduce((s,f)=>(s+(f.dependentes||[]).length),0);
+    const kpi=document.getElementById('rh-kpis-dep');
+    if(kpi) kpi.innerHTML=`
+      <div class="rh-kpi"><div class="rh-kpi-label">👨‍👩‍👧 Total dependentes</div><div class="rh-kpi-val">${totalDeps}</div></div>
+      <div class="rh-kpi"><div class="rh-kpi-label">👥 Com dependentes</div><div class="rh-kpi-val">${data.filter(f=>(f.dependentes||[]).length>0).length}</div></div>`;
+    const tbody=document.getElementById('rh-tbody-dep-page');
+    if(!tbody) return;
+    const rows=data.flatMap(f=>(f.dependentes||[]).map(d=>`
+      <tr>
+        <td><strong>${f.nome}</strong></td><td style="color:#64748b">${f.cargo||'—'}</td>
+        <td>${d.nome}</td><td>${d.parentesco||'—'}</td>
+        <td>${d.nasc?fmtData(d.nasc):'—'}</td><td>${d.cpf||'—'}</td>
+      </tr>`)).join('');
+    tbody.innerHTML=rows||'<tr><td colspan="6" style="color:#475569;text-align:center;padding:20px">Nenhum dependente cadastrado.</td></tr>';
+  };
+
+  // hook no setPage para renderizar sub-páginas
+  const _origSetPage = window.setPage;
+  window.setPage = function(p){
+    _origSetPage(p);
+    if(p==='rh-funcionarios') rhRenderFuncPage();
+    if(p==='rh-salarios')    rhRenderSalPage();
+    if(p==='rh-ferias')      rhRenderFerPage();
+    if(p==='rh-dependentes') rhRenderDepPage();
+  };
 })();
 </script>
 </body>
