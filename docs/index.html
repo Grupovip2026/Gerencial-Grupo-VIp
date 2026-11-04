@@ -3763,45 +3763,46 @@ loadData();
       if(!l) continue;
 
       // ── Detecta início do bloco RESUMO ──
+      // Estrutura real do PDF (colunas separadas pelo PDF.js):
+      //   "(+) SALDO EM CONTA:"          ← label
+      //   "(+) SALDO EM RDC AUTOMÁTICO:" ← label
+      //   "(+) CHEQUE ESPECIAL CONTRATADO:" ← label
+      //   "3.409,55C"   ← valor do saldo em conta
+      //   "14.238,87C"  ← valor do RDC
+      //   "12.000,00C"  ← valor do cheque especial
+      // Estratégia: coleta labels e valores separadamente, associa por índice de posição
       if(/^RESUMO\s*$/i.test(l)){
-        // O bloco RESUMO do Sicoob tem LABELS numa coluna e VALORES em outra:
-        // Labels: "(+) SALDO EM CONTA:", "(+) SALDO EM RDC AUTOMÁTICO:", "(+) CHEQUE ESPECIAL CONTRATADO:", "(=) SALDO DISPONÍVEL:"
-        // Valores (linhas separadas depois): "3.409,55C", "14.238,87C", "12.000,00C", "29.648,42C"
-        // Estratégia: coleta todos os labels em ordem, depois coleta todos os valores em ordem, associa por índice
-        const labels = [];
-        const valores = [];
+        const labels = [];  // tipo: 'conta','rdc','cheque','disponivel','outros'
+        const valores = []; // strings como "12.000,00C"
+        const rValPuro = /^([\d]{1,3}(?:\.[\d]{3})*,\d{2})\s*([CD*])\s*$/i;
         let j = i+1;
         while(j < linhas.length){
-          const rl = linhas[j].trim();
-          j++;
+          const rl = linhas[j].trim(); j++;
           if(!rl) continue;
-          // para ao encontrar seções além do resumo
-          if(/^(SALDO\s+BLOQUEADO|VENCIMENTO|TAXA|CUSTO|LIMITES|CAPITAL|PARCELA|SAC\b|OUVIDORIA|000\s+EXTRATOS)/i.test(rl)) break;
-          // linha de label (contém texto descritivo, não valor monetário puro)
-          if(/[A-Za-zÀ-ú]/.test(rl) && !/^[\d]/.test(rl)){
-            if(/SALDO\s+EM\s+CONTA/i.test(rl) && !/RDC/i.test(rl)) labels.push('conta');
-            else if(/SALDO\s+EM\s+RDC/i.test(rl)) labels.push('rdc');
-            else if(/CHEQUE\s+ESPECIAL\s+CONTRATADO/i.test(rl)) labels.push('cheque');
-            else if(/SALDO\s+DISPON/i.test(rl)) labels.push('disponivel');
-            else labels.push('outros');
-          }
-          // linha de valor monetário puro: "12.000,00C" ou "29.648,42C"
-          else if(/^[\d]{1,3}(?:\.[\d]{3})*,\d{2}[CD*]?\s*$/i.test(rl)){
+          // Para em seções que ficam APÓS o resumo
+          if(/^(ENCARGOS\s+VENCIDOS|TARIFAS\s+VENCIDAS\s+REMANES|ENCARGOS\s+A\s+VENCER|OUTRAS\s+INFO|VENCIMENTO\s+CHEQUE\s+ESP|TAXA\s+CHEQUE|CUSTO\s+EFETIVO|LIMITES\s+DE\s+CRED|CAPITAL\s+DE\s+GIRO|PARCELA|SAC\b|OUVIDORIA|000\s+EXTRA)/i.test(rl)) break;
+          if(rValPuro.test(rl)){
             valores.push(rl);
+          } else if(/[A-Za-zÀ-ú]/.test(rl)){
+            if(/SALDO\s+EM\s+CONTA/i.test(rl) && !/RDC/i.test(rl)) labels.push('conta');
+            else if(/SALDO\s+EM\s+RDC/i.test(rl))                   labels.push('rdc');
+            else if(/CHEQUE\s+ESPECIAL\s+CONTRATADO/i.test(rl))      labels.push('cheque');
+            else if(/SALDO\s+DISPON/i.test(rl))                      labels.push('disponivel');
+            else                                                       labels.push('outros');
           }
         }
-        // Associa labels → valores por posição
+        // Associa label[n] → valor[n] por posição
         labels.forEach((lbl, idx) => {
           if(idx >= valores.length) return;
           const v = extraiValor(valores[idx]);
-          if(lbl === 'conta') saldoEmConta = v;
-          else if(lbl === 'rdc') saldoRDC = v;
+          if(lbl === 'conta')      saldoEmConta   = v;
+          else if(lbl === 'rdc')   saldoRDC       = v;
           else if(lbl === 'cheque') chequeEspecial = v;
           else if(lbl === 'disponivel') saldoDisponivel = v;
         });
         console.log('[Sicoob] RESUMO labels:', labels, 'valores:', valores);
-        console.log('[Sicoob] RESUMO parsed → conta:', saldoEmConta, 'rdc:', saldoRDC, 'cheque:', chequeEspecial, 'disponivel:', saldoDisponivel);
-        i = j - 1; // avança o loop principal até após o RESUMO
+        console.log('[Sicoob] → conta:', saldoEmConta, 'rdc:', saldoRDC, 'cheque:', chequeEspecial, 'disp:', saldoDisponivel);
+        i = j - 1;
         continue;
       }
 
