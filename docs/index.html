@@ -264,6 +264,9 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
   <button class="nav-item" style="opacity:.4;cursor:not-allowed" title="Em breve">
     <span class="nav-icon">🛒</span> Vendas V3
   </button>
+  <button class="nav-item" onclick="setPage('rh')">
+    <span class="nav-icon">👥</span> RH / DP
+  </button>
 </nav>
 
 <!-- ── CONTENT ── -->
@@ -1387,6 +1390,7 @@ function setPage(p){
   if(p==='vendas-vidal') renderVendasVidal();
   if(p==='fluxo') renderFluxo();
   if(p==='marketing' && typeof renderMarketing==='function') renderMarketing();
+  if(p==='rh' && typeof _rhRenderAll==='function') _rhRenderAll();
 }
 
 function mkChart(id,type,labels,datasets,opts={}){
@@ -4462,7 +4466,417 @@ loadData();
   };
 })();
 </script>
-</div><!-- /content-area -->
-</div><!-- /app-body -->
+
+<!-- ── RH / DP ── -->
+<div id="page-rh" class="page">
+<style>
+.rh-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.rh-title{font-size:22px;font-weight:700;color:#e2e8f0;display:flex;align-items:center;gap:10px}
+.rh-title small{font-size:13px;color:#64748b;font-weight:400}
+.rh-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}
+.rh-tab{padding:7px 18px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:#94a3b8;font-size:13px;font-weight:500;cursor:pointer;transition:all .18s}
+.rh-tab.active{background:rgba(56,189,248,.15);border-color:#38bdf8;color:#38bdf8;font-weight:600}
+.rh-section{display:none}.rh-section.active{display:block}
+.rh-toolbar{display:flex;gap:10px;align-items:center;margin-bottom:18px;flex-wrap:wrap}
+.rh-search{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px 14px;color:#e2e8f0;font-size:13px;width:220px;outline:none}
+.rh-search::placeholder{color:#475569}
+.btn-rh{padding:8px 18px;border-radius:8px;border:none;font-size:13px;font-weight:600;cursor:pointer;transition:all .18s}
+.btn-rh-primary{background:linear-gradient(135deg,#38bdf8,#818cf8);color:#fff}
+.btn-rh-primary:hover{opacity:.88}
+.btn-rh-danger{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.3)}
+.btn-rh-danger:hover{background:rgba(239,68,68,.25)}
+.btn-rh-sm{padding:5px 12px;font-size:12px;border-radius:6px;border:none;cursor:pointer;font-weight:600;transition:all .18s}
+.btn-edit-rh{background:rgba(56,189,248,.15);color:#38bdf8}
+.btn-del-rh{background:rgba(239,68,68,.12);color:#f87171}
+/* cards de funcionário */
+.rh-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-bottom:24px}
+.rh-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:20px;cursor:pointer;transition:all .2s}
+.rh-card:hover,.rh-card.selected{border-color:#38bdf8;background:rgba(56,189,248,.07)}
+.rh-card-name{font-size:15px;font-weight:700;color:#e2e8f0;margin-bottom:4px}
+.rh-card-cargo{font-size:12px;color:#64748b;margin-bottom:12px}
+.rh-card-badges{display:flex;gap:6px;flex-wrap:wrap}
+.rh-badge{font-size:11px;padding:3px 10px;border-radius:12px;font-weight:600}
+.rh-badge-ativo{background:rgba(34,197,94,.15);color:#4ade80}
+.rh-badge-inativo{background:rgba(239,68,68,.12);color:#f87171}
+.rh-badge-ferias{background:rgba(251,191,36,.12);color:#fbbf24}
+/* tabela */
+.rh-table{width:100%;border-collapse:collapse;font-size:13px}
+.rh-table th{text-align:left;padding:10px 14px;color:#64748b;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid rgba(255,255,255,.07)}
+.rh-table td{padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.04);color:#cbd5e1;vertical-align:middle}
+.rh-table tr:hover td{background:rgba(255,255,255,.025)}
+/* modal */
+.rh-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9000;display:flex;align-items:center;justify-content:center;padding:16px}
+.rh-modal{background:#1a2035;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:28px;width:100%;max-width:600px;max-height:90vh;overflow-y:auto}
+.rh-modal h3{font-size:18px;font-weight:700;color:#e2e8f0;margin-bottom:20px}
+.rh-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.rh-form-grid .span2{grid-column:1/-1}
+.rh-field{display:flex;flex-direction:column;gap:5px}
+.rh-field label{font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.rh-field input,.rh-field select,.rh-field textarea{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:9px 12px;color:#e2e8f0;font-size:13px;outline:none;font-family:inherit;transition:border-color .18s}
+.rh-field input:focus,.rh-field select:focus,.rh-field textarea:focus{border-color:#38bdf8}
+.rh-field select option{background:#1a2035}
+.rh-field textarea{resize:vertical;min-height:70px}
+.rh-modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.07)}
+/* kpi bar */
+.rh-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:24px}
+.rh-kpi{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:16px}
+.rh-kpi-label{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
+.rh-kpi-val{font-size:22px;font-weight:700;color:#38bdf8}
+/* férias */
+.ferias-status-ok{color:#4ade80}.ferias-status-warn{color:#fbbf24}.ferias-status-venc{color:#f87171}
+/* dependentes */
+.dep-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.dep-item{background:rgba(255,255,255,.04);border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#cbd5e1}
+</style>
+
+<div class="rh-header">
+  <div class="rh-title">👥 RH / Departamento Pessoal <small id="rh-empresa-nome"></small></div>
+  <button class="btn-rh btn-rh-primary" onclick="rhOpenModal()">+ Novo Funcionário</button>
+</div>
+
+<!-- KPIs -->
+<div class="rh-kpis" id="rh-kpis"></div>
+
+<!-- Abas -->
+<div class="rh-tabs">
+  <button class="rh-tab active" onclick="rhTab('geral')">👤 Funcionários</button>
+  <button class="rh-tab" onclick="rhTab('salarios')">💰 Salários</button>
+  <button class="rh-tab" onclick="rhTab('ferias')">🏖️ Férias</button>
+  <button class="rh-tab" onclick="rhTab('dependentes')">👨‍👩‍👧 Dependentes</button>
+</div>
+
+<!-- ABA: Funcionários -->
+<div class="rh-section active" id="rh-sec-geral">
+  <div class="rh-toolbar">
+    <input class="rh-search" id="rh-search" placeholder="🔍 Buscar funcionário..." oninput="rhRenderCards()">
+    <select class="rh-search" id="rh-filtro-status" style="width:140px" onchange="rhRenderCards()">
+      <option value="">Todos</option>
+      <option value="ativo">Ativos</option>
+      <option value="ferias">Em férias</option>
+      <option value="inativo">Inativos</option>
+    </select>
+  </div>
+  <div class="rh-cards" id="rh-cards"></div>
+</div>
+
+<!-- ABA: Salários -->
+<div class="rh-section" id="rh-sec-salarios">
+  <table class="rh-table" id="rh-tbl-salarios">
+    <thead><tr>
+      <th>Funcionário</th><th>Cargo</th><th>Salário Base</th>
+      <th>Benefícios</th><th>VT</th><th>VR/VA</th><th>Plano Saúde</th><th>Total Custo</th>
+    </tr></thead>
+    <tbody id="rh-tbody-salarios"></tbody>
+  </table>
+</div>
+
+<!-- ABA: Férias -->
+<div class="rh-section" id="rh-sec-ferias">
+  <table class="rh-table" id="rh-tbl-ferias">
+    <thead><tr>
+      <th>Funcionário</th><th>Admissão</th><th>Próx. Período</th>
+      <th>Início Férias</th><th>Fim Férias</th><th>Dias</th><th>Status</th>
+    </tr></thead>
+    <tbody id="rh-tbody-ferias"></tbody>
+  </table>
+</div>
+
+<!-- ABA: Dependentes -->
+<div class="rh-section" id="rh-sec-dependentes">
+  <table class="rh-table">
+    <thead><tr><th>Funcionário</th><th>Dependente</th><th>Parentesco</th><th>Nascimento</th><th>CPF</th></tr></thead>
+    <tbody id="rh-tbody-dep"></tbody>
+  </table>
+</div>
+
+<!-- Modal Funcionário -->
+<div class="rh-modal-overlay" id="rh-modal" style="display:none" onclick="if(event.target===this)rhCloseModal()">
+<div class="rh-modal">
+  <h3 id="rh-modal-title">Novo Funcionário</h3>
+  <div class="rh-form-grid">
+    <div class="rh-field span2"><label>Nome completo</label><input id="rh-f-nome" placeholder="Nome completo"></div>
+    <div class="rh-field"><label>CPF</label><input id="rh-f-cpf" placeholder="000.000.000-00"></div>
+    <div class="rh-field"><label>RG</label><input id="rh-f-rg" placeholder="00.000.000-0"></div>
+    <div class="rh-field"><label>Data de nascimento</label><input id="rh-f-nasc" type="date"></div>
+    <div class="rh-field"><label>Sexo</label>
+      <select id="rh-f-sexo"><option value="">—</option><option>Masculino</option><option>Feminino</option><option>Outro</option></select>
+    </div>
+    <div class="rh-field"><label>Telefone</label><input id="rh-f-tel" placeholder="(00) 00000-0000"></div>
+    <div class="rh-field"><label>E-mail</label><input id="rh-f-email" placeholder="email@empresa.com"></div>
+    <div class="rh-field span2"><label>Endereço</label><input id="rh-f-end" placeholder="Rua, número, bairro, cidade/UF"></div>
+    <div class="rh-field"><label>PIS/PASEP</label><input id="rh-f-pis" placeholder="000.00000.00-0"></div>
+    <div class="rh-field"><label>CTPS nº</label><input id="rh-f-ctps" placeholder="Número da carteira"></div>
+    <div class="rh-field"><label>Cargo</label><input id="rh-f-cargo" placeholder="Ex: Vendedor, Mecânico..."></div>
+    <div class="rh-field"><label>Departamento</label>
+      <select id="rh-f-depto">
+        <option value="">—</option><option>Administrativo</option><option>Comercial</option>
+        <option>Financeiro</option><option>Mecânica</option><option>Estoque</option>
+        <option>TI</option><option>Liderança</option><option>Outro</option>
+      </select>
+    </div>
+    <div class="rh-field"><label>Data de contratação</label><input id="rh-f-admissao" type="date"></div>
+    <div class="rh-field"><label>Tipo de contrato</label>
+      <select id="rh-f-contrato">
+        <option value="">—</option><option>CLT</option><option>PJ</option>
+        <option>Estágio</option><option>Temporário</option><option>Autônomo</option>
+      </select>
+    </div>
+    <div class="rh-field"><label>Status</label>
+      <select id="rh-f-status">
+        <option value="ativo">Ativo</option><option value="ferias">Em férias</option><option value="inativo">Inativo</option>
+      </select>
+    </div>
+    <div class="rh-field"><label>Salário base (R$)</label><input id="rh-f-salario" type="number" placeholder="0,00" min="0" step="0.01"></div>
+    <div class="rh-field"><label>VT (R$/mês)</label><input id="rh-f-vt" type="number" placeholder="0,00" min="0" step="0.01"></div>
+    <div class="rh-field"><label>VR / VA (R$/mês)</label><input id="rh-f-vr" type="number" placeholder="0,00" min="0" step="0.01"></div>
+    <div class="rh-field"><label>Plano de saúde (R$/mês)</label><input id="rh-f-saude" type="number" placeholder="0,00" min="0" step="0.01"></div>
+    <div class="rh-field"><label>Outros benefícios (R$/mês)</label><input id="rh-f-outros-ben" type="number" placeholder="0,00" min="0" step="0.01"></div>
+    <div class="rh-field"><label>Início das férias</label><input id="rh-f-ferias-ini" type="date"></div>
+    <div class="rh-field"><label>Fim das férias</label><input id="rh-f-ferias-fim" type="date"></div>
+    <div class="rh-field span2"><label>Observações</label><textarea id="rh-f-obs" placeholder="Observações gerais sobre o funcionário..."></textarea></div>
+    <!-- Dependentes inline -->
+    <div class="rh-field span2">
+      <label>Dependentes</label>
+      <div id="rh-deps-container"></div>
+      <button type="button" class="btn-rh btn-rh-primary" style="margin-top:8px;font-size:12px;padding:6px 14px" onclick="rhAddDepField()">+ Adicionar dependente</button>
+    </div>
+  </div>
+  <div class="rh-modal-actions">
+    <button class="btn-rh btn-rh-danger" onclick="rhCloseModal()">Cancelar</button>
+    <button class="btn-rh btn-rh-primary" onclick="rhSalvar()">💾 Salvar</button>
+  </div>
+</div>
+</div>
+</div><!-- /page-rh -->
+
+<script>
+(function(){
+  const RH_KEY = 'rh_data_v1';
+  let _rhData = [];
+  let _rhEditId = null;
+
+  function rhLoad(){ try{ _rhData = JSON.parse(localStorage.getItem(RH_KEY)||'[]'); }catch(e){ _rhData=[]; } }
+  function rhSave(){ localStorage.setItem(RH_KEY, JSON.stringify(_rhData)); }
+  rhLoad();
+
+  const fmtMoeda = v => 'R$ ' + (Number(v)||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const fmtData  = s => { if(!s) return '—'; const [y,m,d]=s.split('-'); return `${d}/${m}/${y}`; };
+
+  function rhKPIs(){
+    const ativos  = _rhData.filter(f=>f.status==='ativo').length;
+    const ferias  = _rhData.filter(f=>f.status==='ferias').length;
+    const inativos= _rhData.filter(f=>f.status==='inativo').length;
+    const folha   = _rhData.filter(f=>f.status!=='inativo').reduce((s,f)=>{
+      return s + (Number(f.salario)||0) + (Number(f.vt)||0) + (Number(f.vr)||0) + (Number(f.saude)||0) + (Number(f.outrosBen)||0);
+    },0);
+    const totalDeps = _rhData.reduce((s,f)=>(s+(f.dependentes||[]).length),0);
+    document.getElementById('rh-kpis').innerHTML = `
+      <div class="rh-kpi"><div class="rh-kpi-label">👤 Ativos</div><div class="rh-kpi-val">${ativos}</div></div>
+      <div class="rh-kpi"><div class="rh-kpi-label">🏖️ Em férias</div><div class="rh-kpi-val" style="color:#fbbf24">${ferias}</div></div>
+      <div class="rh-kpi"><div class="rh-kpi-label">❌ Inativos</div><div class="rh-kpi-val" style="color:#f87171">${inativos}</div></div>
+      <div class="rh-kpi"><div class="rh-kpi-label">💰 Folha/mês</div><div class="rh-kpi-val" style="font-size:17px">${fmtMoeda(folha)}</div></div>
+      <div class="rh-kpi"><div class="rh-kpi-label">👨‍👩‍👧 Dependentes</div><div class="rh-kpi-val">${totalDeps}</div></div>
+    `;
+  }
+
+  window.rhRenderCards = function(){
+    const q = (document.getElementById('rh-search')?.value||'').toLowerCase();
+    const st= document.getElementById('rh-filtro-status')?.value||'';
+    const list = _rhData.filter(f=>{
+      const nomeOk = f.nome.toLowerCase().includes(q) || (f.cargo||'').toLowerCase().includes(q);
+      const stOk   = !st || f.status===st;
+      return nomeOk && stOk;
+    });
+    const container = document.getElementById('rh-cards');
+    if(!list.length){ container.innerHTML='<p style="color:#475569;font-size:14px">Nenhum funcionário encontrado.</p>'; return; }
+    container.innerHTML = list.map(f=>{
+      const badge = f.status==='ativo'   ? `<span class="rh-badge rh-badge-ativo">Ativo</span>`
+                  : f.status==='ferias'  ? `<span class="rh-badge rh-badge-ferias">Férias</span>`
+                  :                        `<span class="rh-badge rh-badge-inativo">Inativo</span>`;
+      const admissao = f.admissao ? `<span style="font-size:11px;color:#475569">Desde ${fmtData(f.admissao)}</span>` : '';
+      return `<div class="rh-card" onclick="rhOpenModal('${f._id}')">
+        <div class="rh-card-name">${f.nome}</div>
+        <div class="rh-card-cargo">${f.cargo||'—'} · ${f.depto||'—'}</div>
+        <div class="rh-card-badges">${badge}${admissao}</div>
+      </div>`;
+    }).join('');
+  };
+
+  function rhRenderSalarios(){
+    const rows = _rhData.filter(f=>f.status!=='inativo').map(f=>{
+      const total = (Number(f.salario)||0)+(Number(f.vt)||0)+(Number(f.vr)||0)+(Number(f.saude)||0)+(Number(f.outrosBen)||0);
+      return `<tr>
+        <td><strong>${f.nome}</strong></td>
+        <td>${f.cargo||'—'}</td>
+        <td>${fmtMoeda(f.salario)}</td>
+        <td>${fmtMoeda((Number(f.vt)||0)+(Number(f.vr)||0)+(Number(f.saude)||0)+(Number(f.outrosBen)||0))}</td>
+        <td>${fmtMoeda(f.vt)}</td>
+        <td>${fmtMoeda(f.vr)}</td>
+        <td>${fmtMoeda(f.saude)}</td>
+        <td style="color:#38bdf8;font-weight:700">${fmtMoeda(total)}</td>
+      </tr>`;
+    }).join('');
+    document.getElementById('rh-tbody-salarios').innerHTML = rows || '<tr><td colspan="8" style="color:#475569;text-align:center;padding:20px">Nenhum funcionário ativo.</td></tr>';
+  }
+
+  function rhRenderFerias(){
+    const hoje = new Date();
+    const rows = _rhData.map(f=>{
+      if(!f.admissao) return '';
+      const adm = new Date(f.admissao);
+      // Próximo período aquisitivo: aniversário de contrato mais próximo no futuro
+      let proxPer = new Date(adm);
+      proxPer.setFullYear(hoje.getFullYear());
+      if(proxPer <= hoje) proxPer.setFullYear(hoje.getFullYear()+1);
+      const diasProx = Math.ceil((proxPer-hoje)/(1000*60*60*24));
+      let statusTxt='', statusCls='';
+      if(f.status==='ferias'){ statusTxt='Em férias'; statusCls='ferias-status-ok'; }
+      else if(diasProx<=30){ statusTxt=`Vence em ${diasProx}d`; statusCls='ferias-status-venc'; }
+      else if(diasProx<=90){ statusTxt=`${diasProx} dias`; statusCls='ferias-status-warn'; }
+      else { statusTxt=`${diasProx} dias`; statusCls='ferias-status-ok'; }
+      return `<tr>
+        <td><strong>${f.nome}</strong></td>
+        <td>${fmtData(f.admissao)}</td>
+        <td>${fmtData(proxPer.toISOString().split('T')[0])}</td>
+        <td>${f.feriasIni ? fmtData(f.feriasIni) : '—'}</td>
+        <td>${f.feriasFim ? fmtData(f.feriasFim) : '—'}</td>
+        <td>${f.feriasIni && f.feriasFim ? Math.round((new Date(f.feriasFim)-new Date(f.feriasIni))/(1000*60*60*24)) : '—'}</td>
+        <td class="${statusCls}">${statusTxt}</td>
+      </tr>`;
+    }).join('');
+    document.getElementById('rh-tbody-ferias').innerHTML = rows || '<tr><td colspan="7" style="color:#475569;text-align:center;padding:20px">Nenhum funcionário.</td></tr>';
+  }
+
+  function rhRenderDependentes(){
+    const rows = _rhData.flatMap(f=>(f.dependentes||[]).map(d=>`
+      <tr>
+        <td>${f.nome}</td>
+        <td>${d.nome}</td>
+        <td>${d.parentesco||'—'}</td>
+        <td>${d.nasc ? fmtData(d.nasc) : '—'}</td>
+        <td>${d.cpf||'—'}</td>
+      </tr>`)).join('');
+    document.getElementById('rh-tbody-dep').innerHTML = rows || '<tr><td colspan="5" style="color:#475569;text-align:center;padding:20px">Nenhum dependente cadastrado.</td></tr>';
+  }
+
+  function rhRenderAll(){ rhKPIs(); rhRenderCards(); rhRenderSalarios(); rhRenderFerias(); rhRenderDependentes(); }
+
+  window.rhTab = function(tab){
+    document.querySelectorAll('.rh-tab').forEach((b,i)=>{
+      const tabs=['geral','salarios','ferias','dependentes'];
+      b.classList.toggle('active', tabs[i]===tab);
+    });
+    document.querySelectorAll('.rh-section').forEach(s=>s.classList.remove('active'));
+    document.getElementById('rh-sec-'+tab)?.classList.add('active');
+    if(tab==='salarios') rhRenderSalarios();
+    if(tab==='ferias') rhRenderFerias();
+    if(tab==='dependentes') rhRenderDependentes();
+  };
+
+  // ── Dependentes dinâmicos no modal ──
+  window.rhAddDepField = function(dep={}){
+    const c = document.getElementById('rh-deps-container');
+    const idx = c.children.length;
+    const div = document.createElement('div');
+    div.className='dep-item';
+    div.style.cssText='display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:8px;margin-bottom:6px;background:transparent;padding:0';
+    div.innerHTML=`
+      <input class="rh-search" placeholder="Nome do dependente" value="${dep.nome||''}" data-dep-nome="${idx}" style="width:100%">
+      <select class="rh-search" data-dep-par="${idx}" style="width:100%">
+        ${['—','Cônjuge','Filho(a)','Pai/Mãe','Irmão/Irmã','Outro'].map(o=>`<option${dep.parentesco===o?' selected':''}>${o}</option>`).join('')}
+      </select>
+      <input class="rh-search" placeholder="Nascimento" type="date" value="${dep.nasc||''}" data-dep-nasc="${idx}" style="width:100%">
+      <input class="rh-search" placeholder="CPF" value="${dep.cpf||''}" data-dep-cpf="${idx}" style="width:100%">
+      <button type="button" onclick="this.parentElement.remove()" style="background:rgba(239,68,68,.2);color:#f87171;border:none;border-radius:6px;cursor:pointer;padding:0 10px;font-weight:700">✕</button>
+    `;
+    c.appendChild(div);
+  };
+
+  // ── Abrir modal ──
+  window.rhOpenModal = function(id=null){
+    _rhEditId = id;
+    const f = id ? _rhData.find(x=>x._id===id) : null;
+    document.getElementById('rh-modal-title').textContent = f ? 'Editar Funcionário' : 'Novo Funcionário';
+    const v = k => f ? (f[k]||'') : '';
+    document.getElementById('rh-f-nome').value    = v('nome');
+    document.getElementById('rh-f-cpf').value     = v('cpf');
+    document.getElementById('rh-f-rg').value      = v('rg');
+    document.getElementById('rh-f-nasc').value    = v('nasc');
+    document.getElementById('rh-f-sexo').value    = v('sexo');
+    document.getElementById('rh-f-tel').value     = v('tel');
+    document.getElementById('rh-f-email').value   = v('email');
+    document.getElementById('rh-f-end').value     = v('endereco');
+    document.getElementById('rh-f-pis').value     = v('pis');
+    document.getElementById('rh-f-ctps').value    = v('ctps');
+    document.getElementById('rh-f-cargo').value   = v('cargo');
+    document.getElementById('rh-f-depto').value   = v('depto');
+    document.getElementById('rh-f-admissao').value= v('admissao');
+    document.getElementById('rh-f-contrato').value= v('contrato');
+    document.getElementById('rh-f-status').value  = f ? f.status : 'ativo';
+    document.getElementById('rh-f-salario').value = v('salario');
+    document.getElementById('rh-f-vt').value      = v('vt');
+    document.getElementById('rh-f-vr').value      = v('vr');
+    document.getElementById('rh-f-saude').value   = v('saude');
+    document.getElementById('rh-f-outros-ben').value = v('outrosBen');
+    document.getElementById('rh-f-ferias-ini').value = v('feriasIni');
+    document.getElementById('rh-f-ferias-fim').value = v('feriasFim');
+    document.getElementById('rh-f-obs').value     = v('obs');
+    // dependentes
+    const dc = document.getElementById('rh-deps-container');
+    dc.innerHTML = '';
+    (f?.dependentes||[]).forEach(d=>rhAddDepField(d));
+    document.getElementById('rh-modal').style.display='flex';
+  };
+
+  window.rhCloseModal = function(){ document.getElementById('rh-modal').style.display='none'; _rhEditId=null; };
+
+  window.rhSalvar = function(){
+    const nome = document.getElementById('rh-f-nome').value.trim();
+    if(!nome){ alert('Nome obrigatório.'); return; }
+    // coleta dependentes
+    const dc = document.getElementById('rh-deps-container');
+    const deps = [...dc.children].map(row=>({
+      nome:       row.querySelector('[data-dep-nome]')?.value||'',
+      parentesco: row.querySelector('[data-dep-par]')?.value||'',
+      nasc:       row.querySelector('[data-dep-nasc]')?.value||'',
+      cpf:        row.querySelector('[data-dep-cpf]')?.value||''
+    })).filter(d=>d.nome.trim());
+    const func = {
+      _id:        _rhEditId || ('rh_'+Date.now()),
+      nome,
+      cpf:        document.getElementById('rh-f-cpf').value.trim(),
+      rg:         document.getElementById('rh-f-rg').value.trim(),
+      nasc:       document.getElementById('rh-f-nasc').value,
+      sexo:       document.getElementById('rh-f-sexo').value,
+      tel:        document.getElementById('rh-f-tel').value.trim(),
+      email:      document.getElementById('rh-f-email').value.trim(),
+      endereco:   document.getElementById('rh-f-end').value.trim(),
+      pis:        document.getElementById('rh-f-pis').value.trim(),
+      ctps:       document.getElementById('rh-f-ctps').value.trim(),
+      cargo:      document.getElementById('rh-f-cargo').value.trim(),
+      depto:      document.getElementById('rh-f-depto').value,
+      admissao:   document.getElementById('rh-f-admissao').value,
+      contrato:   document.getElementById('rh-f-contrato').value,
+      status:     document.getElementById('rh-f-status').value,
+      salario:    parseFloat(document.getElementById('rh-f-salario').value)||0,
+      vt:         parseFloat(document.getElementById('rh-f-vt').value)||0,
+      vr:         parseFloat(document.getElementById('rh-f-vr').value)||0,
+      saude:      parseFloat(document.getElementById('rh-f-saude').value)||0,
+      outrosBen:  parseFloat(document.getElementById('rh-f-outros-ben').value)||0,
+      feriasIni:  document.getElementById('rh-f-ferias-ini').value,
+      feriasFim:  document.getElementById('rh-f-ferias-fim').value,
+      obs:        document.getElementById('rh-f-obs').value.trim(),
+      dependentes: deps
+    };
+    if(_rhEditId){ const idx=_rhData.findIndex(x=>x._id===_rhEditId); if(idx>=0)_rhData[idx]=func; }
+    else _rhData.push(func);
+    rhSave(); rhCloseModal(); rhRenderAll();
+  };
+
+  // expõe renderAll para setPage
+  window._rhRenderAll = rhRenderAll;
+  rhRenderAll();
+})();
+</script>
 </body>
 </html>
