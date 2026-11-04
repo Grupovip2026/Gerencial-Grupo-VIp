@@ -3762,23 +3762,46 @@ loadData();
       const l = linhas[i].trim();
       if(!l) continue;
 
-      // ── Detecta bloco RESUMO (formato "RESUMO" isolado ou "(+) SALDO EM CONTA") ──
-      if(/^RESUMO\s*$/i.test(l) || /^\(\+\)\s*SALDO\s+EM\s+CONTA/i.test(l)){
-        inResumo = true;
-        if(/SALDO\s+EM\s+CONTA/i.test(l) && !/RDC/i.test(l)) saldoEmConta = extraiValor(l);
-        continue;
-      }
-
-      // ── Lê campos do RESUMO ──
-      if(inResumo){
-        if(/SALDO\s+EM\s+CONTA/i.test(l) && !/RDC/i.test(l))
-          saldoEmConta = extraiValor(l);
-        else if(/SALDO\s+EM\s+RDC/i.test(l))
-          saldoRDC = extraiValor(l);
-        else if(/CHEQUE\s+ESPECIAL/i.test(l))
-          chequeEspecial = extraiValor(l);
-        else if(/SALDO\s+DISPON/i.test(l))
-          saldoDisponivel = extraiValor(l);
+      // ── Detecta início do bloco RESUMO ──
+      if(/^RESUMO\s*$/i.test(l)){
+        // O bloco RESUMO do Sicoob tem LABELS numa coluna e VALORES em outra:
+        // Labels: "(+) SALDO EM CONTA:", "(+) SALDO EM RDC AUTOMÁTICO:", "(+) CHEQUE ESPECIAL CONTRATADO:", "(=) SALDO DISPONÍVEL:"
+        // Valores (linhas separadas depois): "3.409,55C", "14.238,87C", "12.000,00C", "29.648,42C"
+        // Estratégia: coleta todos os labels em ordem, depois coleta todos os valores em ordem, associa por índice
+        const labels = [];
+        const valores = [];
+        let j = i+1;
+        while(j < linhas.length){
+          const rl = linhas[j].trim();
+          j++;
+          if(!rl) continue;
+          // para ao encontrar seções além do resumo
+          if(/^(SALDO\s+BLOQUEADO|VENCIMENTO|TAXA|CUSTO|LIMITES|CAPITAL|PARCELA|SAC\b|OUVIDORIA|000\s+EXTRATOS)/i.test(rl)) break;
+          // linha de label (contém texto descritivo, não valor monetário puro)
+          if(/[A-Za-zÀ-ú]/.test(rl) && !/^[\d]/.test(rl)){
+            if(/SALDO\s+EM\s+CONTA/i.test(rl) && !/RDC/i.test(rl)) labels.push('conta');
+            else if(/SALDO\s+EM\s+RDC/i.test(rl)) labels.push('rdc');
+            else if(/CHEQUE\s+ESPECIAL\s+CONTRATADO/i.test(rl)) labels.push('cheque');
+            else if(/SALDO\s+DISPON/i.test(rl)) labels.push('disponivel');
+            else labels.push('outros');
+          }
+          // linha de valor monetário puro: "12.000,00C" ou "29.648,42C"
+          else if(/^[\d]{1,3}(?:\.[\d]{3})*,\d{2}[CD*]?\s*$/i.test(rl)){
+            valores.push(rl);
+          }
+        }
+        // Associa labels → valores por posição
+        labels.forEach((lbl, idx) => {
+          if(idx >= valores.length) return;
+          const v = extraiValor(valores[idx]);
+          if(lbl === 'conta') saldoEmConta = v;
+          else if(lbl === 'rdc') saldoRDC = v;
+          else if(lbl === 'cheque') chequeEspecial = v;
+          else if(lbl === 'disponivel') saldoDisponivel = v;
+        });
+        console.log('[Sicoob] RESUMO labels:', labels, 'valores:', valores);
+        console.log('[Sicoob] RESUMO parsed → conta:', saldoEmConta, 'rdc:', saldoRDC, 'cheque:', chequeEspecial, 'disponivel:', saldoDisponivel);
+        i = j - 1; // avança o loop principal até após o RESUMO
         continue;
       }
 
