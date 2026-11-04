@@ -3741,11 +3741,9 @@ loadData();
     const lancamentos = [];
     let saldoEmConta = 0, saldoRDC = 0, chequeEspecial = 0, saldoDisponivel = null;
 
-    // Padrão de lançamento: começa com DD/MM, termina com número seguido de C, D ou *
-    // Exemplos reais:
-    //   "03/11   PIX REC.OUTRA IF MT                         8.303,00C"
-    //   "03/11   DÉB.EMPRÉSTIMO                                981,12D"
-    // O valor e C/D ficam no FINAL da linha
+    const rData   = /^(\d{2}\/\d{2})$/;
+    const rValorCD= /^([\d]{1,3}(?:\.[\d]{3})*,\d{2})\s*([CD*])\s*$/i;
+    // linha completa: DD/MM  HISTÓRICO  valor C/D
     const rLanc = /^(\d{2}\/\d{2})\s+(.+?)\s+([\d]{1,3}(?:\.[\d]{3})*,\d{2})\s*([CD*])\s*$/i;
 
     // helper: extrai o ÚLTIMO valor monetário de uma linha
@@ -3756,12 +3754,20 @@ loadData();
 
     let inResumo = false;
 
+    // Log de debug — primeiras 60 linhas
+    console.log('[Sicoob] total linhas recebidas:', linhas.length);
+    linhas.slice(0,60).forEach((ln,idx)=>console.log(`[Sicoob] linha ${idx}: ${JSON.stringify(ln)}`));
+
     for(let i=0; i<linhas.length; i++){
       const l = linhas[i].trim();
       if(!l) continue;
 
-      // ── Detecta bloco RESUMO ──
-      if(/^RESUMO\s*$/i.test(l)){ inResumo = true; continue; }
+      // ── Detecta bloco RESUMO (formato "RESUMO" isolado ou "(+) SALDO EM CONTA") ──
+      if(/^RESUMO\s*$/i.test(l) || /^\(\+\)\s*SALDO\s+EM\s+CONTA/i.test(l)){
+        inResumo = true;
+        if(/SALDO\s+EM\s+CONTA/i.test(l) && !/RDC/i.test(l)) saldoEmConta = extraiValor(l);
+        continue;
+      }
 
       // ── Lê campos do RESUMO ──
       if(inResumo){
@@ -3776,49 +3782,96 @@ loadData();
         continue;
       }
 
-      // ── Tenta casar linha de lançamento ──
+      // ── FORMATO 1 (linha completa): DD/MM  HISTÓRICO  valor C/D ──
       const m = l.match(rLanc);
-      if(!m) continue;
-
-      const [, data, desc, valStr, dc] = m;
-
-      // Pula linhas especiais
-      if(/SALDO\s+(ANTERIOR|BLOQ|DO\s+DIA)/i.test(desc)) continue;
-      if(dc === '*') continue; // saldo bloqueado
-      if(/^(ENCARGO|LIMITE|CAPITAL|SAC\b|OUVIDORIA|TARIFA)/i.test(desc)) continue;
-
-      const valor = parseValor(valStr);
-      if(valor <= 0) continue;
-      const tipo = dc.toUpperCase() === 'C' ? 'entrada' : 'saida';
-
-      // ── Coleta linhas de continuação (sem data) para enriquecer descrição ──
-      let descFinal = desc.trim();
-      while(i+1 < linhas.length){
-        const next = linhas[i+1].trim();
-        if(!next){ i++; continue; }
-        // para se a próxima linha começa com data DD/MM
-        if(/^\d{2}\/\d{2}\s/.test(next)) break;
-        // ignora linhas de documento e CNPJ/CPF
-        if(/^DOC\.\s*:/i.test(next) || /^\d{2}\.\d{3}\.\d{3}/.test(next)){ i++; continue; }
-        // ignora "Recebimento Pix" e similares que são redundantes
-        if(/^Recebimento\s+Pix$/i.test(next)){ i++; continue; }
-        // adiciona nome da empresa/pessoa se for substancial
-        if(next.length > 3) descFinal += ' | ' + next;
-        i++;
+      if(m){
+        const [, data, desc, valStr, dc] = m;
+        if(/SALDO\s+(ANTERIOR|BLOQ|DO\s+DIA)/i.test(desc)) continue;
+        if(dc === '*') continue;
+        if(/^(ENCARGO|LIMITE|CAPITAL|SAC\b|OUVIDORIA|TARIFA)/i.test(desc)) continue;
+        const valor = parseValor(valStr);
+        if(valor <= 0) continue;
+        const tipo = dc.toUpperCase() === 'C' ? 'entrada' : 'saida';
+        let descFinal = desc.trim();
+        while(i+1 < linhas.length){
+          const next = linhas[i+1].trim();
+          if(!next){ i++; continue; }
+          if(/^\d{2}\/\d{2}(\s|$)/.test(next)) break;
+          if(/^DOC\.\s*:/i.test(next) || /^\d{2}\.\d{3}\.\d{3}/.test(next)){ i++; continue; }
+          if(/^Recebimento\s+Pix$/i.test(next)){ i++; continue; }
+          if(next.length > 3) descFinal += ' | ' + next;
+          i++;
+        }
+        console.log(`[Sicoob] ✓ fmt1: ${data} | ${descFinal} | ${valor} | ${tipo}`);
+        lancamentos.push({ data, descricao: descFinal.substring(0,120), tipo, valor, saldo: 0 });
+        continue;
       }
 
-      lancamentos.push({ data, descricao: descFinal.substring(0,120), tipo, valor, saldo: 0 });
+      // ── FORMATO 2 (colunas separadas): "DD/MM" sozinho numa linha ──
+      // Seguido de texto(s) de histórico, depois "9.930,00C" numa linha
+      const mData = l.match(rData);
+      if(mData){
+        const data = mData[1];
+        let desc = '';
+        let j = i+1;
+        while(j < linhas.length){
+          const nx = linhas[j].trim();
+          if(!nx){ j++; continue; }
+          // nova data sozinha → novo lançamento, para aqui
+          if(/^\d{2}\/\d{2}$/.test(nx) && j > i+1) break;
+          // valor+C/D sozinho
+          const mv = nx.match(rValorCD);
+          if(mv){
+            const [, valStr, dc] = mv;
+            if(dc !== '*' && !/SALDO\s+(ANTERIOR|BLOQ)/i.test(desc)){
+              const valor = parseValor(valStr);
+              if(valor > 0 && desc.trim()){
+                const tipo = dc.toUpperCase() === 'C' ? 'entrada' : 'saida';
+                console.log(`[Sicoob] ✓ fmt2: ${data} | ${desc.trim()} | ${valor} | ${tipo}`);
+                lancamentos.push({ data, descricao: desc.trim().substring(0,120), tipo, valor, saldo: 0 });
+              }
+            }
+            i = j;
+            break;
+          }
+          // linha de histórico com valor+CD inline ao final: "PIX REC.OUTRA IF MT  8.303,00C"
+          const mvInline = nx.match(/^(.+?)\s+([\d]{1,3}(?:\.[\d]{3})*,\d{2})\s*([CD*])\s*$/i);
+          if(mvInline){
+            const [, extraDesc, valStr, dc] = mvInline;
+            if(dc !== '*'){
+              const fullDesc = (desc ? desc + ' | ' : '') + extraDesc.trim();
+              if(!/SALDO\s+(ANTERIOR|BLOQ)/i.test(fullDesc)){
+                const valor = parseValor(valStr);
+                if(valor > 0){
+                  const tipo = dc.toUpperCase() === 'C' ? 'entrada' : 'saida';
+                  console.log(`[Sicoob] ✓ fmt2b: ${data} | ${fullDesc} | ${valor} | ${tipo}`);
+                  lancamentos.push({ data, descricao: fullDesc.substring(0,120), tipo, valor, saldo: 0 });
+                }
+              }
+            }
+            i = j;
+            break;
+          }
+          // acumula descrição (descarta lixo de doc/CNPJ/Recebimento Pix)
+          if(!/^DOC\.\s*:/i.test(nx) && !/^\d{2}\.\d{3}\.\d{3}/.test(nx) && !/^Recebimento\s+Pix$/i.test(nx)){
+            desc += (desc ? ' | ' : '') + nx;
+          }
+          j++;
+        }
+        continue;
+      }
     }
+
+    console.log('[Sicoob] lançamentos encontrados:', lancamentos.length);
+    console.log('[Sicoob] saldoEmConta:', saldoEmConta, 'saldoRDC:', saldoRDC, 'chequeEspecial:', chequeEspecial, 'saldoDisponivel:', saldoDisponivel);
 
     const totalEnt = lancamentos.filter(l=>l.tipo==='entrada').reduce((s,l)=>s+l.valor,0);
     const totalSai = lancamentos.filter(l=>l.tipo==='saida').reduce((s,l)=>s+l.valor,0);
 
-    // Saldo final = lido diretamente do RESUMO (mais confiável)
     const saldoFinal = saldoDisponivel !== null
       ? saldoDisponivel
       : saldoEmConta + saldoRDC + chequeEspecial;
 
-    // Saldo running: começa do saldo antes das transações do dia
     const saldoInicial = saldoEmConta - totalEnt + totalSai;
     let saldo = saldoInicial;
     for(const l of lancamentos){
