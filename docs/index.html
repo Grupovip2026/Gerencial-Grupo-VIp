@@ -817,10 +817,6 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
     </div>
     <div id="cc-saldos-sicoob" style="display:none">
       <div class="cc-saldo-cards">
-        <div class="cc-saldo-card card-saldo-anterior">
-          <div class="cc-saldo-label">Saldo Anterior</div>
-          <div class="cc-saldo-value" id="cc-sal-ant-sicoob" style="color:#ccc">R$ 0,00</div>
-        </div>
         <div class="cc-saldo-card card-entradas">
           <div class="cc-saldo-label">Total Entradas</div>
           <div class="cc-saldo-value cc-entrada" id="cc-sal-ent-sicoob">R$ 0,00</div>
@@ -828,6 +824,18 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
         <div class="cc-saldo-card card-saidas">
           <div class="cc-saldo-label">Total Saídas</div>
           <div class="cc-saldo-value cc-saida" id="cc-sal-sai-sicoob">R$ 0,00</div>
+        </div>
+        <div class="cc-saldo-card card-saldo-anterior">
+          <div class="cc-saldo-label">Saldo em Conta</div>
+          <div class="cc-saldo-value" id="cc-sal-ant-sicoob" style="color:#ccc">R$ 0,00</div>
+        </div>
+        <div class="cc-saldo-card" style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2)">
+          <div class="cc-saldo-label">RDC Automático</div>
+          <div class="cc-saldo-value" id="cc-sal-rdc-sicoob" style="color:#818cf8">R$ 0,00</div>
+        </div>
+        <div class="cc-saldo-card" style="background:rgba(234,179,8,.08);border:1px solid rgba(234,179,8,.2)">
+          <div class="cc-saldo-label">Cheque Especial</div>
+          <div class="cc-saldo-value" id="cc-sal-che-sicoob" style="color:#eab308">R$ 0,00</div>
         </div>
         <div class="cc-saldo-card card-saldo-final">
           <div class="cc-saldo-label">Saldo Disponível</div>
@@ -3677,13 +3685,27 @@ loadData();
   }
 
   // Parser Sicoob: formato DD/MM   DESCRIÇÃO    VALOR[C/D]
-  // Lê lançamentos do período e captura Saldo Disponível real do bloco RESUMO
+  // Lê lançamentos do período e captura os 3 campos do bloco RESUMO:
+  //   (+) SALDO EM CONTA           → saldoEmConta
+  //   (+) SALDO EM RDC AUTOMÁTICO  → saldoRDC
+  //   (+) CHEQUE ESPECIAL CONTRATADO → chequeEspecial
+  //   (=) SALDO DISPONÍVEL         → saldoDisponivel = soma dos três
   function parseSicoob(linhas){
     const lancamentos = [];
-    let saldoAnterior = 0;
-    let saldoDisponivel = null; // será preenchido pelo RESUMO se encontrado
-    const rLinha = /^(\d{2}\/\d{2})\s{1,}(.+?)\s{2,}([\d.]+,\d{2})\s*([CD*])\s*$/i;
-    const SKIP_DESC = /^(SALDO\s+(ANTERIOR|BLOQ|DO\s+DIA|EM\s+CONTA|EM\s+RDC|DISPONIVEL|DISPONÍVEL)|ENCARGO|OUTRAS\s+INFO|LIMITE|CAPITAL|SAC|OUVIDORIA|CHEQUE\s+ESPECIAL|JUROS|TARIFAS)/i;
+    let saldoEmConta = 0;
+    let saldoRDC = 0;
+    let chequeEspecial = 0;
+    let saldoDisponivel = null;
+
+    // padrão lançamento: DD/MM  DESCRIÇÃO  VALOR  C/D
+    // usa separador de 1+ espaços entre campos (extrato real pode variar)
+    const rLinha = /^(\d{2}\/\d{2})\s+(.+?)\s+([\d.]+,\d{2})\s*([CD*])\s*$/i;
+
+    // helper: extrai o primeiro valor numérico de uma linha
+    const extraiValor = (linha) => {
+      const m = linha.match(/([\d.]+,\d{2})/);
+      return m ? parseValor(m[1]) : 0;
+    };
 
     let inResumo = false;
     for(let i=0; i<linhas.length; i++){
@@ -3694,24 +3716,27 @@ loadData();
       if(/^RESUMO\s*$/i.test(l)){ inResumo = true; continue; }
 
       if(inResumo){
-        // captura saldo disponível: linha "(=) SALDO DISPONÍVEL: ... 29.648,42C"
-        if(/SALDO\s+DISPON/i.test(l)){
+        // (+) SALDO EM CONTA: 3.409,55C
+        if(/SALDO\s+EM\s+CONTA/i.test(l))            saldoEmConta   = extraiValor(l);
+        // (+) SALDO EM RDC AUTOMÁTICO: 14.238,87C
+        else if(/SALDO\s+EM\s+RDC/i.test(l))         saldoRDC       = extraiValor(l);
+        // (+) CHEQUE ESPECIAL CONTRATADO: 12.000,00C
+        else if(/CHEQUE\s+ESPECIAL/i.test(l))         chequeEspecial = extraiValor(l);
+        // (=) SALDO DISPONÍVEL: 29.648,42C
+        else if(/SALDO\s+DISPON/i.test(l)){
           const mv = l.match(/([\d.]+,\d{2})\s*C/i);
           if(mv) saldoDisponivel = parseValor(mv[1]);
         }
-        continue; // pula todas as linhas do RESUMO
+        continue;
       }
 
       const m = l.match(rLinha);
       if(!m) continue;
       const [,data, desc, valStr, dc] = m;
 
-      // captura saldo anterior
-      if(/SALDO\s+ANTERIOR/i.test(desc)){
-        saldoAnterior = parseValor(valStr);
-        continue;
-      }
-      if(SKIP_DESC.test(desc) || dc === '*') continue;
+      // pula linhas de saldo/resumo no corpo
+      if(/SALDO\s+(ANTERIOR|BLOQ|DO\s+DIA)|ENCARGO|LIMITE|CAPITAL|SAC|OUVIDORIA|JUROS\s+VENCIDO|TARIFA/i.test(desc)) continue;
+      if(dc === '*') continue; // bloqueado
 
       const valor = parseValor(valStr);
       if(valor <= 0) continue;
@@ -3722,7 +3747,7 @@ loadData();
       while(i+1 < linhas.length){
         const next = linhas[i+1].trim();
         if(!next){ i++; continue; }
-        if(/^\d{2}\/\d{2}\s/.test(next)) break; // próximo lançamento
+        if(/^\d{2}\/\d{2}\s/.test(next)) break;
         if(!/^DOC\.\s*:/i.test(next) && !/^\d{2}\.\d{3}\.\d{3}/.test(next) && next.length > 4){
           descFinal += ' | ' + next;
         }
@@ -3731,113 +3756,131 @@ loadData();
       lancamentos.push({ data, descricao: descFinal.substring(0,100), tipo, valor, saldo: 0 });
     }
 
-    // calcula saldo running
-    let saldo = saldoAnterior;
+    // calcula saldo running a partir das transações do dia
+    const totalEnt = lancamentos.filter(l=>l.tipo==='entrada').reduce((s,l)=>s+l.valor,0);
+    const totalSai = lancamentos.filter(l=>l.tipo==='saida').reduce((s,l)=>s+l.valor,0);
+    // saldo em conta = resultado das transações do dia (entradas - saídas)
+    // saldo disponível = saldo em conta + RDC + cheque especial (lido do RESUMO)
+    let saldoFinal;
+    if(saldoDisponivel !== null){
+      // lido direto do extrato — mais confiável
+      saldoFinal = saldoDisponivel;
+    } else {
+      saldoFinal = saldoEmConta + saldoRDC + chequeEspecial;
+    }
+
+    // calcula saldo running da tabela
+    // saldoEmConta já é o saldo do dia após todas as transações
+    // para reconstruir o saldo progressivo, começa do saldo inicial (antes das transações)
+    const saldoInicial = saldoEmConta - totalEnt + totalSai;
+    let saldo = saldoInicial;
     for(const l of lancamentos){
       saldo += l.tipo === 'entrada' ? l.valor : -l.valor;
       l.saldo = saldo;
     }
-    const totalEnt = lancamentos.filter(l=>l.tipo==='entrada').reduce((s,l)=>s+l.valor,0);
-    const totalSai = lancamentos.filter(l=>l.tipo==='saida').reduce((s,l)=>s+l.valor,0);
-    // usa saldo disponível do RESUMO se capturado (inclui RDC automático, cheque especial, etc.)
-    const saldoFinal = saldoDisponivel !== null ? saldoDisponivel : (saldoAnterior + totalEnt - totalSai);
-    return { lancamentos, saldoAnterior, totalEnt, totalSai, saldoFinal, saldoDisponivel };
+
+    return { lancamentos, saldoEmConta, saldoRDC, chequeEspecial, totalEnt, totalSai, saldoFinal };
   }
 
-  // Parser Itaú: formato tabular com colunas separadas por duplo-espaço
-  // Colunas: Data  Lançamentos  Razão Social  CNPJ/CPF  Valor(R$)  Saldo(R$)
-  // Saldo Anterior: linha DD/MM/YYYY  SALDO ANTERIOR  <vazio>  <vazio>  <vazio>  59.169,94
+  // Parser Itaú: formato tabular com 6 colunas separadas por duplo-espaço
+  // Colunas: Data  |  Lançamentos  |  Razão Social  |  CNPJ/CPF  |  Valor (R$)  |  Saldo (R$)
+  //
+  // Regras:
+  //  - Saldo Anterior: linha com "SALDO ANTERIOR" na col Lançamentos; valor na col Saldo (sem valor na col Valor)
+  //  - Lançamento normal: valor na col Valor (negativo=saída, positivo=entrada) + saldo na col Saldo
+  //  - Descrição exibida = Razão Social (cols[2]) se existir, senão Lançamentos (cols[1])
+  //  - CNPJ/CPF (cols[3]) é ignorado na exibição
+  //  - Algumas linhas têm só 2 colunas (Data + Lançamentos) com continuação na linha seguinte
   function parseItau(linhas){
     const lancamentos = [];
     let saldoAnterior = 0;
     const rData = /^(\d{2}\/\d{2}\/\d{4})/;
+    const rValor = /^-?[\d.]+,\d{2}$/;      // número monetário puro
+    const rCNPJ  = /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/;
+    const rCPF   = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
 
     for(let i=0; i<linhas.length; i++){
-      const l = linhas[i].trim();
+      let l = linhas[i].trim();
       if(!l || !rData.test(l)) continue;
 
       const dataPart = l.match(rData)[1];
-      const resto = l.substring(dataPart.length).trim();
+      let resto = l.substring(dataPart.length).trim();
 
-      // Divide por duplo espaço (separador de colunas do pdfjs)
-      // Filtra chunks vazios
-      const cols = resto.split(/\s{2,}/).map(c=>c.trim()).filter(Boolean);
-
-      if(!cols.length) continue;
-
-      const primCol = cols[0];
-
-      // Saldo Anterior: valor está no último chunk (coluna Saldo, sem valor em Valor)
-      if(/SALDO\s+ANTERIOR/i.test(primCol)){
-        // último número da linha é o saldo anterior
-        const mv = l.match(/([\d.]+,\d{2})\s*$/);
-        if(mv) saldoAnterior = parseValor(mv[1]);
-        continue;
-      }
-
-      // Pula linhas que não são lançamentos
-      if(/SALDO\s+(TOTAL|FINAL|DISPONIVEL|DISPONÍVEL)|LIMITE|UTILIZADO|RESUMO|EXTRATO|CONTA\s+CORRENTE/i.test(primCol)) continue;
-
-      // Busca colunas de valor:
-      // Formato esperado: [descricao, razao_social?, cnpj?, valor, saldo]
-      // O valor tem sinal negativo se for saída; saldo é sempre positivo
-      // Estratégia: procura o penúltimo número como Valor e último como Saldo
-      // (ou último como Valor se só há um número no fim)
-
-      // Coleta linha atual + possível continuação (linha seguinte sem data)
-      let linhaCompleta = l;
+      // ── Junta linha de continuação se a próxima não começa com data nem é cabeçalho ──
       if(i+1 < linhas.length){
         const prox = linhas[i+1].trim();
-        if(prox && !rData.test(prox) && !/^(Data|Lançamentos|Histórico)/i.test(prox)){
-          linhaCompleta += '  ' + prox;
+        if(prox && !rData.test(prox) && !/^(data\b|lançamentos|histórico|período|extrato|agência|conta)/i.test(prox)){
+          resto += '  ' + prox;
           i++;
         }
       }
 
-      // Extrai todos os valores monetários da linha (com ou sem sinal negativo)
-      const todosValores = [...linhaCompleta.matchAll(/(-?[\d]+\.?[\d]*,\d{2})/g)];
-      if(todosValores.length < 1) continue;
+      // ── Split por 2+ espaços → colunas ──
+      const cols = resto.split(/\s{2,}/).map(c=>c.trim()).filter(Boolean);
+      if(!cols.length) continue;
 
-      let valorStr, saldoStr;
-      if(todosValores.length >= 2){
-        // penúltimo = Valor (R$), último = Saldo (R$)
-        valorStr = todosValores[todosValores.length - 2][1];
-        saldoStr = todosValores[todosValores.length - 1][1];
-      } else {
-        valorStr = todosValores[0][1];
-        saldoStr = valorStr;
+      // ── Detecta e pula linhas de cabeçalho / totais ──
+      if(/^(data\b|lançamentos|período|extrato|agência|conta|histórico)/i.test(cols[0])) continue;
+      if(/SALDO\s+(TOTAL|FINAL|DISPONIVEL|DISPONÍVEL)|LIMITE|UTILIZADO/i.test(cols[0])) continue;
+
+      // ── SALDO ANTERIOR ──
+      if(/SALDO\s+ANTERIOR/i.test(cols[0])){
+        // Linha: "SALDO ANTERIOR  [vazio]  [vazio]  [vazio]  59.169,94"
+        // O saldo está no ÚLTIMO chunk que seja um número monetário
+        for(let k = cols.length-1; k >= 0; k--){
+          if(rValor.test(cols[k])){ saldoAnterior = parseValor(cols[k].replace('-','')); break; }
+        }
+        continue;
       }
 
-      // Verifica se valorStr parece um CNPJ/CPF (números sem vírgula) — ignora
-      // Já filtrado pelo regex que requer ,\d{2} no final
-      const valorNum = parseValor(valorStr.replace(/^-/,''));
+      // ── Encontra colunas Valor e Saldo no final ──
+      // Percorre da direita para esquerda; pula CNPJ/CPF
+      let saldoStr = '', valorStr = '';
+      let colsRestantes = [...cols];
+      // Remove último se for valor → Saldo
+      for(let k = colsRestantes.length-1; k >= 0; k--){
+        if(rValor.test(colsRestantes[k])){ saldoStr = colsRestantes[k]; colsRestantes.splice(k,1); break; }
+      }
+      // Remove novo último se for valor → Valor da transação
+      for(let k = colsRestantes.length-1; k >= 0; k--){
+        if(rValor.test(colsRestantes[k])){ valorStr = colsRestantes[k]; colsRestantes.splice(k,1); break; }
+      }
+
+      // Se não achou valorStr mas achou saldoStr, pode ser linha de SALDO ANTERIOR já tratada
+      if(!saldoStr && !valorStr) continue;
+      // Se só achou saldoStr (linha com 1 número = saldo sem transação — tipo Saldo Anterior)
+      if(!valorStr) continue;
+
+      const valorNum = parseValor(valorStr.replace('-',''));
       if(valorNum <= 0) continue;
       const tipo = valorStr.startsWith('-') ? 'saida' : 'entrada';
+      const saldoNum = saldoStr ? parseValor(saldoStr.replace('-','')) : 0;
 
-      // Descrição: tudo antes do primeiro valor monetário, sem CNPJ/CPF
-      const posValorInicio = linhaCompleta.indexOf(valorStr.replace(/^-/,'- ').replace('- ',''));
-      let descPart = linhaCompleta.substring(dataPart.length, linhaCompleta.search(/\s{2,}-?[\d]+\.?[\d]*,\d{2}/)).trim();
-      descPart = descPart
-        .replace(/\s+\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}/g, '') // CNPJ
-        .replace(/\s+\d{3}\.\d{3}\.\d{3}-\d{2}/g, '')         // CPF
-        .replace(/\s{2,}/g, ' ').trim();
+      // ── Monta descrição: Razão Social > Lançamentos ──
+      // colsRestantes agora tem: [Lançamentos, RazãoSocial?, CNPJ?]
+      // remove CNPJ/CPF
+      const semDoc = colsRestantes.filter(c => !rCNPJ.test(c) && !rCPF.test(c));
+      let descricao = '';
+      if(semDoc.length >= 2){
+        // tem Lançamentos e Razão Social — usa Razão Social como descrição principal
+        // mas acrescenta tipo de operação do campo Lançamentos entre parênteses
+        const lancTxt = semDoc[0]; // ex: "PIX RECEBIDO VIP MX 02/11"
+        const razaoTxt = semDoc[1]; // ex: "VIP MX PECAS E ACESSORIOS LTDA"
+        // se razão social é mais informativa (nome de empresa), usa ela; caso contrário usa lançamentos
+        const temEmpresa = /LTDA|S\.A\.|ME\b|EIRELI|EPP|SA\b/i.test(razaoTxt);
+        descricao = temEmpresa ? razaoTxt + ' (' + lancTxt + ')' : lancTxt + (razaoTxt ? ' — ' + razaoTxt : '');
+      } else {
+        descricao = semDoc[0] || cols[0];
+      }
+      descricao = descricao.replace(/\s{2,}/g,' ').trim();
 
-      const saldoNum = parseValor(saldoStr.replace(/^-/,''));
       const dataFmt = dataPart.substring(0,5); // DD/MM
-      lancamentos.push({ data: dataFmt, descricao: descPart.substring(0,100), tipo, valor: valorNum, saldo: saldoNum });
-    }
-
-    // Se saldo anterior não foi capturado mas temos lançamentos, estima pelo primeiro saldo
-    if(saldoAnterior === 0 && lancamentos.length > 0){
-      const primeiro = lancamentos[0];
-      saldoAnterior = primeiro.tipo === 'entrada'
-        ? primeiro.saldo - primeiro.valor
-        : primeiro.saldo + primeiro.valor;
+      lancamentos.push({ data: dataFmt, descricao: descricao.substring(0,120), tipo, valor: valorNum, saldo: saldoNum });
     }
 
     const totalEnt = lancamentos.filter(l=>l.tipo==='entrada').reduce((s,l)=>s+l.valor,0);
     const totalSai = lancamentos.filter(l=>l.tipo==='saida').reduce((s,l)=>s+l.valor,0);
-    // usa saldo do último lançamento se disponível
+    // saldo final = saldo do último lançamento (já vem calculado pelo banco)
     const saldoFinal = lancamentos.length > 0
       ? lancamentos[lancamentos.length-1].saldo
       : saldoAnterior + totalEnt - totalSai;
@@ -3896,11 +3939,21 @@ loadData();
     st.className='cc-status loaded';
     st.innerHTML=`<span class="dot"></span> ${nomeArq} · ${result.lancamentos.length} lançamentos`;
 
-    document.getElementById('cc-sal-ant-'+banco).textContent = fmtCC(result.saldoAnterior);
     document.getElementById('cc-sal-ent-'+banco).textContent = fmtCC(result.totalEnt);
     document.getElementById('cc-sal-sai-'+banco).textContent = fmtCC(result.totalSai);
 
-    // Sicoob: saldoFinal já é o saldoDisponivel (do RESUMO), que inclui RDC+Cheque Especial
+    if(banco === 'sicoob'){
+      // Sicoob: mostra Saldo em Conta + RDC + Cheque Especial + Disponível
+      document.getElementById('cc-sal-ant-sicoob').textContent = fmtCC(result.saldoEmConta || 0);
+      const rdcEl = document.getElementById('cc-sal-rdc-sicoob');
+      if(rdcEl) rdcEl.textContent = fmtCC(result.saldoRDC || 0);
+      const cheEl = document.getElementById('cc-sal-che-sicoob');
+      if(cheEl) cheEl.textContent = fmtCC(result.chequeEspecial || 0);
+    } else {
+      // Itaú: card "Saldo Anterior" normal
+      document.getElementById('cc-sal-ant-'+banco).textContent = fmtCC(result.saldoAnterior || 0);
+    }
+
     const saldoFinalEl = document.getElementById('cc-sal-fin-'+banco);
     saldoFinalEl.textContent = fmtCC(result.saldoFinal);
     saldoFinalEl.style.color = result.saldoFinal >= 0 ? '#38bdf8' : '#ff6b6b';
