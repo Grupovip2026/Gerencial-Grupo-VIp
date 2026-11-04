@@ -144,11 +144,14 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
 .mkt-cal-header div{text-align:center;font-size:9px;color:#444;text-transform:uppercase;letter-spacing:1px;padding:4px}
 
 /* ── CONTA CORRENTE ── */
-.cc-tabs{display:flex;gap:8px;margin-bottom:20px}
+.cc-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
 .cc-tab{padding:9px 20px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:transparent;color:#666;font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;display:flex;align-items:center;gap:8px}
 .cc-tab.active-itau{border-color:#f59e0b;background:rgba(245,158,11,.12);color:#f59e0b;font-weight:600}
 .cc-tab.active-sicoob{border-color:#00C9A7;background:rgba(0,201,167,.12);color:#00C9A7;font-weight:600}
 .cc-panel{display:none}.cc-panel.cc-active{display:block}
+.cc-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.cc-import-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:8px;border:1px solid rgba(56,189,248,.35);background:rgba(56,189,248,.1);color:#38bdf8;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+.cc-import-btn:hover{background:rgba(56,189,248,.18);border-color:rgba(56,189,248,.55)}
 .cc-upload-area{border:2px dashed rgba(255,255,255,.12);border-radius:14px;padding:36px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:24px;background:rgba(255,255,255,.02)}
 .cc-upload-area:hover{border-color:rgba(56,189,248,.4);background:rgba(56,189,248,.04)}
 .cc-upload-icon{font-size:36px;margin-bottom:10px}
@@ -163,7 +166,7 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
 .cc-saldo-card.card-saldo-final{background:rgba(56,189,248,.06);border-color:rgba(56,189,248,.2)}
 .cc-saldo-label{font-size:10px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
 .cc-saldo-value{font-size:22px;font-weight:700;font-family:'DM Mono',monospace}
-.cc-status{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:#555;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:4px 12px;margin-bottom:16px}
+.cc-status{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:#555;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:4px 12px}
 .cc-status .dot{width:7px;height:7px;border-radius:50%;background:#333}
 .cc-status.loaded .dot{background:#00C9A7;box-shadow:0 0 6px rgba(0,201,167,.6)}
 .cc-table-wrap{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);border-radius:12px;overflow:hidden}
@@ -181,8 +184,17 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
 .cc-filter-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
 .cc-filter-btn{padding:5px 14px;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:transparent;color:#666;font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s}
 .cc-filter-btn.active{background:rgba(56,189,248,.12);border-color:rgba(56,189,248,.3);color:#38bdf8;font-weight:600}
-.cc-search{flex:1;max-width:280px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:7px 12px;color:#ccc;font-size:12px;font-family:'Inter',sans-serif}
+.cc-search{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:7px 12px;color:#ccc;font-size:12px;font-family:'Inter',sans-serif;width:180px}
 .cc-search:focus{outline:none;border-color:#38bdf8}
+.cc-date-input{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:6px 10px;color:#ccc;font-size:11px;font-family:'Inter',sans-serif;width:120px;color-scheme:dark}
+.cc-date-input:focus{outline:none;border-color:#38bdf8}
+.cc-btn-del{background:none;border:none;color:#ff6b6b;cursor:pointer;font-size:14px;padding:2px 6px;border-radius:4px;opacity:.5;transition:opacity .15s}
+.cc-btn-del:hover{opacity:1;background:rgba(255,107,107,.12)}
+.cc-add-row{background:rgba(255,255,255,.02);border-top:2px dashed rgba(255,255,255,.08);padding:12px 18px}
+.cc-add-row form{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.cc-add-row input,.cc-add-row select{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:6px 10px;color:#ccc;font-size:12px;font-family:'Inter',sans-serif}
+.cc-add-row input:focus,.cc-add-row select:focus{outline:none;border-color:#38bdf8}
+.cc-add-row select option{background:#1a1a2e}
 .cc-empty{text-align:center;padding:48px;color:#444;font-size:14px}
 .cc-empty-icon{font-size:40px;margin-bottom:12px;opacity:.4}
 .cc-processing{text-align:center;padding:36px;color:#555}
@@ -731,15 +743,10 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
 
   <!-- PAINEL ITAÚ -->
   <div class="cc-panel cc-active" id="cc-panel-itau">
-    <div class="cc-status" id="cc-status-itau">
-      <span class="dot"></span> Nenhum extrato carregado
-    </div>
-    <div class="cc-upload-area" id="cc-drop-itau" onclick="document.getElementById('cc-file-itau').click()" ondragover="event.preventDefault()" ondrop="ccHandleDrop(event,'itau')">
-      <input type="file" id="cc-file-itau" accept=".pdf" style="display:none" onchange="ccProcessPDF(this,'itau')">
-      <div class="cc-upload-icon">📄</div>
-      <div class="cc-upload-title">Importar extrato Itaú</div>
-      <div class="cc-upload-sub">Arraste o PDF aqui ou clique para selecionar</div>
-      <button class="cc-upload-btn" onclick="event.stopPropagation()">Selecionar PDF</button>
+    <input type="file" id="cc-file-itau" accept=".pdf" style="display:none" onchange="ccProcessPDF(this,'itau')">
+    <div class="cc-topbar">
+      <div class="cc-status" id="cc-status-itau"><span class="dot"></span> Nenhum extrato carregado</div>
+      <button class="cc-import-btn" onclick="document.getElementById('cc-file-itau').click()">📄 Importar PDF</button>
     </div>
     <div id="cc-saldos-itau" style="display:none">
       <div class="cc-saldo-cards">
@@ -764,44 +771,49 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
         <button class="cc-filter-btn active" onclick="ccFilter('itau','todos',this)">Todos</button>
         <button class="cc-filter-btn" onclick="ccFilter('itau','entradas',this)">Entradas</button>
         <button class="cc-filter-btn" onclick="ccFilter('itau','saidas',this)">Saídas</button>
-        <input class="cc-search" id="cc-search-itau" type="text" placeholder="Buscar descrição..." oninput="ccSearch('itau')">
-        <button class="mkt-btn mkt-btn-primary" style="margin-left:auto" onclick="ccClear('itau')">🗑 Limpar</button>
+        <input class="cc-search" id="cc-search-itau" type="text" placeholder="Buscar..." oninput="ccSearch('itau')">
+        <input class="cc-date-input" id="cc-dt1-itau" type="date" title="Data inicial" onchange="ccSearch('itau')">
+        <input class="cc-date-input" id="cc-dt2-itau" type="date" title="Data final" onchange="ccSearch('itau')">
+        <button class="cc-filter-btn" onclick="ccClearDates('itau')" title="Limpar datas">✕ Datas</button>
+        <button class="mkt-btn mkt-btn-primary" style="margin-left:auto" onclick="ccClear('itau')">🗑 Limpar tudo</button>
       </div>
       <div class="cc-table-wrap">
         <div class="cc-table-header">
-          <span class="cc-table-header-title" id="cc-tbl-title-itau">Lançamentos</span>
+          <span class="cc-table-header-title">Lançamentos</span>
           <span style="font-size:11px;color:#444" id="cc-tbl-count-itau"></span>
         </div>
         <div style="overflow-x:auto">
           <table class="cc-table">
             <thead><tr>
-              <th>Data</th>
-              <th style="width:45%">Descrição</th>
-              <th>Tipo</th>
-              <th style="text-align:right">Valor</th>
-              <th style="text-align:right">Saldo</th>
+              <th>Data</th><th style="width:42%">Descrição</th><th>Tipo</th>
+              <th style="text-align:right">Valor</th><th style="text-align:right">Saldo</th><th></th>
             </tr></thead>
             <tbody id="cc-tbody-itau"></tbody>
           </table>
         </div>
+        <div class="cc-add-row">
+          <form onsubmit="ccAddRow(event,'itau')">
+            <input type="date" id="cc-new-dt-itau" required style="width:130px">
+            <input type="text" id="cc-new-desc-itau" placeholder="Descrição" required style="flex:1;min-width:150px">
+            <select id="cc-new-tipo-itau">
+              <option value="entrada">Entrada</option>
+              <option value="saida">Saída</option>
+            </select>
+            <input type="number" id="cc-new-val-itau" placeholder="Valor" step="0.01" required style="width:110px">
+            <button type="submit" class="cc-import-btn" style="padding:6px 14px">＋ Adicionar</button>
+          </form>
+        </div>
       </div>
     </div>
-    <div id="cc-processing-itau" class="cc-processing" style="display:none">
-      ⏳ Processando PDF...
-    </div>
+    <div id="cc-processing-itau" class="cc-processing" style="display:none">⏳ Processando PDF...</div>
   </div>
 
   <!-- PAINEL SICOOB -->
   <div class="cc-panel" id="cc-panel-sicoob">
-    <div class="cc-status" id="cc-status-sicoob">
-      <span class="dot"></span> Nenhum extrato carregado
-    </div>
-    <div class="cc-upload-area" id="cc-drop-sicoob" onclick="document.getElementById('cc-file-sicoob').click()" ondragover="event.preventDefault()" ondrop="ccHandleDrop(event,'sicoob')">
-      <input type="file" id="cc-file-sicoob" accept=".pdf" style="display:none" onchange="ccProcessPDF(this,'sicoob')">
-      <div class="cc-upload-icon">📄</div>
-      <div class="cc-upload-title">Importar extrato Sicoob</div>
-      <div class="cc-upload-sub">Arraste o PDF aqui ou clique para selecionar</div>
-      <button class="cc-upload-btn" onclick="event.stopPropagation()">Selecionar PDF</button>
+    <input type="file" id="cc-file-sicoob" accept=".pdf" style="display:none" onchange="ccProcessPDF(this,'sicoob')">
+    <div class="cc-topbar">
+      <div class="cc-status" id="cc-status-sicoob"><span class="dot"></span> Nenhum extrato carregado</div>
+      <button class="cc-import-btn" onclick="document.getElementById('cc-file-sicoob').click()">📄 Importar PDF</button>
     </div>
     <div id="cc-saldos-sicoob" style="display:none">
       <div class="cc-saldo-cards">
@@ -818,7 +830,7 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
           <div class="cc-saldo-value cc-saida" id="cc-sal-sai-sicoob">R$ 0,00</div>
         </div>
         <div class="cc-saldo-card card-saldo-final">
-          <div class="cc-saldo-label">Saldo Final</div>
+          <div class="cc-saldo-label">Saldo Disponível</div>
           <div class="cc-saldo-value cc-saldo-col" id="cc-sal-fin-sicoob">R$ 0,00</div>
         </div>
       </div>
@@ -826,31 +838,41 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
         <button class="cc-filter-btn active" onclick="ccFilter('sicoob','todos',this)">Todos</button>
         <button class="cc-filter-btn" onclick="ccFilter('sicoob','entradas',this)">Entradas</button>
         <button class="cc-filter-btn" onclick="ccFilter('sicoob','saidas',this)">Saídas</button>
-        <input class="cc-search" id="cc-search-sicoob" type="text" placeholder="Buscar descrição..." oninput="ccSearch('sicoob')">
-        <button class="mkt-btn mkt-btn-primary" style="margin-left:auto" onclick="ccClear('sicoob')">🗑 Limpar</button>
+        <input class="cc-search" id="cc-search-sicoob" type="text" placeholder="Buscar..." oninput="ccSearch('sicoob')">
+        <input class="cc-date-input" id="cc-dt1-sicoob" type="date" title="Data inicial" onchange="ccSearch('sicoob')">
+        <input class="cc-date-input" id="cc-dt2-sicoob" type="date" title="Data final" onchange="ccSearch('sicoob')">
+        <button class="cc-filter-btn" onclick="ccClearDates('sicoob')" title="Limpar datas">✕ Datas</button>
+        <button class="mkt-btn mkt-btn-primary" style="margin-left:auto" onclick="ccClear('sicoob')">🗑 Limpar tudo</button>
       </div>
       <div class="cc-table-wrap">
         <div class="cc-table-header">
-          <span class="cc-table-header-title" id="cc-tbl-title-sicoob">Lançamentos</span>
+          <span class="cc-table-header-title">Lançamentos</span>
           <span style="font-size:11px;color:#444" id="cc-tbl-count-sicoob"></span>
         </div>
         <div style="overflow-x:auto">
           <table class="cc-table">
             <thead><tr>
-              <th>Data</th>
-              <th style="width:45%">Descrição</th>
-              <th>Tipo</th>
-              <th style="text-align:right">Valor</th>
-              <th style="text-align:right">Saldo</th>
+              <th>Data</th><th style="width:42%">Descrição</th><th>Tipo</th>
+              <th style="text-align:right">Valor</th><th style="text-align:right">Saldo</th><th></th>
             </tr></thead>
             <tbody id="cc-tbody-sicoob"></tbody>
           </table>
         </div>
+        <div class="cc-add-row">
+          <form onsubmit="ccAddRow(event,'sicoob')">
+            <input type="date" id="cc-new-dt-sicoob" required style="width:130px">
+            <input type="text" id="cc-new-desc-sicoob" placeholder="Descrição" required style="flex:1;min-width:150px">
+            <select id="cc-new-tipo-sicoob">
+              <option value="entrada">Entrada</option>
+              <option value="saida">Saída</option>
+            </select>
+            <input type="number" id="cc-new-val-sicoob" placeholder="Valor" step="0.01" required style="width:110px">
+            <button type="submit" class="cc-import-btn" style="padding:6px 14px">＋ Adicionar</button>
+          </form>
+        </div>
       </div>
     </div>
-    <div id="cc-processing-sicoob" class="cc-processing" style="display:none">
-      ⏳ Processando PDF...
-    </div>
+    <div id="cc-processing-sicoob" class="cc-processing" style="display:none">⏳ Processando PDF...</div>
   </div>
 </div>
 <!-- /CONTA CORRENTE -->
@@ -3532,11 +3554,12 @@ loadData();
 <!-- ═══════ CONTA CORRENTE JS ═══════ -->
 <script>
 (function(){
-  // estado por banco
+  // estado por banco — cada lançamento tem id único para exclusão
   const CC = {
-    itau:   { lancamentos:[], filtro:'todos', search:'' },
-    sicoob: { lancamentos:[], filtro:'todos', search:'' }
+    itau:   { lancamentos:[], filtro:'todos', search:'', dt1:'', dt2:'', result:null },
+    sicoob: { lancamentos:[], filtro:'todos', search:'', dt1:'', dt2:'', result:null }
   };
+  let _nextId = 1;
 
   window.ccSetBank = function(banco){
     ['itau','sicoob'].forEach(b=>{
@@ -3546,43 +3569,44 @@ loadData();
     });
   };
 
-  window.ccHandleDrop = function(evt, banco){
-    evt.preventDefault();
-    const file = evt.dataTransfer.files[0];
-    if(file && file.type==='application/pdf') ccProcessFile(file, banco);
-  };
-
   window.ccProcessPDF = function(input, banco){
     const file = input.files[0];
     if(file) ccProcessFile(file, banco);
+    input.value='';
   };
 
   function ccProcessFile(file, banco){
-    document.getElementById('cc-upload-area'  ) ; // não needed
-    document.getElementById('cc-drop-'+banco).style.display='none';
     document.getElementById('cc-processing-'+banco).style.display='block';
     document.getElementById('cc-saldos-'+banco).style.display='none';
-
     const reader = new FileReader();
     reader.onload = async function(e){
       try {
         const typedArray = new Uint8Array(e.target.result);
-        // usa pdf.js via CDN se disponível, caso contrário usa fallback
-        let text = '';
-        if(window.pdfjsLib){
-          text = await extractPDFText(typedArray);
-        } else {
-          // carregar pdf.js dinamicamente
+        if(!window.pdfjsLib){
           await loadScript('https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js');
           window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
-          text = await extractPDFText(typedArray);
         }
+        const text = await extractPDFText(typedArray);
         const result = parseBankStatement(text, banco);
+        // atribui IDs únicos e normaliza _dataISO (YYYY-MM-DD) para filtros
+        const anoAtual = new Date().getFullYear();
+        result.lancamentos.forEach(l=>{
+          l._id = _nextId++;
+          if(!l._dataISO && l.data){
+            const pts = l.data.split('/');
+            if(pts.length >= 2){
+              const dia = pts[0].padStart(2,'0');
+              const mes = pts[1].padStart(2,'0');
+              const ano = pts.length === 3 ? pts[2] : String(anoAtual);
+              l._dataISO = ano+'-'+mes+'-'+dia;
+            }
+          }
+        });
         CC[banco].lancamentos = result.lancamentos;
+        CC[banco].result = result;
         ccRender(banco, result, file.name);
       } catch(err){
         document.getElementById('cc-processing-'+banco).style.display='none';
-        document.getElementById('cc-drop-'+banco).style.display='block';
         alert('Erro ao processar PDF: '+err.message+'\n\nCertifique-se que o PDF tem camada de texto (não é escaneado).');
       }
     };
@@ -3598,39 +3622,47 @@ loadData();
     });
   }
 
-  // Extrai texto do PDF preservando layout por linha (agrupa itens com mesma posição Y)
+  // Extrai texto do PDF preservando layout por linha
+  // Agrupa itens com mesma posição Y, reconstrói linha em ordem X com espaçamento
   async function extractPDFText(typedArray){
     const pdf = await pdfjsLib.getDocument({data:typedArray}).promise;
-    let fullLines = [];
+    const fullLines = [];
     for(let p=1; p<=pdf.numPages; p++){
       const page = await pdf.getPage(p);
       const content = await page.getTextContent();
-      // agrupa itens por linha (Y arredondado para 1 decimal)
-      const byY = {};
+      // obtém largura da página para calcular espaçamento proporcional
+      const vp = page.getViewport({scale:1});
+      const pageW = vp.width;
+      // agrupa itens por linha — tolerância de 2pt para Y
+      const rows = [];
       for(const item of content.items){
-        if(!item.str || !item.str.trim()) continue;
-        const y = Math.round(item.transform[5] * 10) / 10;
-        if(!byY[y]) byY[y] = [];
-        byY[y].push({ x: item.transform[4], str: item.str });
+        if(!item.str) continue;
+        const y = item.transform[5];
+        const x = item.transform[4];
+        // busca linha existente dentro de ±2pt
+        let row = rows.find(r=>Math.abs(r.y-y)<2);
+        if(!row){ row={y,items:[]}; rows.push(row); }
+        row.items.push({x, str:item.str, w: item.width||0});
       }
-      // ordena linhas de cima para baixo (Y decrescente em PDF)
-      const ys = Object.keys(byY).map(Number).sort((a,b)=>b-a);
-      for(const y of ys){
+      // ordena linhas de cima para baixo (Y maior = mais alto no PDF)
+      rows.sort((a,b)=>b.y-a.y);
+      for(const row of rows){
         // ordena itens da linha por X
-        const items = byY[y].sort((a,b)=>a.x-b.x);
-        // reconstrói linha com espaços proporcionais
+        const its = row.items.sort((a,b)=>a.x-b.x);
         let line = '';
-        let lastX = null;
-        for(const it of items){
-          if(lastX !== null && it.x - lastX > 5){
-            // espaço proporcional: ~1 espaço a cada 6px
-            const spaces = Math.max(1, Math.round((it.x - lastX) / 6));
-            line += ' '.repeat(spaces);
+        let prevEnd = 0;
+        for(const it of its){
+          if(line.length > 0){
+            // gap entre fim do item anterior e início do atual
+            const gap = it.x - prevEnd;
+            if(gap > 8) line += '  '; // 2 espaços para gaps grandes (colunas separadas)
+            else if(gap > 2) line += ' ';
           }
           line += it.str;
-          lastX = it.x + (it.str.length * 6);
+          prevEnd = it.x + (it.w || it.str.length * 5);
         }
-        fullLines.push(line);
+        const trimmed = line.trim();
+        if(trimmed) fullLines.push(trimmed);
       }
     }
     return fullLines.join('\n');
@@ -3645,39 +3677,53 @@ loadData();
   }
 
   // Parser Sicoob: formato DD/MM   DESCRIÇÃO    VALOR[C/D]
-  // Linhas sem data são continuação (DOC:, nome do pagador etc.) — enriquecem descrição
+  // Lê lançamentos do período e captura Saldo Disponível real do bloco RESUMO
   function parseSicoob(linhas){
     const lancamentos = [];
     let saldoAnterior = 0;
-    const rLinha = /^(\d{2}\/\d{2})\s+(.+?)\s+([\d.]+,\d{2})\s*([CD\*])\s*$/i;
-    const SKIP = /^(SALDO\s+(ANTERIOR|BLOQ|DO\s+DIA)|RESUMO|ENCARGO|OUTRAS\s+INFO|LIMITE|CAPITAL|SAC|OUVIDORIA)/i;
+    let saldoDisponivel = null; // será preenchido pelo RESUMO se encontrado
+    const rLinha = /^(\d{2}\/\d{2})\s{1,}(.+?)\s{2,}([\d.]+,\d{2})\s*([CD*])\s*$/i;
+    const SKIP_DESC = /^(SALDO\s+(ANTERIOR|BLOQ|DO\s+DIA|EM\s+CONTA|EM\s+RDC|DISPONIVEL|DISPONÍVEL)|ENCARGO|OUTRAS\s+INFO|LIMITE|CAPITAL|SAC|OUVIDORIA|CHEQUE\s+ESPECIAL|JUROS|TARIFAS)/i;
 
+    let inResumo = false;
     for(let i=0; i<linhas.length; i++){
       const l = linhas[i].trim();
       if(!l) continue;
+
+      // detecta início do bloco RESUMO
+      if(/^RESUMO\s*$/i.test(l)){ inResumo = true; continue; }
+
+      if(inResumo){
+        // captura saldo disponível: linha "(=) SALDO DISPONÍVEL: ... 29.648,42C"
+        if(/SALDO\s+DISPON/i.test(l)){
+          const mv = l.match(/([\d.]+,\d{2})\s*C/i);
+          if(mv) saldoDisponivel = parseValor(mv[1]);
+        }
+        continue; // pula todas as linhas do RESUMO
+      }
+
       const m = l.match(rLinha);
       if(!m) continue;
       const [,data, desc, valStr, dc] = m;
-      if(SKIP.test(desc)) {
-        // captura saldo anterior
-        if(/SALDO\s+ANTERIOR/i.test(desc)){
-          saldoAnterior = parseValor(valStr);
-        }
+
+      // captura saldo anterior
+      if(/SALDO\s+ANTERIOR/i.test(desc)){
+        saldoAnterior = parseValor(valStr);
         continue;
       }
-      if(dc === '*') continue; // bloqueado, pula
+      if(SKIP_DESC.test(desc) || dc === '*') continue;
+
       const valor = parseValor(valStr);
       if(valor <= 0) continue;
       const tipo = dc.toUpperCase() === 'C' ? 'entrada' : 'saida';
-      // coleta linhas de detalhe (sem data) para enriquecer descrição
+
+      // coleta linhas de detalhe (sem data) — enriquecem descrição
       let descFinal = desc.trim();
       while(i+1 < linhas.length){
         const next = linhas[i+1].trim();
-        if(!next) { i++; continue; }
-        // linha de detalhe: não começa com DD/MM
-        if(/^\d{2}\/\d{2}\s/.test(next)) break;
-        // adiciona info relevante (pula DOC: genérico)
-        if(!/^DOC\.\s*:/i.test(next) && !/^\d{2}\.\d{3}\.\d{3}/.test(next)){
+        if(!next){ i++; continue; }
+        if(/^\d{2}\/\d{2}\s/.test(next)) break; // próximo lançamento
+        if(!/^DOC\.\s*:/i.test(next) && !/^\d{2}\.\d{3}\.\d{3}/.test(next) && next.length > 4){
           descFinal += ' | ' + next;
         }
         i++;
@@ -3685,7 +3731,7 @@ loadData();
       lancamentos.push({ data, descricao: descFinal.substring(0,100), tipo, valor, saldo: 0 });
     }
 
-    // calcula saldo corrente
+    // calcula saldo running
     let saldo = saldoAnterior;
     for(const l of lancamentos){
       saldo += l.tipo === 'entrada' ? l.valor : -l.valor;
@@ -3693,92 +3739,109 @@ loadData();
     }
     const totalEnt = lancamentos.filter(l=>l.tipo==='entrada').reduce((s,l)=>s+l.valor,0);
     const totalSai = lancamentos.filter(l=>l.tipo==='saida').reduce((s,l)=>s+l.valor,0);
-    return { lancamentos, saldoAnterior, totalEnt, totalSai, saldoFinal: saldoAnterior + totalEnt - totalSai };
+    // usa saldo disponível do RESUMO se capturado (inclui RDC automático, cheque especial, etc.)
+    const saldoFinal = saldoDisponivel !== null ? saldoDisponivel : (saldoAnterior + totalEnt - totalSai);
+    return { lancamentos, saldoAnterior, totalEnt, totalSai, saldoFinal, saldoDisponivel };
   }
 
-  // Parser Itaú: formato tabular com colunas Data / Lançamentos / Razão Social / CNPJ / Valor / Saldo
-  // Cada lançamento pode ter 1 ou 2 linhas (descrição + razão social na linha seguinte)
-  // Valores positivos = entrada, negativos (com -) = saída
+  // Parser Itaú: formato tabular com colunas separadas por duplo-espaço
+  // Colunas: Data  Lançamentos  Razão Social  CNPJ/CPF  Valor(R$)  Saldo(R$)
+  // Saldo Anterior: linha DD/MM/YYYY  SALDO ANTERIOR  <vazio>  <vazio>  <vazio>  59.169,94
   function parseItau(linhas){
     const lancamentos = [];
     let saldoAnterior = 0;
-    // Padrão data: DD/MM/YYYY ou DD/MM/AAAA
-    const rData = /^(\d{2}\/\d{2}\/\d{4})\s+(.+?)\s+(-?[\d.]+,\d{2})\s*$/;
-    // Padrão data sem valor no final (valor na coluna separada)
-    const rDataSemVal = /^(\d{2}\/\d{2}\/\d{4})\s+/;
-    const SKIP = /SALDO\s+(ANTERIOR|TOTAL|DISPONÍVEL)|LIMITE|UTILIZADO|DISPONÍVEL/i;
+    const rData = /^(\d{2}\/\d{2}\/\d{4})/;
 
-    // O Itaú tem muitas colunas na mesma linha; o PDF.js pode separar
-    // Estratégia: juntar linhas que se referem à mesma transação
-    // Identificador: linha começa com data completa DD/MM/YYYY
     for(let i=0; i<linhas.length; i++){
       const l = linhas[i].trim();
-      if(!l) continue;
-      if(!rDataSemVal.test(l)) continue;
+      if(!l || !rData.test(l)) continue;
 
-      // extrai data
-      const dataPart = l.match(/^(\d{2}\/\d{2}\/\d{4})/)[1];
+      const dataPart = l.match(rData)[1];
       const resto = l.substring(dataPart.length).trim();
 
-      if(SKIP.test(resto)){
-        // captura saldo anterior
-        if(/SALDO ANTERIOR/i.test(resto)){
-          const mv = resto.match(/([\d.]+,\d{2})\s*$/);
-          if(mv) saldoAnterior = parseValor(mv[1]);
-        }
+      // Divide por duplo espaço (separador de colunas do pdfjs)
+      // Filtra chunks vazios
+      const cols = resto.split(/\s{2,}/).map(c=>c.trim()).filter(Boolean);
+
+      if(!cols.length) continue;
+
+      const primCol = cols[0];
+
+      // Saldo Anterior: valor está no último chunk (coluna Saldo, sem valor em Valor)
+      if(/SALDO\s+ANTERIOR/i.test(primCol)){
+        // último número da linha é o saldo anterior
+        const mv = l.match(/([\d.]+,\d{2})\s*$/);
+        if(mv) saldoAnterior = parseValor(mv[1]);
         continue;
       }
 
-      // Busca o valor: pode estar no fim da linha atual ou precisar de mais tokens
-      // No formato Itaú extraído pelo pdfjs, a linha terá o valor com sinal -/+ no fim
-      // Exemplo: "BOLETO PAGO   HANBAI LTDA   15.082.489/0001-65   -2.045,10"
-      // Ou pode estar em chunks separados e precisar da linha seguinte
+      // Pula linhas que não são lançamentos
+      if(/SALDO\s+(TOTAL|FINAL|DISPONIVEL|DISPONÍVEL)|LIMITE|UTILIZADO|RESUMO|EXTRATO|CONTA\s+CORRENTE/i.test(primCol)) continue;
 
-      // Tenta encontrar valor no final da linha atual
-      let valorStr = '';
-      let descricao = '';
-      const mVal = resto.match(/(-?[\d.]+,\d{2})\s*$/);
-      if(mVal){
-        valorStr = mVal[1];
-        descricao = resto.substring(0, mVal.index).trim();
-      } else {
-        // valor pode estar na próxima linha (fragmentação do pdfjs)
-        // coleta próxima linha se não começa com data
-        let combined = resto;
-        if(i+1 < linhas.length && !/^\d{2}\/\d{2}\/\d{4}/.test(linhas[i+1].trim())){
-          combined += ' ' + linhas[i+1].trim();
+      // Busca colunas de valor:
+      // Formato esperado: [descricao, razao_social?, cnpj?, valor, saldo]
+      // O valor tem sinal negativo se for saída; saldo é sempre positivo
+      // Estratégia: procura o penúltimo número como Valor e último como Saldo
+      // (ou último como Valor se só há um número no fim)
+
+      // Coleta linha atual + possível continuação (linha seguinte sem data)
+      let linhaCompleta = l;
+      if(i+1 < linhas.length){
+        const prox = linhas[i+1].trim();
+        if(prox && !rData.test(prox) && !/^(Data|Lançamentos|Histórico)/i.test(prox)){
+          linhaCompleta += '  ' + prox;
           i++;
-        }
-        const mVal2 = combined.match(/(-?[\d.]+,\d{2})\s*(?:[\d.]+,\d{2}\s*)?$/);
-        if(mVal2){
-          valorStr = mVal2[1];
-          descricao = combined.substring(0, mVal2.index).trim();
         }
       }
 
-      if(!valorStr) continue;
-      // limpa razão social / CNPJ da descrição
-      descricao = descricao
-        .replace(/\s+\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}\s*$/, '')
-        .replace(/\s+\d{3}\.\d{3}\.\d{3}-\d{2}\s*$/, '')
-        .replace(/\s{2,}/g, ' ').trim();
+      // Extrai todos os valores monetários da linha (com ou sem sinal negativo)
+      const todosValores = [...linhaCompleta.matchAll(/(-?[\d]+\.?[\d]*,\d{2})/g)];
+      if(todosValores.length < 1) continue;
 
-      const valorNum = parseValor(valorStr.replace('-',''));
+      let valorStr, saldoStr;
+      if(todosValores.length >= 2){
+        // penúltimo = Valor (R$), último = Saldo (R$)
+        valorStr = todosValores[todosValores.length - 2][1];
+        saldoStr = todosValores[todosValores.length - 1][1];
+      } else {
+        valorStr = todosValores[0][1];
+        saldoStr = valorStr;
+      }
+
+      // Verifica se valorStr parece um CNPJ/CPF (números sem vírgula) — ignora
+      // Já filtrado pelo regex que requer ,\d{2} no final
+      const valorNum = parseValor(valorStr.replace(/^-/,''));
       if(valorNum <= 0) continue;
       const tipo = valorStr.startsWith('-') ? 'saida' : 'entrada';
+
+      // Descrição: tudo antes do primeiro valor monetário, sem CNPJ/CPF
+      const posValorInicio = linhaCompleta.indexOf(valorStr.replace(/^-/,'- ').replace('- ',''));
+      let descPart = linhaCompleta.substring(dataPart.length, linhaCompleta.search(/\s{2,}-?[\d]+\.?[\d]*,\d{2}/)).trim();
+      descPart = descPart
+        .replace(/\s+\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}/g, '') // CNPJ
+        .replace(/\s+\d{3}\.\d{3}\.\d{3}-\d{2}/g, '')         // CPF
+        .replace(/\s{2,}/g, ' ').trim();
+
+      const saldoNum = parseValor(saldoStr.replace(/^-/,''));
       const dataFmt = dataPart.substring(0,5); // DD/MM
-      lancamentos.push({ data: dataFmt, descricao: descricao.substring(0,100), tipo, valor: valorNum, saldo: 0 });
+      lancamentos.push({ data: dataFmt, descricao: descPart.substring(0,100), tipo, valor: valorNum, saldo: saldoNum });
     }
 
-    // calcula saldo corrente
-    let saldo = saldoAnterior;
-    for(const l of lancamentos){
-      saldo += l.tipo === 'entrada' ? l.valor : -l.valor;
-      l.saldo = saldo;
+    // Se saldo anterior não foi capturado mas temos lançamentos, estima pelo primeiro saldo
+    if(saldoAnterior === 0 && lancamentos.length > 0){
+      const primeiro = lancamentos[0];
+      saldoAnterior = primeiro.tipo === 'entrada'
+        ? primeiro.saldo - primeiro.valor
+        : primeiro.saldo + primeiro.valor;
     }
+
     const totalEnt = lancamentos.filter(l=>l.tipo==='entrada').reduce((s,l)=>s+l.valor,0);
     const totalSai = lancamentos.filter(l=>l.tipo==='saida').reduce((s,l)=>s+l.valor,0);
-    return { lancamentos, saldoAnterior, totalEnt, totalSai, saldoFinal: saldoAnterior + totalEnt - totalSai };
+    // usa saldo do último lançamento se disponível
+    const saldoFinal = lancamentos.length > 0
+      ? lancamentos[lancamentos.length-1].saldo
+      : saldoAnterior + totalEnt - totalSai;
+    return { lancamentos, saldoAnterior, totalEnt, totalSai, saldoFinal };
   }
 
   function parseBankStatement(text, banco){
@@ -3836,9 +3899,10 @@ loadData();
     document.getElementById('cc-sal-ant-'+banco).textContent = fmtCC(result.saldoAnterior);
     document.getElementById('cc-sal-ent-'+banco).textContent = fmtCC(result.totalEnt);
     document.getElementById('cc-sal-sai-'+banco).textContent = fmtCC(result.totalSai);
-    document.getElementById('cc-sal-fin-'+banco).textContent = fmtCC(result.saldoFinal);
 
+    // Sicoob: saldoFinal já é o saldoDisponivel (do RESUMO), que inclui RDC+Cheque Especial
     const saldoFinalEl = document.getElementById('cc-sal-fin-'+banco);
+    saldoFinalEl.textContent = fmtCC(result.saldoFinal);
     saldoFinalEl.style.color = result.saldoFinal >= 0 ? '#38bdf8' : '#ff6b6b';
 
     ccRenderTable(banco);
@@ -3853,30 +3917,100 @@ loadData();
 
   window.ccSearch = function(banco){
     CC[banco].search = document.getElementById('cc-search-'+banco).value.toLowerCase();
+    CC[banco].dt1 = document.getElementById('cc-dt1-'+banco).value; // YYYY-MM-DD
+    CC[banco].dt2 = document.getElementById('cc-dt2-'+banco).value;
+    ccRenderTable(banco);
+  };
+
+  window.ccClearDates = function(banco){
+    document.getElementById('cc-dt1-'+banco).value = '';
+    document.getElementById('cc-dt2-'+banco).value = '';
+    CC[banco].dt1 = '';
+    CC[banco].dt2 = '';
     ccRenderTable(banco);
   };
 
   window.ccClear = function(banco){
     if(!confirm('Limpar extrato '+banco.toUpperCase()+'?')) return;
     CC[banco].lancamentos = [];
+    CC[banco].result = null;
+    CC[banco].dt1 = ''; CC[banco].dt2 = '';
     document.getElementById('cc-saldos-'+banco).style.display='none';
-    document.getElementById('cc-drop-'+banco).style.display='block';
     document.getElementById('cc-status-'+banco).className='cc-status';
     document.getElementById('cc-status-'+banco).innerHTML='<span class="dot"></span> Nenhum extrato carregado';
     document.getElementById('cc-file-'+banco).value='';
   };
 
+  window.ccAddRow = function(e, banco){
+    e.preventDefault();
+    const data = document.getElementById('cc-new-dt-'+banco).value; // YYYY-MM-DD
+    const desc = document.getElementById('cc-new-desc-'+banco).value.trim();
+    const tipo = document.getElementById('cc-new-tipo-'+banco).value;
+    const val  = parseFloat(document.getElementById('cc-new-val-'+banco).value);
+    if(!data || !desc || isNaN(val) || val <= 0) return;
+    // converte data para DD/MM
+    const [ano,mes,dia] = data.split('-');
+    const dataFmt = dia+'/'+mes;
+    // recalcula saldos
+    const novaLista = [...CC[banco].lancamentos, {
+      _id: _nextId++, data: dataFmt, _dataISO: data,
+      descricao: desc, tipo, valor: val, saldo: 0
+    }];
+    // ordena por data
+    novaLista.sort((a,b)=>{
+      const ia = a._dataISO || '0000-00-00';
+      const ib = b._dataISO || '0000-00-00';
+      return ia.localeCompare(ib);
+    });
+    // recalcula saldo running
+    const result = CC[banco].result;
+    let s = result ? result.saldoAnterior : 0;
+    for(const l of novaLista){ s += l.tipo==='entrada'?l.valor:-l.valor; l.saldo=s; }
+    CC[banco].lancamentos = novaLista;
+    // limpa form
+    document.getElementById('cc-new-desc-'+banco).value='';
+    document.getElementById('cc-new-val-'+banco).value='';
+    ccRenderTable(banco);
+  };
+
+  window.ccDeleteRow = function(banco, id){
+    CC[banco].lancamentos = CC[banco].lancamentos.filter(l=>l._id !== id);
+    // recalcula saldo running
+    const result = CC[banco].result;
+    let s = result ? result.saldoAnterior : 0;
+    for(const l of CC[banco].lancamentos){ s += l.tipo==='entrada'?l.valor:-l.valor; l.saldo=s; }
+    ccRenderTable(banco);
+  };
+
   function ccRenderTable(banco){
-    const { lancamentos, filtro, search } = CC[banco];
+    const { lancamentos, filtro, search, dt1, dt2 } = CC[banco];
     let lista = lancamentos;
+    // filtro tipo
     if(filtro !== 'todos') lista = lista.filter(l=>l.tipo===filtro.replace('entradas','entrada').replace('saidas','saida'));
+    // filtro busca
     if(search) lista = lista.filter(l=>l.descricao.toLowerCase().includes(search) || l.data.includes(search));
+    // filtro datas
+    if(dt1 || dt2){
+      lista = lista.filter(l=>{
+        // lançamento tem data DD/MM ou DD/MM/YYYY; normaliza para comparação
+        let dStr = l._dataISO || '';
+        if(!dStr && l.data){
+          const pts = l.data.split('/');
+          if(pts.length === 3) dStr = pts[2]+'-'+pts[1]+'-'+pts[0];
+          else if(pts.length === 2) dStr = new Date().getFullYear()+'-'+pts[1]+'-'+pts[0];
+        }
+        if(dt1 && dStr && dStr < dt1) return false;
+        if(dt2 && dStr && dStr > dt2) return false;
+        return true;
+      });
+    }
 
     const tbody = document.getElementById('cc-tbody-'+banco);
-    document.getElementById('cc-tbl-count-'+banco).textContent = lista.length + ' registros';
+    const countEl = document.getElementById('cc-tbl-count-'+banco);
+    if(countEl) countEl.textContent = lista.length + ' registros';
 
     if(!lista.length){
-      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:36px;color:#444">
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:36px;color:#444">
         <div style="font-size:28px;margin-bottom:8px;opacity:.4">📋</div>
         Nenhum lançamento encontrado</td></tr>`;
       return;
@@ -3892,6 +4026,7 @@ loadData();
         }</td>
         <td class="${l.tipo==='entrada'?'cc-entrada':'cc-saida'}">${fmtCC(l.valor)}</td>
         <td class="cc-saldo-col">${fmtCC(l.saldo)}</td>
+        <td><button class="cc-btn-del" onclick="ccDeleteRow('${banco}',${l._id})" title="Excluir">🗑</button></td>
       </tr>
     `).join('');
   }
