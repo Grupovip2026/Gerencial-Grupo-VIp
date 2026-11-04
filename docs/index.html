@@ -3266,73 +3266,123 @@ function renderOrc2027(){
       return;
     }
 
-    // Agrupa por categoria para subtotais
-    const porCat = {};
+    // ── Agrupa por CONTA, depois por categoria dentro de cada conta ──
+    const porConta = {};
     filtrados.forEach(l=>{
-      const c = l.cat || 'Sem categoria';
-      if(!porCat[c]) porCat[c] = {entradas:[],saidas:[]};
-      if(l.tipo==='ENTRADA') porCat[c].entradas.push(l);
-      else porCat[c].saidas.push(l);
+      const c = l.conta || 'Sem conta';
+      if(!porConta[c]) porConta[c] = [];
+      porConta[c].push(l);
     });
 
-    // Tabela principal
+    const iconeConta = c => c==='Itaú'?'🏦':c==='Sicoob'?'🌾':'🏦';
+
     let html2 = `
 <div class="fc-relat-print-area">
   <div class="fc-relat-print-header" style="display:none;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid #333">
     <div><strong style="font-size:18px">Relatório de Pagamentos</strong><br><span style="color:#666;font-size:13px">Grupo VIP — ${dataFmt}</span></div>
     <div style="text-align:right;font-size:12px;color:#666">Emitido em: ${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</div>
-  </div>
+  </div>`;
+
+    // ── Um bloco por conta ──
+    Object.entries(porConta).sort(([a],[b])=>a.localeCompare(b)).forEach(([contaNome, lancs])=>{
+      const entConta = lancs.filter(l=>l.tipo==='ENTRADA').reduce((s,l)=>s+parseMoeda(l.valor),0);
+      const saiConta = lancs.filter(l=>l.tipo==='SAÍDA').reduce((s,l)=>s+parseMoeda(l.valor),0);
+      const saldoConta = entConta - saiConta;
+
+      // Agrupa os lançamentos desta conta por categoria
+      const porCatConta = {};
+      lancs.forEach(l=>{
+        const c = l.cat || 'Sem categoria';
+        if(!porCatConta[c]) porCatConta[c] = [];
+        porCatConta[c].push(l);
+      });
+
+      html2 += `
+  <div style="margin-bottom:28px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(56,189,248,.1);border-left:3px solid #38bdf8;border-radius:0 8px 8px 0;margin-bottom:0">
+      <span style="font-size:15px;font-weight:700;color:#38bdf8">${iconeConta(contaNome)} ${contaNome}</span>
+      <span style="font-size:12px;color:#94a3b8">${lancs.length} lançamento${lancs.length!==1?'s':''}</span>
+    </div>
   <div class="fc-tbl-wrap">
   <table class="fc-tbl" style="min-width:700px">
     <thead>
       <tr>
-        <th style="text-align:left;width:90px">Conta</th>
         <th style="text-align:left">Descrição</th>
-        <th style="text-align:left;width:110px">Categoria</th>
+        <th style="text-align:left;width:130px">Categoria</th>
         <th style="width:80px">Tipo</th>
-        <th style="width:140px">Valor</th>
+        <th style="width:150px">Valor</th>
       </tr>
     </thead>
     <tbody>`;
 
-    Object.entries(porCat).sort(([a],[b])=>a.localeCompare(b)).forEach(([catNome, grp])=>{
-      const todos = [...grp.entradas, ...grp.saidas];
-      const subtotEnt = grp.entradas.reduce((s,l)=>s+parseMoeda(l.valor),0);
-      const subtotSai = grp.saidas.reduce((s,l)=>s+parseMoeda(l.valor),0);
-      html2 += `<tr class="fc-mes-head"><td colspan="5" style="text-align:left">📂 ${catNome}</td></tr>`;
-      todos.sort((a,b)=>a.conta.localeCompare(b.conta)).forEach(l=>{
-        const v = parseMoeda(l.valor);
-        const isEnt = l.tipo==='ENTRADA';
-        html2 += `<tr>
-          <td style="text-align:left">${l.conta}</td>
-          <td style="text-align:left;font-family:'Inter',sans-serif">${l.desc}</td>
-          <td style="text-align:left;font-size:11px;color:#888;font-family:'Inter',sans-serif">${l.cat||'—'}</td>
-          <td style="text-align:center"><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;background:${isEnt?'rgba(0,201,167,.15)':'rgba(255,107,107,.15)'};color:${isEnt?'#00C9A7':'#FF6B6B'}">${l.tipo}</span></td>
-          <td class="${isEnt?'fc-pos':'fc-neg'}" style="font-weight:600">${fmtR(v)}</td>
-        </tr>`;
-      });
-      if(todos.length > 1){
-        html2 += `<tr style="border-top:1px solid rgba(255,255,255,.12)">
-          <td colspan="4" style="text-align:right;font-size:11px;color:#666;font-family:'Inter',sans-serif;padding-right:8px">Subtotal ${catNome}</td>
-          <td style="font-weight:700">`;
-        if(subtotEnt > 0 && subtotSai > 0){
-          html2 += `<span class="fc-pos">${fmtR(subtotEnt)}</span> / <span class="fc-neg">${fmtR(subtotSai)}</span>`;
-        } else if(subtotEnt > 0){
-          html2 += `<span class="fc-pos">${fmtR(subtotEnt)}</span>`;
-        } else {
-          html2 += `<span class="fc-neg">${fmtR(subtotSai)}</span>`;
+      Object.entries(porCatConta).sort(([a],[b])=>a.localeCompare(b)).forEach(([catNome, grupo])=>{
+        const subEnt = grupo.filter(l=>l.tipo==='ENTRADA').reduce((s,l)=>s+parseMoeda(l.valor),0);
+        const subSai = grupo.filter(l=>l.tipo==='SAÍDA').reduce((s,l)=>s+parseMoeda(l.valor),0);
+
+        // separador de categoria dentro da conta
+        if(Object.keys(porCatConta).length > 1){
+          html2 += `<tr class="fc-mes-head"><td colspan="4" style="text-align:left;font-size:11px;padding:6px 12px">📂 ${catNome}</td></tr>`;
         }
-        html2 += `</td></tr>`;
+
+        grupo.sort((a,b)=>a.desc.localeCompare(b.desc)).forEach(l=>{
+          const v = parseMoeda(l.valor);
+          const isEnt = l.tipo==='ENTRADA';
+          html2 += `<tr>
+            <td style="text-align:left;font-family:'Inter',sans-serif">${l.desc}</td>
+            <td style="text-align:left;font-size:11px;color:#888;font-family:'Inter',sans-serif">${l.cat||'—'}</td>
+            <td style="text-align:center"><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;background:${isEnt?'rgba(0,201,167,.15)':'rgba(255,107,107,.15)'};color:${isEnt?'#00C9A7':'#FF6B6B'}">${l.tipo}</span></td>
+            <td class="${isEnt?'fc-pos':'fc-neg'}" style="font-weight:600">${fmtR(v)}</td>
+          </tr>`;
+        });
+
+        // subtotal da categoria se tiver mais de 1 item
+        if(grupo.length > 1 && Object.keys(porCatConta).length > 1){
+          html2 += `<tr style="background:rgba(255,255,255,.025)">
+            <td colspan="2" style="text-align:right;font-size:11px;color:#555;padding-right:8px">Subtotal ${catNome}</td>
+            <td></td>
+            <td style="font-weight:600">`;
+          if(subEnt>0&&subSai>0) html2+=`<span class="fc-pos">${fmtR(subEnt)}</span> <span style="color:#555">/</span> <span class="fc-neg">${fmtR(subSai)}</span>`;
+          else if(subEnt>0) html2+=`<span class="fc-pos">${fmtR(subEnt)}</span>`;
+          else html2+=`<span class="fc-neg">${fmtR(subSai)}</span>`;
+          html2 += `</td></tr>`;
+        }
+      });
+
+      // ── Subtotal da conta ──
+      html2 += `
+      <tr style="border-top:2px solid rgba(56,189,248,.3);background:rgba(56,189,248,.05)">
+        <td colspan="2" style="text-align:right;font-weight:700;color:#94a3b8;font-size:12px;padding-right:8px">SUBTOTAL ${contaNome.toUpperCase()}</td>
+        <td></td>
+        <td style="font-weight:800;font-size:14px">`;
+      if(entConta>0&&saiConta>0){
+        html2+=`<div><span class="fc-pos">${fmtR(entConta)}</span></div><div><span class="fc-neg">- ${fmtR(saiConta)}</span></div>`;
+        html2+=`<div style="border-top:1px solid rgba(255,255,255,.1);margin-top:3px;padding-top:3px"><span class="${saldoConta>=0?'fc-pos':'fc-neg'}">${fmtR(saldoConta)}</span></div>`;
+      } else if(entConta>0){
+        html2+=`<span class="fc-pos">${fmtR(entConta)}</span>`;
+      } else {
+        html2+=`<span class="fc-neg">${fmtR(saiConta)}</span>`;
       }
+      html2 += `</td></tr>
+    </tbody>
+  </table>
+  </div>
+  </div>`;
     });
 
+    // ── TOTAL GERAL ──
     html2 += `
-      <tr style="border-top:2px solid rgba(255,255,255,.15)">
-        <td colspan="4" style="text-align:right;font-weight:700;font-family:'Inter',sans-serif;color:#ccc">TOTAL DO DIA</td>
-        <td style="font-weight:700">
-          ${totEnt>0?`<span class="fc-pos">${fmtR(totEnt)}</span>`:''}
-          ${totEnt>0&&totSai>0?' / ':''}
-          ${totSai>0?`<span class="fc-neg">${fmtR(totSai)}</span>`:''}
+  <div class="fc-tbl-wrap">
+  <table class="fc-tbl" style="min-width:700px">
+    <tbody>
+      <tr style="border-top:3px solid rgba(255,255,255,.2);background:rgba(255,255,255,.04)">
+        <td style="text-align:right;font-weight:800;font-size:14px;color:#e2e8f0;letter-spacing:.5px;padding:14px 12px" colspan="3">💰 TOTAL GERAL DO DIA</td>
+        <td style="font-weight:800;font-size:15px;padding:14px 12px;width:150px">
+          ${totEnt>0?`<div><span class="fc-pos">${fmtR(totEnt)}</span> <span style="font-size:10px;color:#4ade80;font-weight:600">↗ Entradas</span></div>`:''}
+          ${totSai>0?`<div><span class="fc-neg">${fmtR(totSai)}</span> <span style="font-size:10px;color:#f87171;font-weight:600">↙ Saídas</span></div>`:''}
+          <div style="border-top:1px solid rgba(255,255,255,.15);margin-top:6px;padding-top:6px">
+            <span class="${(totEnt-totSai)>=0?'fc-pos':'fc-neg'}" style="font-size:16px">${fmtR(totEnt-totSai)}</span>
+            <span style="font-size:10px;color:#64748b;font-weight:600;margin-left:4px">Saldo</span>
+          </div>
         </td>
       </tr>
     </tbody>
