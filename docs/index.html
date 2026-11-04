@@ -3598,95 +3598,221 @@ loadData();
     });
   }
 
+  // Extrai texto do PDF preservando layout por linha (agrupa itens com mesma posição Y)
   async function extractPDFText(typedArray){
     const pdf = await pdfjsLib.getDocument({data:typedArray}).promise;
-    let full = '';
-    for(let i=1; i<=pdf.numPages; i++){
-      const page = await pdf.getPage(i);
+    let fullLines = [];
+    for(let p=1; p<=pdf.numPages; p++){
+      const page = await pdf.getPage(p);
       const content = await page.getTextContent();
-      full += content.items.map(it=>it.str).join(' ') + '\n';
+      // agrupa itens por linha (Y arredondado para 1 decimal)
+      const byY = {};
+      for(const item of content.items){
+        if(!item.str || !item.str.trim()) continue;
+        const y = Math.round(item.transform[5] * 10) / 10;
+        if(!byY[y]) byY[y] = [];
+        byY[y].push({ x: item.transform[4], str: item.str });
+      }
+      // ordena linhas de cima para baixo (Y decrescente em PDF)
+      const ys = Object.keys(byY).map(Number).sort((a,b)=>b-a);
+      for(const y of ys){
+        // ordena itens da linha por X
+        const items = byY[y].sort((a,b)=>a.x-b.x);
+        // reconstrói linha com espaços proporcionais
+        let line = '';
+        let lastX = null;
+        for(const it of items){
+          if(lastX !== null && it.x - lastX > 5){
+            // espaço proporcional: ~1 espaço a cada 6px
+            const spaces = Math.max(1, Math.round((it.x - lastX) / 6));
+            line += ' '.repeat(spaces);
+          }
+          line += it.str;
+          lastX = it.x + (it.str.length * 6);
+        }
+        fullLines.push(line);
+      }
     }
-    return full;
+    return fullLines.join('\n');
   }
 
-  function parseBankStatement(text, banco){
-    const linhas = text.split('\n').map(l=>l.trim()).filter(Boolean);
+  // Detecta o banco pelo conteúdo do texto extraído
+  function detectBanco(text){
+    const up = text.toUpperCase();
+    if(up.includes('SICOOB') || up.includes('SISBR') || up.includes('COOPERATIVA')) return 'sicoob';
+    if(up.includes('ITAU') || up.includes('ITAÚ') || up.includes('LANÇAMENTOS DO PERÍODO')) return 'itau';
+    return null;
+  }
+
+  // Parser Sicoob: formato DD/MM   DESCRIÇÃO    VALOR[C/D]
+  // Linhas sem data são continuação (DOC:, nome do pagador etc.) — enriquecem descrição
+  function parseSicoob(linhas){
     const lancamentos = [];
     let saldoAnterior = 0;
+    const rLinha = /^(\d{2}\/\d{2})\s+(.+?)\s+([\d.]+,\d{2})\s*([CD\*])\s*$/i;
+    const SKIP = /^(SALDO\s+(ANTERIOR|BLOQ|DO\s+DIA)|RESUMO|ENCARGO|OUTRAS\s+INFO|LIMITE|CAPITAL|SAC|OUVIDORIA)/i;
 
-    // regex para detectar valor monetário BR
-    const rVal = /R?\$?\s*([\d.,]+)/;
-    // regex para data DD/MM/YYYY ou DD/MM/YY
-    const rData = /(\d{2})\/(\d{2})\/(\d{2,4})/;
-
-    // procura saldo anterior
-    for(const l of linhas){
-      const lu = l.toUpperCase();
-      if(lu.includes('SALDO ANTERIOR') || lu.includes('SALDO INICIAL')){
-        const m = l.match(/([\d.,]+)/g);
-        if(m && m.length){
-          saldoAnterior = parseValor(m[m.length-1]);
-          break;
-        }
-      }
-    }
-
-    // padrão geral: data + descrição + valor (± ou D/C)
-    // funciona para Itaú e Sicoob com texto estruturado
     for(let i=0; i<linhas.length; i++){
-      const l = linhas[i];
-      const mData = l.match(/^(\d{2}\/\d{2}(?:\/\d{2,4})?)/);
-      if(!mData) continue;
-
-      const resto = l.substring(mData[0].length).trim();
-      // busca valor no final da linha ou na próxima linha
-      let valorStr = '';
-      let tipo = '';
-
-      // padrão: linha contém D ou C no final com valor
-      const mDC = resto.match(/([\d.]+,\d{2})\s*([DC])\s*$/i);
-      if(mDC){
-        valorStr = mDC[1];
-        tipo = mDC[2].toUpperCase()==='C' ? 'entrada' : 'saida';
-      } else {
-        // valor isolado no final
-        const mV = resto.match(/([\d.]+,\d{2})\s*$/);
-        if(mV){
-          valorStr = mV[1];
-          // tenta inferir pelo contexto: débito/crédito, pagamento etc.
-          const descUp = resto.toUpperCase();
-          tipo = /PIX RECEBIDO|TED RECEBIDA|CRÉDITO|DEPOSITO|ENTRADA|RESGAT|RECEB/.test(descUp) ? 'entrada' : 'saida';
+      const l = linhas[i].trim();
+      if(!l) continue;
+      const m = l.match(rLinha);
+      if(!m) continue;
+      const [,data, desc, valStr, dc] = m;
+      if(SKIP.test(desc)) {
+        // captura saldo anterior
+        if(/SALDO\s+ANTERIOR/i.test(desc)){
+          saldoAnterior = parseValor(valStr);
         }
+        continue;
       }
-
-      if(!valorStr) continue;
-      const valor = parseValor(valorStr);
+      if(dc === '*') continue; // bloqueado, pula
+      const valor = parseValor(valStr);
       if(valor <= 0) continue;
-
-      const descricao = resto.replace(/([\d.]+,\d{2})\s*[DC]?\s*$/, '').trim() || 'Lançamento';
-
-      lancamentos.push({
-        data: mData[0],
-        descricao: descricao.substring(0,80),
-        tipo,
-        valor,
-        saldo: 0 // calculado depois
-      });
+      const tipo = dc.toUpperCase() === 'C' ? 'entrada' : 'saida';
+      // coleta linhas de detalhe (sem data) para enriquecer descrição
+      let descFinal = desc.trim();
+      while(i+1 < linhas.length){
+        const next = linhas[i+1].trim();
+        if(!next) { i++; continue; }
+        // linha de detalhe: não começa com DD/MM
+        if(/^\d{2}\/\d{2}\s/.test(next)) break;
+        // adiciona info relevante (pula DOC: genérico)
+        if(!/^DOC\.\s*:/i.test(next) && !/^\d{2}\.\d{3}\.\d{3}/.test(next)){
+          descFinal += ' | ' + next;
+        }
+        i++;
+      }
+      lancamentos.push({ data, descricao: descFinal.substring(0,100), tipo, valor, saldo: 0 });
     }
 
     // calcula saldo corrente
     let saldo = saldoAnterior;
     for(const l of lancamentos){
-      if(l.tipo==='entrada') saldo += l.valor;
-      else saldo -= l.valor;
+      saldo += l.tipo === 'entrada' ? l.valor : -l.valor;
       l.saldo = saldo;
     }
-
     const totalEnt = lancamentos.filter(l=>l.tipo==='entrada').reduce((s,l)=>s+l.valor,0);
     const totalSai = lancamentos.filter(l=>l.tipo==='saida').reduce((s,l)=>s+l.valor,0);
-    const saldoFinal = saldoAnterior + totalEnt - totalSai;
+    return { lancamentos, saldoAnterior, totalEnt, totalSai, saldoFinal: saldoAnterior + totalEnt - totalSai };
+  }
 
-    return { lancamentos, saldoAnterior, totalEnt, totalSai, saldoFinal };
+  // Parser Itaú: formato tabular com colunas Data / Lançamentos / Razão Social / CNPJ / Valor / Saldo
+  // Cada lançamento pode ter 1 ou 2 linhas (descrição + razão social na linha seguinte)
+  // Valores positivos = entrada, negativos (com -) = saída
+  function parseItau(linhas){
+    const lancamentos = [];
+    let saldoAnterior = 0;
+    // Padrão data: DD/MM/YYYY ou DD/MM/AAAA
+    const rData = /^(\d{2}\/\d{2}\/\d{4})\s+(.+?)\s+(-?[\d.]+,\d{2})\s*$/;
+    // Padrão data sem valor no final (valor na coluna separada)
+    const rDataSemVal = /^(\d{2}\/\d{2}\/\d{4})\s+/;
+    const SKIP = /SALDO\s+(ANTERIOR|TOTAL|DISPONÍVEL)|LIMITE|UTILIZADO|DISPONÍVEL/i;
+
+    // O Itaú tem muitas colunas na mesma linha; o PDF.js pode separar
+    // Estratégia: juntar linhas que se referem à mesma transação
+    // Identificador: linha começa com data completa DD/MM/YYYY
+    for(let i=0; i<linhas.length; i++){
+      const l = linhas[i].trim();
+      if(!l) continue;
+      if(!rDataSemVal.test(l)) continue;
+
+      // extrai data
+      const dataPart = l.match(/^(\d{2}\/\d{2}\/\d{4})/)[1];
+      const resto = l.substring(dataPart.length).trim();
+
+      if(SKIP.test(resto)){
+        // captura saldo anterior
+        if(/SALDO ANTERIOR/i.test(resto)){
+          const mv = resto.match(/([\d.]+,\d{2})\s*$/);
+          if(mv) saldoAnterior = parseValor(mv[1]);
+        }
+        continue;
+      }
+
+      // Busca o valor: pode estar no fim da linha atual ou precisar de mais tokens
+      // No formato Itaú extraído pelo pdfjs, a linha terá o valor com sinal -/+ no fim
+      // Exemplo: "BOLETO PAGO   HANBAI LTDA   15.082.489/0001-65   -2.045,10"
+      // Ou pode estar em chunks separados e precisar da linha seguinte
+
+      // Tenta encontrar valor no final da linha atual
+      let valorStr = '';
+      let descricao = '';
+      const mVal = resto.match(/(-?[\d.]+,\d{2})\s*$/);
+      if(mVal){
+        valorStr = mVal[1];
+        descricao = resto.substring(0, mVal.index).trim();
+      } else {
+        // valor pode estar na próxima linha (fragmentação do pdfjs)
+        // coleta próxima linha se não começa com data
+        let combined = resto;
+        if(i+1 < linhas.length && !/^\d{2}\/\d{2}\/\d{4}/.test(linhas[i+1].trim())){
+          combined += ' ' + linhas[i+1].trim();
+          i++;
+        }
+        const mVal2 = combined.match(/(-?[\d.]+,\d{2})\s*(?:[\d.]+,\d{2}\s*)?$/);
+        if(mVal2){
+          valorStr = mVal2[1];
+          descricao = combined.substring(0, mVal2.index).trim();
+        }
+      }
+
+      if(!valorStr) continue;
+      // limpa razão social / CNPJ da descrição
+      descricao = descricao
+        .replace(/\s+\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}\s*$/, '')
+        .replace(/\s+\d{3}\.\d{3}\.\d{3}-\d{2}\s*$/, '')
+        .replace(/\s{2,}/g, ' ').trim();
+
+      const valorNum = parseValor(valorStr.replace('-',''));
+      if(valorNum <= 0) continue;
+      const tipo = valorStr.startsWith('-') ? 'saida' : 'entrada';
+      const dataFmt = dataPart.substring(0,5); // DD/MM
+      lancamentos.push({ data: dataFmt, descricao: descricao.substring(0,100), tipo, valor: valorNum, saldo: 0 });
+    }
+
+    // calcula saldo corrente
+    let saldo = saldoAnterior;
+    for(const l of lancamentos){
+      saldo += l.tipo === 'entrada' ? l.valor : -l.valor;
+      l.saldo = saldo;
+    }
+    const totalEnt = lancamentos.filter(l=>l.tipo==='entrada').reduce((s,l)=>s+l.valor,0);
+    const totalSai = lancamentos.filter(l=>l.tipo==='saida').reduce((s,l)=>s+l.valor,0);
+    return { lancamentos, saldoAnterior, totalEnt, totalSai, saldoFinal: saldoAnterior + totalEnt - totalSai };
+  }
+
+  function parseBankStatement(text, banco){
+    const linhas = text.split('\n');
+    // auto-detecta banco se não especificado
+    const bancoDetectado = banco || detectBanco(text);
+    if(bancoDetectado === 'sicoob') return parseSicoob(linhas);
+    if(bancoDetectado === 'itau')   return parseItau(linhas);
+
+    // fallback genérico
+    const limpas = linhas.map(l=>l.trim()).filter(Boolean);
+    const lancamentos = [];
+    let saldoAnterior = 0;
+    for(const l of limpas){
+      const mData = l.match(/^(\d{2}\/\d{2}(?:\/\d{2,4})?)/);
+      if(!mData) continue;
+      const resto = l.substring(mData[0].length).trim();
+      const mDC = resto.match(/([\d.]+,\d{2})\s*([DC])\s*$/i);
+      let valorStr='', tipo='';
+      if(mDC){ valorStr=mDC[1]; tipo=mDC[2].toUpperCase()==='C'?'entrada':'saida'; }
+      else {
+        const mV = resto.match(/(-?[\d.]+,\d{2})\s*$/);
+        if(mV){ valorStr=mV[1].replace('-',''); tipo=mV[1].startsWith('-')?'saida':'entrada'; }
+      }
+      if(!valorStr) continue;
+      const valor=parseValor(valorStr);
+      if(valor<=0) continue;
+      lancamentos.push({ data:mData[0], descricao:resto.replace(/([\d.]+,\d{2})\s*[DC]?\s*$/,'').trim().substring(0,80)||'Lançamento', tipo, valor, saldo:0 });
+    }
+    let saldo=saldoAnterior;
+    for(const l of lancamentos){ saldo+=l.tipo==='entrada'?l.valor:-l.valor; l.saldo=saldo; }
+    const totalEnt=lancamentos.filter(l=>l.tipo==='entrada').reduce((s,l)=>s+l.valor,0);
+    const totalSai=lancamentos.filter(l=>l.tipo==='saida').reduce((s,l)=>s+l.valor,0);
+    return { lancamentos, saldoAnterior, totalEnt, totalSai, saldoFinal: saldoAnterior+totalEnt-totalSai };
   }
 
   function parseValor(s){
