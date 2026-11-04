@@ -3562,10 +3562,41 @@ loadData();
 <!-- ═══════ CONTA CORRENTE JS ═══════ -->
 <script>
 (function(){
+  const CC_STORAGE_KEY = 'cc_data_v2';
+
+  // ── Persistência localStorage ──
+  function ccSave(){
+    try{
+      const payload = {
+        itau:   { lancamentos: CC.itau.lancamentos,   result: CC.itau.result,   nome: CC.itau.nome   },
+        sicoob: { lancamentos: CC.sicoob.lancamentos, result: CC.sicoob.result, nome: CC.sicoob.nome },
+        nextId: _nextId
+      };
+      localStorage.setItem(CC_STORAGE_KEY, JSON.stringify(payload));
+    }catch(e){}
+  }
+
+  function ccLoad(){
+    try{
+      const raw = localStorage.getItem(CC_STORAGE_KEY);
+      if(!raw) return;
+      const p = JSON.parse(raw);
+      if(p.nextId) _nextId = p.nextId;
+      ['itau','sicoob'].forEach(banco=>{
+        if(p[banco] && Array.isArray(p[banco].lancamentos) && p[banco].lancamentos.length){
+          CC[banco].lancamentos = p[banco].lancamentos;
+          CC[banco].result      = p[banco].result || null;
+          CC[banco].nome        = p[banco].nome   || '';
+          ccRender(banco, CC[banco].result, CC[banco].nome, true);
+        }
+      });
+    }catch(e){}
+  }
+
   // estado por banco — cada lançamento tem id único para exclusão
   const CC = {
-    itau:   { lancamentos:[], filtro:'todos', search:'', dt1:'', dt2:'', result:null },
-    sicoob: { lancamentos:[], filtro:'todos', search:'', dt1:'', dt2:'', result:null }
+    itau:   { lancamentos:[], filtro:'todos', search:'', dt1:'', dt2:'', result:null, nome:'' },
+    sicoob: { lancamentos:[], filtro:'todos', search:'', dt1:'', dt2:'', result:null, nome:'' }
   };
   let _nextId = 1;
 
@@ -3594,7 +3625,10 @@ loadData();
           await loadScript('https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js');
           window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
         }
-        const text = await extractPDFText(typedArray);
+        const { text, rawLines } = await extractPDFText(typedArray);
+        // debug: mostra primeiras linhas no console para diagnóstico
+        console.log('[CC] Primeiras 40 linhas extraídas do PDF ('+banco+'):');
+        rawLines.slice(0,40).forEach((l,i)=>console.log(i+': '+l));
         const result = parseBankStatement(text, banco);
         // atribui IDs únicos e normaliza _dataISO (YYYY-MM-DD) para filtros
         const anoAtual = new Date().getFullYear();
@@ -3612,6 +3646,8 @@ loadData();
         });
         CC[banco].lancamentos = result.lancamentos;
         CC[banco].result = result;
+        CC[banco].nome = file.name;
+        ccSave();
         ccRender(banco, result, file.name);
       } catch(err){
         document.getElementById('cc-processing-'+banco).style.display='none';
@@ -3632,48 +3668,53 @@ loadData();
 
   // Extrai texto do PDF preservando layout por linha
   // Agrupa itens com mesma posição Y, reconstrói linha em ordem X com espaçamento
+  // Retorna { text: string com linhas, rawLines: array de linhas }
   async function extractPDFText(typedArray){
     const pdf = await pdfjsLib.getDocument({data:typedArray}).promise;
     const fullLines = [];
     for(let p=1; p<=pdf.numPages; p++){
       const page = await pdf.getPage(p);
       const content = await page.getTextContent();
-      // obtém largura da página para calcular espaçamento proporcional
       const vp = page.getViewport({scale:1});
-      const pageW = vp.width;
-      // agrupa itens por linha — tolerância de 2pt para Y
+      const pageW = vp.width || 595; // A4 width em pts ≈ 595
+      // threshold de gap: ~1.5% da largura da página = separador de coluna
+      const colGapThreshold = pageW * 0.015;
+
+      // agrupa itens por linha — tolerância de 3pt para Y
       const rows = [];
       for(const item of content.items){
-        if(!item.str) continue;
-        const y = item.transform[5];
+        if(!item.str || !item.str.trim()) continue;
+        const y = Math.round(item.transform[5]);
         const x = item.transform[4];
-        // busca linha existente dentro de ±2pt
-        let row = rows.find(r=>Math.abs(r.y-y)<2);
+        let row = rows.find(r=>Math.abs(r.y-y)<3);
         if(!row){ row={y,items:[]}; rows.push(row); }
         row.items.push({x, str:item.str, w: item.width||0});
       }
       // ordena linhas de cima para baixo (Y maior = mais alto no PDF)
       rows.sort((a,b)=>b.y-a.y);
       for(const row of rows){
-        // ordena itens da linha por X
         const its = row.items.sort((a,b)=>a.x-b.x);
         let line = '';
         let prevEnd = 0;
         for(const it of its){
           if(line.length > 0){
-            // gap entre fim do item anterior e início do atual
             const gap = it.x - prevEnd;
-            if(gap > 8) line += '  '; // 2 espaços para gaps grandes (colunas separadas)
-            else if(gap > 2) line += ' ';
+            // gap grande = separador de coluna → duplo espaço
+            // gap pequeno = espaço normal dentro de uma coluna
+            if(gap > colGapThreshold) line += '  ';
+            else if(gap > 1) line += ' ';
           }
           line += it.str;
-          prevEnd = it.x + (it.w || it.str.length * 5);
+          // usa item.width se disponível; fallback proporcional ao fontSize
+          const fontSize = (it.transform ? Math.abs(it.transform[0]) : 0) || 10;
+          prevEnd = it.x + (it.w > 0 ? it.w : it.str.length * fontSize * 0.55);
         }
         const trimmed = line.trim();
         if(trimmed) fullLines.push(trimmed);
       }
     }
-    return fullLines.join('\n');
+    const text = fullLines.join('\n');
+    return { text, rawLines: fullLines };
   }
 
   // Detecta o banco pelo conteúdo do texto extraído
@@ -3782,95 +3823,100 @@ loadData();
     return { lancamentos, saldoEmConta, saldoRDC, chequeEspecial, totalEnt, totalSai, saldoFinal };
   }
 
-  // Parser Itaú: formato tabular com 6 colunas separadas por duplo-espaço
-  // Colunas: Data  |  Lançamentos  |  Razão Social  |  CNPJ/CPF  |  Valor (R$)  |  Saldo (R$)
-  //
-  // Regras:
-  //  - Saldo Anterior: linha com "SALDO ANTERIOR" na col Lançamentos; valor na col Saldo (sem valor na col Valor)
-  //  - Lançamento normal: valor na col Valor (negativo=saída, positivo=entrada) + saldo na col Saldo
-  //  - Descrição exibida = Razão Social (cols[2]) se existir, senão Lançamentos (cols[1])
-  //  - CNPJ/CPF (cols[3]) é ignorado na exibição
-  //  - Algumas linhas têm só 2 colunas (Data + Lançamentos) com continuação na linha seguinte
+  // Parser Itaú: lê linha por linha do texto extraído pelo PDF.js
+  // Estratégia robusta: identifica valores monetários de trás pra frente,
+  // usa tudo antes dos valores como descrição, prioriza Razão Social
   function parseItau(linhas){
     const lancamentos = [];
     let saldoAnterior = 0;
-    const rData = /^(\d{2}\/\d{2}\/\d{4})/;
-    const rValor = /^-?[\d.]+,\d{2}$/;      // número monetário puro
-    const rCNPJ  = /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/;
-    const rCPF   = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
+    const rData   = /^(\d{2}\/\d{2}\/\d{4})/;
+    // número monetário: opcionalmente negativo, com pontos e vírgula
+    const rValorFull = /^-?[\d]{1,3}(?:\.[\d]{3})*,\d{2}$/;
+    const rCNPJ = /\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}/;
+    const rCPF  = /\d{3}\.\d{3}\.\d{3}-\d{2}/;
+    // Padrão para achar valores monetários dentro de string
+    const rValorInline = /(-?[\d]{1,3}(?:\.[\d]{3})*,\d{2})/g;
 
     for(let i=0; i<linhas.length; i++){
       let l = linhas[i].trim();
-      if(!l || !rData.test(l)) continue;
+      if(!l) continue;
 
+      // ── Pula cabeçalhos da tabela ──
+      if(/^(Data\b|Lançamentos|Período|Extrato|Agência|Conta\s+Corrente|Histórico|Movimentação)/i.test(l)) continue;
+
+      // ── Linhas com data completa DD/MM/YYYY ──
+      if(!rData.test(l)) continue;
       const dataPart = l.match(rData)[1];
-      let resto = l.substring(dataPart.length).trim();
+      let corpo = l.substring(dataPart.length).trim();
 
-      // ── Junta linha de continuação se a próxima não começa com data nem é cabeçalho ──
+      // Junta linha seguinte se não começa com data nem cabeçalho
       if(i+1 < linhas.length){
         const prox = linhas[i+1].trim();
-        if(prox && !rData.test(prox) && !/^(data\b|lançamentos|histórico|período|extrato|agência|conta)/i.test(prox)){
-          resto += '  ' + prox;
+        if(prox && !rData.test(prox) &&
+           !/^(Data\b|Lançamentos|Período|Extrato|Agência|Conta|Histórico)/i.test(prox)){
+          corpo += '  ' + prox;
           i++;
         }
       }
 
-      // ── Split por 2+ espaços → colunas ──
-      const cols = resto.split(/\s{2,}/).map(c=>c.trim()).filter(Boolean);
+      // ── Split de colunas: por 2+ espaços ──
+      const cols = corpo.split(/\s{2,}/).map(c=>c.trim()).filter(Boolean);
       if(!cols.length) continue;
 
-      // ── Detecta e pula linhas de cabeçalho / totais ──
-      if(/^(data\b|lançamentos|período|extrato|agência|conta|histórico)/i.test(cols[0])) continue;
-      if(/SALDO\s+(TOTAL|FINAL|DISPONIVEL|DISPONÍVEL)|LIMITE|UTILIZADO/i.test(cols[0])) continue;
-
-      // ── SALDO ANTERIOR ──
-      if(/SALDO\s+ANTERIOR/i.test(cols[0])){
-        // Linha: "SALDO ANTERIOR  [vazio]  [vazio]  [vazio]  59.169,94"
-        // O saldo está no ÚLTIMO chunk que seja um número monetário
-        for(let k = cols.length-1; k >= 0; k--){
-          if(rValor.test(cols[k])){ saldoAnterior = parseValor(cols[k].replace('-','')); break; }
-        }
+      // ── SALDO ANTERIOR: sem valor na col Valor, tem na col Saldo ──
+      if(/SALDO\s+ANTERIOR/i.test(corpo)){
+        // busca o ÚNICO número monetário na linha (que é o saldo)
+        const vals = [...corpo.matchAll(rValorInline)].map(m=>m[1]);
+        if(vals.length > 0) saldoAnterior = parseValor(vals[vals.length-1].replace('-',''));
         continue;
       }
 
-      // ── Encontra colunas Valor e Saldo no final ──
-      // Percorre da direita para esquerda; pula CNPJ/CPF
-      let saldoStr = '', valorStr = '';
-      let colsRestantes = [...cols];
-      // Remove último se for valor → Saldo
-      for(let k = colsRestantes.length-1; k >= 0; k--){
-        if(rValor.test(colsRestantes[k])){ saldoStr = colsRestantes[k]; colsRestantes.splice(k,1); break; }
-      }
-      // Remove novo último se for valor → Valor da transação
-      for(let k = colsRestantes.length-1; k >= 0; k--){
-        if(rValor.test(colsRestantes[k])){ valorStr = colsRestantes[k]; colsRestantes.splice(k,1); break; }
-      }
+      // Pula totais e linhas não-transação
+      if(/SALDO\s+(TOTAL|FINAL|DISPONIVEL|DISPONÍVEL)|LIMITE\s+DE\s+CRÉDITO|UTILIZADO/i.test(corpo)) continue;
 
-      // Se não achou valorStr mas achou saldoStr, pode ser linha de SALDO ANTERIOR já tratada
-      if(!saldoStr && !valorStr) continue;
-      // Se só achou saldoStr (linha com 1 número = saldo sem transação — tipo Saldo Anterior)
-      if(!valorStr) continue;
+      // ── Extrai TODOS os valores monetários da linha ──
+      const todosVals = [...corpo.matchAll(rValorInline)].map(m=>m[1]);
+      // Precisa de pelo menos 1 valor para ser lançamento
+      if(todosVals.length < 1) continue;
+
+      let valorStr, saldoStr;
+      if(todosVals.length >= 2){
+        // último = Saldo (R$), penúltimo = Valor (R$) da transação
+        saldoStr = todosVals[todosVals.length - 1];
+        valorStr = todosVals[todosVals.length - 2];
+      } else {
+        // só um número: pode ser saldo anterior sem valor → pula
+        continue;
+      }
 
       const valorNum = parseValor(valorStr.replace('-',''));
       if(valorNum <= 0) continue;
       const tipo = valorStr.startsWith('-') ? 'saida' : 'entrada';
-      const saldoNum = saldoStr ? parseValor(saldoStr.replace('-','')) : 0;
+      const saldoNum = parseValor(saldoStr.replace('-',''));
 
-      // ── Monta descrição: Razão Social > Lançamentos ──
-      // colsRestantes agora tem: [Lançamentos, RazãoSocial?, CNPJ?]
-      // remove CNPJ/CPF
-      const semDoc = colsRestantes.filter(c => !rCNPJ.test(c) && !rCPF.test(c));
+      // ── Monta descrição: remove data, números monetários, CNPJ/CPF ──
+      let descCorpo = corpo
+        .replace(rCNPJ, '')  // remove CNPJ
+        .replace(rCPF,  '')  // remove CPF
+        // remove todos os valores monetários encontrados (de trás pra frente para não cortar demais)
+        .replace(rValorInline, '')
+        .replace(/\s{2,}/g, '  ')
+        .trim();
+
+      // descCorpo agora tem as colunas de texto separadas por 2+ espaços
+      const textCols = descCorpo.split(/\s{2,}/).map(c=>c.trim()).filter(Boolean);
+
       let descricao = '';
-      if(semDoc.length >= 2){
-        // tem Lançamentos e Razão Social — usa Razão Social como descrição principal
-        // mas acrescenta tipo de operação do campo Lançamentos entre parênteses
-        const lancTxt = semDoc[0]; // ex: "PIX RECEBIDO VIP MX 02/11"
-        const razaoTxt = semDoc[1]; // ex: "VIP MX PECAS E ACESSORIOS LTDA"
-        // se razão social é mais informativa (nome de empresa), usa ela; caso contrário usa lançamentos
-        const temEmpresa = /LTDA|S\.A\.|ME\b|EIRELI|EPP|SA\b/i.test(razaoTxt);
-        descricao = temEmpresa ? razaoTxt + ' (' + lancTxt + ')' : lancTxt + (razaoTxt ? ' — ' + razaoTxt : '');
+      if(textCols.length >= 2){
+        const lancTxt  = textCols[0]; // ex: "PIX RECEBIDO VIP MX 02/11"
+        const razaoTxt = textCols[1]; // ex: "VIP MX PECAS E ACESSORIOS LTDA"
+        // Razão Social: prefere se tiver indicativo de empresa ou nome próprio substancial
+        const temEmpresa = razaoTxt.length > 5 && !/^\d/.test(razaoTxt);
+        descricao = temEmpresa
+          ? razaoTxt + ' — ' + lancTxt
+          : lancTxt + (razaoTxt ? ' ' + razaoTxt : '');
       } else {
-        descricao = semDoc[0] || cols[0];
+        descricao = textCols[0] || corpo.split(/\s{2,}/)[0] || '';
       }
       descricao = descricao.replace(/\s{2,}/g,' ').trim();
 
@@ -3880,7 +3926,6 @@ loadData();
 
     const totalEnt = lancamentos.filter(l=>l.tipo==='entrada').reduce((s,l)=>s+l.valor,0);
     const totalSai = lancamentos.filter(l=>l.tipo==='saida').reduce((s,l)=>s+l.valor,0);
-    // saldo final = saldo do último lançamento (já vem calculado pelo banco)
     const saldoFinal = lancamentos.length > 0
       ? lancamentos[lancamentos.length-1].saldo
       : saldoAnterior + totalEnt - totalSai;
@@ -3931,13 +3976,15 @@ loadData();
     return 'R$ ' + v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
   }
 
-  function ccRender(banco, result, nomeArq){
+  function ccRender(banco, result, nomeArq, fromStorage){
     document.getElementById('cc-processing-'+banco).style.display='none';
     document.getElementById('cc-saldos-'+banco).style.display='block';
 
+    const count = CC[banco].lancamentos.length;
     const st = document.getElementById('cc-status-'+banco);
     st.className='cc-status loaded';
-    st.innerHTML=`<span class="dot"></span> ${nomeArq} · ${result.lancamentos.length} lançamentos`;
+    const sufixo = fromStorage ? ' (salvo)' : '';
+    st.innerHTML=`<span class="dot"></span> ${nomeArq || 'Extrato'}${sufixo} · ${count} lançamentos`;
 
     document.getElementById('cc-sal-ent-'+banco).textContent = fmtCC(result.totalEnt);
     document.getElementById('cc-sal-sai-'+banco).textContent = fmtCC(result.totalSai);
@@ -3987,7 +4034,9 @@ loadData();
     if(!confirm('Limpar extrato '+banco.toUpperCase()+'?')) return;
     CC[banco].lancamentos = [];
     CC[banco].result = null;
+    CC[banco].nome = '';
     CC[banco].dt1 = ''; CC[banco].dt2 = '';
+    ccSave();
     document.getElementById('cc-saldos-'+banco).style.display='none';
     document.getElementById('cc-status-'+banco).className='cc-status';
     document.getElementById('cc-status-'+banco).innerHTML='<span class="dot"></span> Nenhum extrato carregado';
@@ -4020,6 +4069,7 @@ loadData();
     let s = result ? result.saldoAnterior : 0;
     for(const l of novaLista){ s += l.tipo==='entrada'?l.valor:-l.valor; l.saldo=s; }
     CC[banco].lancamentos = novaLista;
+    ccSave();
     // limpa form
     document.getElementById('cc-new-desc-'+banco).value='';
     document.getElementById('cc-new-val-'+banco).value='';
@@ -4030,8 +4080,9 @@ loadData();
     CC[banco].lancamentos = CC[banco].lancamentos.filter(l=>l._id !== id);
     // recalcula saldo running
     const result = CC[banco].result;
-    let s = result ? result.saldoAnterior : 0;
+    let s = result ? (result.saldoAnterior || result.saldoInicial || 0) : 0;
     for(const l of CC[banco].lancamentos){ s += l.tipo==='entrada'?l.valor:-l.valor; l.saldo=s; }
+    ccSave();
     ccRenderTable(banco);
   };
 
@@ -4083,6 +4134,9 @@ loadData();
       </tr>
     `).join('');
   }
+
+  // ── Carrega dados salvos ao iniciar ──
+  ccLoad();
 })();
 </script>
 
