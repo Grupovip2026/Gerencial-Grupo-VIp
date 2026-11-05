@@ -385,7 +385,7 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
 </style>
 
 <div class="forn-header">
-  <div class="forn-title">💳 Dívidas Fornecedores — Grupo VIP</div>
+  <div class="forn-title">💳 Despesas — Grupo VIP</div>
   <div style="display:flex;gap:8px;flex-wrap:wrap">
     <select id="forn-filtro-mes" class="forn-search" style="width:150px" onchange="fornRender()">
       <option value="">Todos os meses</option>
@@ -2412,8 +2412,8 @@ function fornPopularFiltroMes(lancs){
 window.fornRender = function(){
   const todos   = fornGetLancamentos();
   const baixas  = fornLoadBaixas();
-  // Filtra apenas lançamentos do tipo SAÍDA com categoria Fornecedores (case-insensitive)
-  const forn    = todos.filter(l=> l.tipo==='SAÍDA' && /fornecedor/i.test(l.cat||''));
+  // Todas as despesas (SAÍDA), independente de categoria
+  const forn    = todos.filter(l=> l.tipo==='SAÍDA');
   fornPopularFiltroMes(forn);
 
   const filtroMes   = document.getElementById('forn-filtro-mes')?.value||'';
@@ -2436,10 +2436,10 @@ window.fornRender = function(){
 
   // KPIs
   document.getElementById('forn-kpis').innerHTML = `
-    <div class="forn-kpi"><div class="forn-kpi-lbl">🔴 A Pagar</div><div class="forn-kpi-val forn-valor-neg">${fmtR(totAberto)}</div><div style="font-size:11px;color:#64748b;margin-top:4px">${abertos.length} lançamento${abertos.length!==1?'s':''}</div></div>
-    <div class="forn-kpi"><div class="forn-kpi-lbl">✅ Pagas</div><div class="forn-kpi-val forn-valor-pos">${fmtR(totPago)}</div><div style="font-size:11px;color:#64748b;margin-top:4px">${pagos.length} lançamento${pagos.length!==1?'s':''}</div></div>
-    <div class="forn-kpi"><div class="forn-kpi-lbl">💰 Total Geral</div><div class="forn-kpi-val" style="color:#38bdf8">${fmtR(totAberto+totPago)}</div></div>
-    <div class="forn-kpi"><div class="forn-kpi-lbl">📋 Total lançamentos</div><div class="forn-kpi-val" style="color:#e2e8f0">${filtrado.length}</div></div>
+    <div class="forn-kpi"><div class="forn-kpi-lbl">🔴 Em Aberto</div><div class="forn-kpi-val forn-valor-neg">${fmtR(totAberto)}</div><div style="font-size:11px;color:#64748b;margin-top:4px">${abertos.length} lançamento${abertos.length!==1?'s':''}</div></div>
+    <div class="forn-kpi"><div class="forn-kpi-lbl">✅ Pagos</div><div class="forn-kpi-val forn-valor-pos">${fmtR(totPago)}</div><div style="font-size:11px;color:#64748b;margin-top:4px">${pagos.length} lançamento${pagos.length!==1?'s':''}</div></div>
+    <div class="forn-kpi"><div class="forn-kpi-lbl">💰 Total Despesas</div><div class="forn-kpi-val" style="color:#38bdf8">${fmtR(totAberto+totPago)}</div></div>
+    <div class="forn-kpi"><div class="forn-kpi-lbl">📋 Lançamentos</div><div class="forn-kpi-val" style="color:#e2e8f0">${filtrado.length}</div></div>
   `;
 
   const lista = _fornTab==='aberto' ? abertos : pagos;
