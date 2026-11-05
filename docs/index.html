@@ -352,28 +352,62 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
 
 <!-- DIVIDA FORNECEDORES -->
 <div id="page-divida" class="page">
-  <div class="tabs">
-    <button class="tab active-vip" onclick="setDiv('VIP')">VIP MX</button>
-    <button class="tab" onclick="setDiv('VIDAL')">VIDAL</button>
-    <button class="tab" onclick="setDiv('GRUPO')">Grupo VIP</button>
+<style>
+.forn-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.forn-title{font-size:20px;font-weight:700;color:#e2e8f0}
+.forn-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.forn-tab{padding:7px 18px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:#94a3b8;font-size:13px;font-weight:500;cursor:pointer;transition:all .18s}
+.forn-tab.active{background:rgba(239,68,68,.15);border-color:#f87171;color:#f87171;font-weight:700}
+.forn-tab.ativo{background:rgba(34,197,94,.12);border-color:#4ade80;color:#4ade80}
+.forn-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:22px}
+.forn-kpi{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:16px}
+.forn-kpi-lbl{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
+.forn-kpi-val{font-size:20px;font-weight:700}
+.forn-toolbar{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+.forn-search{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px 14px;color:#e2e8f0;font-size:13px;width:220px;outline:none}
+.forn-search::placeholder{color:#475569}
+.forn-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.forn-tbl th{text-align:left;padding:10px 14px;color:#64748b;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid rgba(255,255,255,.07)}
+.forn-tbl td{padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.04);color:#cbd5e1;vertical-align:middle}
+.forn-tbl tr:hover td{background:rgba(255,255,255,.02)}
+.forn-tbl .total-row td{font-weight:700;color:#e2e8f0;border-top:2px solid rgba(255,255,255,.12);background:rgba(255,255,255,.03)}
+.forn-valor-neg{color:#f87171;font-weight:600}
+.forn-valor-pos{color:#4ade80;font-weight:600}
+.forn-badge-pago{background:rgba(34,197,94,.12);color:#4ade80;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+.forn-badge-aberto{background:rgba(239,68,68,.12);color:#f87171;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+.btn-baixar{padding:4px 12px;border-radius:6px;border:none;cursor:pointer;font-size:11px;font-weight:700;background:rgba(34,197,94,.15);color:#4ade80;transition:all .18s}
+.btn-baixar:hover{background:rgba(34,197,94,.3)}
+.btn-reabrir{padding:4px 12px;border-radius:6px;border:none;cursor:pointer;font-size:11px;font-weight:700;background:rgba(239,68,68,.12);color:#f87171;transition:all .18s}
+.btn-reabrir:hover{background:rgba(239,68,68,.25)}
+.forn-section-title{font-size:14px;font-weight:700;padding:12px 14px;border-radius:8px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.forn-sec-aberto{background:rgba(239,68,68,.07);color:#f87171;border-left:3px solid #f87171}
+.forn-sec-pago{background:rgba(34,197,94,.06);color:#4ade80;border-left:3px solid #4ade80;margin-top:24px}
+</style>
+
+<div class="forn-header">
+  <div class="forn-title">💳 Dívidas Fornecedores — Grupo VIP</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <select id="forn-filtro-mes" class="forn-search" style="width:150px" onchange="fornRender()">
+      <option value="">Todos os meses</option>
+    </select>
+    <select id="forn-filtro-conta" class="forn-search" style="width:130px" onchange="fornRender()">
+      <option value="">Todas as contas</option>
+      <option value="Itaú">Itaú</option>
+      <option value="Sicoob">Sicoob</option>
+    </select>
+    <input class="forn-search" id="forn-search" placeholder="🔍 Buscar descrição..." oninput="fornRender()">
   </div>
-  <div class="filter-bar">
-    <span class="filter-label">Filtrar meses:</span>
-    <div id="div-mes-btns" style="display:flex;gap:6px;flex-wrap:wrap"></div>
-    <div class="filter-actions">
-      <button class="filter-action" onclick="divAll()">Todos</button>
-      <button class="filter-action" onclick="divClear()">Limpar</button>
-    </div>
-  </div>
-  <div id="div-kpis" class="kpis"><div class="loading">Carregando...</div></div>
-  <div class="charts-row">
-    <div class="chart-box"><div class="chart-title">Contas Pagas · Mês a Mês</div><div class="chart-wrap"><canvas id="cDivPagas"></canvas></div></div>
-    <div class="chart-box"><div class="chart-title">Contas a Pagar · Mês a Mês</div><div class="chart-wrap"><canvas id="cDivAPagar"></canvas></div></div>
-  </div>
-  <div class="table-box">
-    <div class="chart-title">Detalhe por Mês</div>
-    <table id="div-tbl"><tbody><tr><td class="loading">Carregando...</td></tr></tbody></table>
-  </div>
+</div>
+
+<div class="forn-kpis" id="forn-kpis"></div>
+
+<!-- Abas: A Pagar / Pagas -->
+<div class="forn-tabs">
+  <button class="forn-tab active" id="forn-tab-aberto" onclick="fornSetTab('aberto')">🔴 Contas a Pagar</button>
+  <button class="forn-tab" id="forn-tab-pago" onclick="fornSetTab('pago')">✅ Contas Pagas</button>
+</div>
+
+<div id="forn-corpo"></div>
 </div>
 
 <!-- CUSTOS -->
@@ -1371,7 +1405,7 @@ const fmtP=v=>(v>=0?'+':'')+v.toFixed(1)+'%';
 let DATA=null,charts={};
 let gerCur='VIP',gerSel=new Set();
 let dreCur='VIP',dreSel=new Set();
-let divCur='VIP',divSel=new Set();
+let divCur='VIP',divSel=new Set(); // mantido por compatibilidade (não usado pela nova tela)
 
 async function loadData(){
   try{
@@ -1407,6 +1441,7 @@ function setPage(p){
   if(p==='fluxo') renderFluxo();
   if(p==='marketing' && typeof renderMarketing==='function') renderMarketing();
   if(p==='rh' && typeof _rhRenderAll==='function') _rhRenderAll();
+  if(p==='divida' && typeof fornRender==='function') fornRender();
 }
 
 function mkChart(id,type,labels,datasets,opts={}){
@@ -2337,57 +2372,154 @@ function renderDre(){
 }
 
 // ── DÍVIDA FORNECEDORES ────────────────────────────────────────────────────────
-function setDiv(k){
-  if(!DATA)return; divCur=k;
-  document.querySelectorAll('#page-divida .tab').forEach((t,i)=>{t.className='tab';if(['VIP','VIDAL','GRUPO'][i]===k)t.classList.add('active-'+k.toLowerCase())});
-  const allM=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-  const div=DATA.divida||{};
-  const pagas=div.pagas?.[k]||{};
-  const apagar=div.a_pagar?.[k]||{};
-  const mesesAtivos=allM.filter(m=>(pagas[m]||0)+(apagar[m]||0)>0);
-  divSel=new Set(mesesAtivos.map((_,i)=>i));
-  buildDivFilter(mesesAtivos);renderDiv(mesesAtivos);
+// Alimentado pelo Fluxo de Caixa — categoria "Fornecedores"
+// localStorage: fluxo_lancamentos_v1 (compartilhado com Fluxo de Caixa)
+//               forn_baixas_v1  → Set de IDs já baixados (pagos)
+
+const FORN_BAIXAS_KEY = 'forn_baixas_v1';
+let _fornTab = 'aberto'; // 'aberto' | 'pago'
+
+function fornLoadBaixas(){ try{ return new Set(JSON.parse(localStorage.getItem(FORN_BAIXAS_KEY)||'[]')); }catch(e){ return new Set(); } }
+function fornSaveBaixas(s){ localStorage.setItem(FORN_BAIXAS_KEY, JSON.stringify([...s])); }
+
+window.fornBaixar = function(id){
+  const s = fornLoadBaixas(); s.add(id); fornSaveBaixas(s); fornRender();
+};
+window.fornReabrir = function(id){
+  const s = fornLoadBaixas(); s.delete(id); fornSaveBaixas(s); fornRender();
+};
+
+window.fornSetTab = function(tab){
+  _fornTab = tab;
+  document.getElementById('forn-tab-aberto').className = 'forn-tab' + (tab==='aberto'?' active':'');
+  document.getElementById('forn-tab-pago').className   = 'forn-tab' + (tab==='pago'?' ativo':'');
+  fornRender();
+};
+
+function fornGetLancamentos(){
+  try{ return JSON.parse(localStorage.getItem('fluxo_lancamentos_v1')||'[]'); }catch(e){ return []; }
 }
-function buildDivFilter(meses){
-  if(!meses){
-    const allM=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-    const div=DATA.divida||{};
-    const pagas=div.pagas?.[divCur]||{};const apagar=div.a_pagar?.[divCur]||{};
-    meses=allM.filter(m=>(pagas[m]||0)+(apagar[m]||0)>0);
-  }
-  document.getElementById('div-mes-btns').innerHTML=meses.map((m,i)=>`<button class="mes-btn ${divSel.has(i)?'sel-div':''}" onclick="divToggle(${i})">${m}</button>`).join('');
+
+function fornPopularFiltroMes(lancs){
+  const sel = document.getElementById('forn-filtro-mes');
+  const atual = sel.value;
+  const meses = [...new Set(lancs.map(l=>l.data?.slice(0,7)).filter(Boolean))].sort();
+  const NOMES = {1:'Jan',2:'Fev',3:'Mar',4:'Abr',5:'Mai',6:'Jun',7:'Jul',8:'Ago',9:'Set',10:'Out',11:'Nov',12:'Dez'};
+  sel.innerHTML = '<option value="">Todos os meses</option>' +
+    meses.map(m=>{ const [y,mo]=m.split('-'); return `<option value="${m}"${m===atual?' selected':''}>${NOMES[+mo]}/${y.slice(2)}</option>`; }).join('');
 }
-function divToggle(i){if(divSel.has(i)){if(divSel.size===1)return;divSel.delete(i)}else divSel.add(i);buildDivFilter();renderDiv();}
-function divAll(){setDiv(divCur)}
-function divClear(){divSel=new Set([0]);buildDivFilter();renderDiv();}
-function renderDiv(mesesParam){
-  const div=DATA.divida||{};const pagas=div.pagas?.[divCur]||{};const apagar=div.a_pagar?.[divCur]||{};
-  const allM=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-  const mesesAtivos=mesesParam||allM.filter(m=>(pagas[m]||0)+(apagar[m]||0)>0);
-  const meses=mesesAtivos.filter((_,i)=>divSel.has(i));
-  if(!meses.length)return;
-  const colors={'VIP':'#00C9A7','VIDAL':'#6C63FF','GRUPO':'#F5A623'};
-  const color=colors[divCur]||'#00C9A7';
-  const totalPagas=meses.reduce((s,m)=>s+(pagas[m]||0),0);
-  const totalAPagar=meses.reduce((s,m)=>s+(apagar[m]||0),0);
-  let kpiExtra='';
-  if(divCur==='GRUPO'){const tVIP=meses.reduce((s,m)=>s+(div.pagas?.VIP?.[m]||0),0);const tVIDAL=meses.reduce((s,m)=>s+(div.pagas?.VIDAL?.[m]||0),0);kpiExtra=`<div class="kpi"><div class="kpi-label">Pagas VIP</div><div class="kpi-value pos">${fmt(tVIP)}</div></div><div class="kpi"><div class="kpi-label">Pagas VIDAL</div><div class="kpi-value purple">${fmt(tVIDAL)}</div></div>`;}
-  document.getElementById('div-kpis').innerHTML=`<div class="kpi"><div class="kpi-label">Total Contas Pagas</div><div class="kpi-value sky">${fmt(totalPagas)}</div></div><div class="kpi"><div class="kpi-label">Total a Pagar</div><div class="kpi-value neg">${fmt(totalAPagar)}</div></div><div class="kpi"><div class="kpi-label">Saldo</div><div class="kpi-value ${totalAPagar>0?'neg':'pos'}">${fmt(totalAPagar)}</div><div class="kpi-delta dim">Em aberto</div></div>${kpiExtra}`;
-  if(divCur==='GRUPO'){mkChart('cDivPagas','bar',meses,[{label:'VIP',data:meses.map(m=>div.pagas?.VIP?.[m]||0),backgroundColor:'#00C9A7',borderRadius:4},{label:'VIDAL',data:meses.map(m=>div.pagas?.VIDAL?.[m]||0),backgroundColor:'#6C63FF',borderRadius:4}]);}
-  else{mkChart('cDivPagas','bar',meses,[{label:'Contas Pagas',data:meses.map(m=>pagas[m]||0),backgroundColor:color,borderRadius:4}]);}
-  mkChart('cDivAPagar','bar',meses,[{label:'A Pagar',data:meses.map(m=>apagar[m]||0),backgroundColor:'#FF6B6B',borderRadius:4}]);
-  let html='<thead><tr><th>Mês</th>';
-  if(divCur==='GRUPO') html+='<th>Pagas VIP</th><th>Pagas VIDAL</th>';
-  html+='<th>Total Pagas</th><th>A Pagar</th></tr></thead><tbody>';
-  let[sp,sa]=[0,0];
-  meses.forEach(m=>{const p=pagas[m]||0,a=apagar[m]||0;sp+=p;sa+=a;
-    if(divCur==='GRUPO'){const vip=div.pagas?.VIP?.[m]||0,vidal=div.pagas?.VIDAL?.[m]||0;html+=`<tr><td>${m}/26</td><td class="pos">${fmt(vip)}</td><td class="purple">${fmt(vidal)}</td><td class="sky">${fmt(p)}</td><td class="${a>0?'neg':'dim'}">${fmt(a)}</td></tr>`;}
-    else{html+=`<tr><td>${m}/26</td><td class="sky">${fmt(p)}</td><td class="${a>0?'neg':'dim'}">${fmt(a)}</td></tr>`;}
+
+window.fornRender = function(){
+  const todos   = fornGetLancamentos();
+  const baixas  = fornLoadBaixas();
+  // Filtra apenas lançamentos do tipo SAÍDA com categoria Fornecedores (case-insensitive)
+  const forn    = todos.filter(l=> l.tipo==='SAÍDA' && /fornecedor/i.test(l.cat||''));
+  fornPopularFiltroMes(forn);
+
+  const filtroMes   = document.getElementById('forn-filtro-mes')?.value||'';
+  const filtroConta = document.getElementById('forn-filtro-conta')?.value||'';
+  const q           = (document.getElementById('forn-search')?.value||'').toLowerCase();
+
+  const filtrado = forn.filter(l=>{
+    if(filtroMes   && !(l.data||'').startsWith(filtroMes)) return false;
+    if(filtroConta && l.conta!==filtroConta)               return false;
+    if(q           && !(l.desc||'').toLowerCase().includes(q)) return false;
+    return true;
   });
-  if(divCur==='GRUPO'){const tvip=meses.reduce((s,m)=>s+(div.pagas?.VIP?.[m]||0),0);const tvidal=meses.reduce((s,m)=>s+(div.pagas?.VIDAL?.[m]||0),0);html+=`<tr class="total-row"><td>TOTAL</td><td class="pos">${fmt(tvip)}</td><td class="purple">${fmt(tvidal)}</td><td class="sky">${fmt(sp)}</td><td class="${sa>0?'neg':'dim'}">${fmt(sa)}</td></tr>`;}
-  else{html+=`<tr class="total-row"><td>TOTAL</td><td class="sky">${fmt(sp)}</td><td class="${sa>0?'neg':'dim'}">${fmt(sa)}</td></tr>`;}
-  document.getElementById('div-tbl').innerHTML=html+'</tbody>';
-}
+
+  const abertos = filtrado.filter(l=>!baixas.has(l.id));
+  const pagos   = filtrado.filter(l=> baixas.has(l.id));
+  const fmtR    = v=>'R$ '+(Number(v)||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const fmtD    = s=>{ if(!s)return'—'; const[y,m,d]=s.split('-'); return`${d}/${m}/${y}`; };
+  const totAberto = abertos.reduce((s,l)=>s+(Number(l.valor)||0),0);
+  const totPago   = pagos.reduce((s,l)=>s+(Number(l.valor)||0),0);
+
+  // KPIs
+  document.getElementById('forn-kpis').innerHTML = `
+    <div class="forn-kpi"><div class="forn-kpi-lbl">🔴 A Pagar</div><div class="forn-kpi-val forn-valor-neg">${fmtR(totAberto)}</div><div style="font-size:11px;color:#64748b;margin-top:4px">${abertos.length} lançamento${abertos.length!==1?'s':''}</div></div>
+    <div class="forn-kpi"><div class="forn-kpi-lbl">✅ Pagas</div><div class="forn-kpi-val forn-valor-pos">${fmtR(totPago)}</div><div style="font-size:11px;color:#64748b;margin-top:4px">${pagos.length} lançamento${pagos.length!==1?'s':''}</div></div>
+    <div class="forn-kpi"><div class="forn-kpi-lbl">💰 Total Geral</div><div class="forn-kpi-val" style="color:#38bdf8">${fmtR(totAberto+totPago)}</div></div>
+    <div class="forn-kpi"><div class="forn-kpi-lbl">📋 Total lançamentos</div><div class="forn-kpi-val" style="color:#e2e8f0">${filtrado.length}</div></div>
+  `;
+
+  const lista = _fornTab==='aberto' ? abertos : pagos;
+  const isPago = _fornTab==='pago';
+
+  if(!lista.length){
+    document.getElementById('forn-corpo').innerHTML =
+      `<div class="${isPago?'forn-section-title forn-sec-pago':'forn-section-title forn-sec-aberto'}">${isPago?'✅ Contas Pagas':'🔴 Contas a Pagar'}</div>
+       <p style="color:#475569;padding:20px 14px;font-size:14px">Nenhum lançamento encontrado${forn.length===0?' — adicione lançamentos com categoria <strong>Fornecedores</strong> no Fluxo de Caixa.':''}</p>`;
+    return;
+  }
+
+  // Agrupa por conta
+  const porConta = {};
+  lista.forEach(l=>{ const c=l.conta||'Sem conta'; if(!porConta[c]) porConta[c]=[]; porConta[c].push(l); });
+
+  let html = `<div class="forn-section-title ${isPago?'forn-sec-pago':'forn-sec-aberto'}">${isPago?'✅ Contas Pagas':'🔴 Contas a Pagar'}</div>`;
+
+  Object.entries(porConta).sort(([a],[b])=>a.localeCompare(b)).forEach(([conta, items])=>{
+    const subtotal = items.reduce((s,l)=>s+(Number(l.valor)||0),0);
+    html += `
+    <div style="margin-bottom:20px">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:rgba(56,189,248,.07);border-left:3px solid #38bdf8;border-radius:0 6px 6px 0;margin-bottom:4px">
+        <span style="font-size:13px;font-weight:700;color:#38bdf8">🏦 ${conta}</span>
+        <span style="font-size:12px;color:#64748b">${items.length} lançamento${items.length!==1?'s':''} · ${fmtR(subtotal)}</span>
+      </div>
+      <table class="forn-tbl">
+        <thead><tr>
+          <th>Data</th><th>Descrição</th><th style="width:110px">Categoria</th>
+          <th style="width:140px">Valor</th><th style="width:90px">Status</th><th style="width:100px">Ação</th>
+        </tr></thead>
+        <tbody>`;
+
+    items.sort((a,b)=>(a.data||'').localeCompare(b.data||'')).forEach(l=>{
+      const v = Number(l.valor)||0;
+      const badge = isPago
+        ? `<span class="forn-badge-pago">✅ Pago</span>`
+        : `<span class="forn-badge-aberto">🔴 Aberto</span>`;
+      const btn = isPago
+        ? `<button class="btn-reabrir" onclick="fornReabrir(${l.id})">↩ Reabrir</button>`
+        : `<button class="btn-baixar" onclick="fornBaixar(${l.id})">✅ Baixar</button>`;
+      html += `<tr${isPago?' style="opacity:.75"':''}>
+        <td style="white-space:nowrap">${fmtD(l.data)}</td>
+        <td>${l.desc||'—'}</td>
+        <td style="font-size:11px;color:#64748b">${l.cat||'—'}</td>
+        <td class="forn-valor-neg">${fmtR(v)}</td>
+        <td>${badge}</td>
+        <td>${btn}</td>
+      </tr>`;
+    });
+
+    html += `
+        <tr class="total-row">
+          <td colspan="3" style="text-align:right;font-size:11px;color:#64748b">Subtotal ${conta}</td>
+          <td class="${isPago?'forn-valor-pos':'forn-valor-neg'}">${fmtR(subtotal)}</td>
+          <td colspan="2"></td>
+        </tr>
+        </tbody>
+      </table>
+    </div>`;
+  });
+
+  // Total geral da aba
+  const totAba = lista.reduce((s,l)=>s+(Number(l.valor)||0),0);
+  html += `
+    <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+      <span style="font-weight:700;color:#e2e8f0;font-size:14px">💰 TOTAL ${isPago?'PAGO':'A PAGAR'}</span>
+      <span style="font-size:18px;font-weight:800;${isPago?'color:#4ade80':'color:#f87171'}">${fmtR(totAba)}</span>
+    </div>`;
+
+  document.getElementById('forn-corpo').innerHTML = html;
+};
+
+// Compatibilidade: setDiv ainda chamado no init — ignora
+function setDiv(k){}
+function renderDiv(){}
+function buildDivFilter(){}
+function divAll(){}
+function divClear(){}
+function divToggle(){}
 
 // ── CUSTOS ────────────────────────────────────────────────────────────────────
 function renderCustos(){
