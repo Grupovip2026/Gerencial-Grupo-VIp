@@ -387,15 +387,20 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
 <div class="forn-header">
   <div class="forn-title">💳 Despesas — Grupo VIP</div>
   <div style="display:flex;gap:8px;flex-wrap:wrap">
-    <select id="forn-filtro-mes" class="forn-search" style="width:150px" onchange="fornRender()">
-      <option value="">Todos os meses</option>
-    </select>
+    <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#94a3b8">
+      De <input type="date" id="forn-dt1" class="forn-search" style="width:140px" onchange="fornRender()">
+    </label>
+    <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#94a3b8">
+      Até <input type="date" id="forn-dt2" class="forn-search" style="width:140px" onchange="fornRender()">
+    </label>
+    <button onclick="fornLimparData()" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:7px;color:#94a3b8;font-size:12px;padding:6px 12px;cursor:pointer">✖ Limpar</button>
     <select id="forn-filtro-conta" class="forn-search" style="width:130px" onchange="fornRender()">
       <option value="">Todas as contas</option>
       <option value="Itaú">Itaú</option>
       <option value="Sicoob">Sicoob</option>
     </select>
     <input class="forn-search" id="forn-search" placeholder="🔍 Buscar descrição..." oninput="fornRender()">
+    <button onclick="fornGerarPDF()" style="background:linear-gradient(135deg,#dc2626,#b91c1c);border:none;border-radius:7px;color:#fff;font-size:12px;font-weight:700;padding:7px 14px;cursor:pointer;display:flex;align-items:center;gap:6px">📄 Gerar PDF</button>
   </div>
 </div>
 
@@ -775,6 +780,35 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
 <div class="footer" id="footer"></div>
 
 <div id="page-fluxo" class="page"></div>
+
+<!-- ══ MODAL EDITAR LANÇAMENTO (Fluxo de Caixa) ══ -->
+<div id="fc-edit-modal">
+  <div id="fc-edit-box">
+    <h3>✏️ Editar Lançamento</h3>
+    <label>Data</label>
+    <input type="date" id="fc-edit-data">
+    <label>Descrição</label>
+    <input type="text" id="fc-edit-desc" placeholder="Descrição">
+    <label>Tipo</label>
+    <select id="fc-edit-tipo">
+      <option value="ENTRADA">ENTRADA</option>
+      <option value="SAÍDA">SAÍDA</option>
+    </select>
+    <label>Conta</label>
+    <select id="fc-edit-conta">
+      <option value="Itaú">Itaú</option>
+      <option value="Sicoob">Sicoob</option>
+    </select>
+    <label>Valor</label>
+    <input type="number" id="fc-edit-valor" min="0" step="0.01" placeholder="0,00">
+    <label>Categoria</label>
+    <input type="text" id="fc-edit-cat" placeholder="Categoria">
+    <div class="fc-edit-btns">
+      <button class="fc-edit-cancel" onclick="fcCloseEdit()">Cancelar</button>
+      <button class="fc-edit-save" onclick="fcSaveEdit()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
 
 <!-- ═══════════════════════════════════════════════════════════════════ -->
 <!-- CONTA CORRENTE -->
@@ -2400,28 +2434,28 @@ function fornGetLancamentos(){
   try{ return JSON.parse(localStorage.getItem('fluxo_lancamentos_v1')||'[]'); }catch(e){ return []; }
 }
 
-function fornPopularFiltroMes(lancs){
-  const sel = document.getElementById('forn-filtro-mes');
-  const atual = sel.value;
-  const meses = [...new Set(lancs.map(l=>l.data?.slice(0,7)).filter(Boolean))].sort();
-  const NOMES = {1:'Jan',2:'Fev',3:'Mar',4:'Abr',5:'Mai',6:'Jun',7:'Jul',8:'Ago',9:'Set',10:'Out',11:'Nov',12:'Dez'};
-  sel.innerHTML = '<option value="">Todos os meses</option>' +
-    meses.map(m=>{ const [y,mo]=m.split('-'); return `<option value="${m}"${m===atual?' selected':''}>${NOMES[+mo]}/${y.slice(2)}</option>`; }).join('');
-}
+window.fornLimparData = function(){
+  const d1 = document.getElementById('forn-dt1');
+  const d2 = document.getElementById('forn-dt2');
+  if(d1) d1.value='';
+  if(d2) d2.value='';
+  fornRender();
+};
 
 window.fornRender = function(){
   const todos   = fornGetLancamentos();
   const baixas  = fornLoadBaixas();
   // Todas as despesas (SAÍDA), independente de categoria
   const forn    = todos.filter(l=> l.tipo==='SAÍDA');
-  fornPopularFiltroMes(forn);
 
-  const filtroMes   = document.getElementById('forn-filtro-mes')?.value||'';
+  const dt1         = document.getElementById('forn-dt1')?.value||'';
+  const dt2         = document.getElementById('forn-dt2')?.value||'';
   const filtroConta = document.getElementById('forn-filtro-conta')?.value||'';
   const q           = (document.getElementById('forn-search')?.value||'').toLowerCase();
 
   const filtrado = forn.filter(l=>{
-    if(filtroMes   && !(l.data||'').startsWith(filtroMes)) return false;
+    if(dt1 && (l.data||'') < dt1) return false;
+    if(dt2 && (l.data||'') > dt2) return false;
     if(filtroConta && l.conta!==filtroConta)               return false;
     if(q           && !(l.desc||'').toLowerCase().includes(q)) return false;
     return true;
@@ -2511,6 +2545,107 @@ window.fornRender = function(){
     </div>`;
 
   document.getElementById('forn-corpo').innerHTML = html;
+};
+
+// ── GERAR PDF — DESPESAS ────────────────────────────────────────────────────
+window.fornGerarPDF = function(){
+  const todos  = fornGetLancamentos();
+  const baixas = fornLoadBaixas();
+  const forn   = todos.filter(l=> l.tipo==='SAÍDA');
+
+  const dt1 = document.getElementById('forn-dt1')?.value||'';
+  const dt2 = document.getElementById('forn-dt2')?.value||'';
+  const filtroConta = document.getElementById('forn-filtro-conta')?.value||'';
+  const q   = (document.getElementById('forn-search')?.value||'').toLowerCase();
+
+  const filtrado = forn.filter(l=>{
+    if(dt1 && (l.data||'') < dt1) return false;
+    if(dt2 && (l.data||'') > dt2) return false;
+    if(filtroConta && l.conta!==filtroConta) return false;
+    if(q && !(l.desc||'').toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  const fmtR = v=>'R$ '+(Number(v)||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const fmtD = s=>{ if(!s)return'—'; const[y,m,d]=s.split('-'); return`${d}/${m}/${y}`; };
+
+  const abertos = filtrado.filter(l=>!baixas.has(l.id));
+  const pagos   = filtrado.filter(l=> baixas.has(l.id));
+  const totAberto = abertos.reduce((s,l)=>s+(Number(l.valor)||0),0);
+  const totPago   = pagos.reduce((s,l)=>s+(Number(l.valor)||0),0);
+  const totGeral  = totAberto + totPago;
+
+  const periodoTxt = dt1||dt2
+    ? `Período: ${dt1?fmtD(dt1):'início'} até ${dt2?fmtD(dt2):'hoje'}`
+    : 'Período: Todos os lançamentos';
+
+  // Monta linhas por conta
+  const porConta = {};
+  filtrado.forEach(l=>{ const c=l.conta||'Sem conta'; if(!porConta[c]) porConta[c]=[]; porConta[c].push(l); });
+
+  let tabelaHTML = '';
+  Object.entries(porConta).sort(([a],[b])=>a.localeCompare(b)).forEach(([conta, items])=>{
+    const sub = items.reduce((s,l)=>s+(Number(l.valor)||0),0);
+    tabelaHTML += `
+      <tr><td colspan="5" style="background:#1e3a5f;color:#7dd3fc;font-weight:700;padding:8px 10px;font-size:13px">🏦 ${conta}</td></tr>`;
+    items.sort((a,b)=>(a.data||'').localeCompare(b.data||'')).forEach(l=>{
+      const pago = baixas.has(l.id);
+      tabelaHTML += `<tr>
+        <td>${fmtD(l.data)}</td>
+        <td>${l.desc||'—'}</td>
+        <td style="font-size:11px;color:#555">${l.cat||'—'}</td>
+        <td style="color:${pago?'#166534':'#991b1b'}">${pago?'✅ Pago':'🔴 Aberto'}</td>
+        <td style="text-align:right;color:#dc2626">${fmtR(Number(l.valor)||0)}</td>
+      </tr>`;
+    });
+    tabelaHTML += `<tr style="background:#f1f5f9">
+      <td colspan="4" style="text-align:right;font-weight:700;font-size:12px;color:#334155">Subtotal ${conta}:</td>
+      <td style="text-align:right;font-weight:700;color:#dc2626">${fmtR(sub)}</td>
+    </tr>`;
+  });
+
+  const htmlDoc = `<!DOCTYPE html><html><head><meta charset="utf-8">
+  <title>Despesas — Grupo VIP</title>
+  <style>
+    body{font-family:Arial,sans-serif;font-size:13px;color:#1e293b;margin:0;padding:24px}
+    h1{font-size:18px;color:#1e293b;margin:0 0 4px}
+    .sub{font-size:12px;color:#64748b;margin-bottom:16px}
+    table{width:100%;border-collapse:collapse;margin-bottom:20px}
+    th{background:#1e293b;color:#fff;padding:7px 10px;text-align:left;font-size:12px}
+    td{padding:6px 10px;border-bottom:1px solid #e2e8f0;font-size:12px}
+    tr:nth-child(even) td{background:#f8fafc}
+    .kpi-row{display:flex;gap:16px;margin-bottom:20px}
+    .kpi{background:#f1f5f9;border-radius:8px;padding:12px 16px;flex:1;text-align:center}
+    .kpi-lbl{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.5px}
+    .kpi-val{font-size:16px;font-weight:700;margin-top:4px}
+    .total-row{background:#1e293b!important}
+    .total-row td{color:#fff!important;font-weight:700;font-size:13px;padding:10px 10px}
+    @media print{body{padding:10px} button{display:none}}
+  </style></head><body>
+  <h1>💳 Despesas — Grupo VIP</h1>
+  <div class="sub">${periodoTxt} · Gerado em ${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</div>
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-lbl">🔴 Em Aberto</div><div class="kpi-val" style="color:#dc2626">${fmtR(totAberto)}</div></div>
+    <div class="kpi"><div class="kpi-lbl">✅ Pagos</div><div class="kpi-val" style="color:#16a34a">${fmtR(totPago)}</div></div>
+    <div class="kpi"><div class="kpi-lbl">💰 Total Geral</div><div class="kpi-val" style="color:#0369a1">${fmtR(totGeral)}</div></div>
+    <div class="kpi"><div class="kpi-lbl">📋 Lançamentos</div><div class="kpi-val">${filtrado.length}</div></div>
+  </div>
+  <table>
+    <thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Status</th><th style="text-align:right">Valor</th></tr></thead>
+    <tbody>${tabelaHTML}
+      <tr class="total-row">
+        <td colspan="4" style="text-align:right">TOTAL GERAL:</td>
+        <td style="text-align:right">${fmtR(totGeral)}</td>
+      </tr>
+    </tbody>
+  </table>
+  <script>window.onload=()=>setTimeout(()=>window.print(),400);<\/script>
+  </body></html>`;
+
+  const blob = new Blob([htmlDoc], {type:'text/html'});
+  const url  = URL.createObjectURL(blob);
+  const win  = window.open(url,'_blank');
+  if(!win) alert('Habilite popups para gerar o PDF.');
 };
 
 // Compatibilidade: setDiv ainda chamado no init — ignora
@@ -2726,6 +2861,17 @@ function renderOrc2027(){
 .fc-btn-add:hover{background:#7dd3fc}
 .fc-btn-del{background:rgba(255,107,107,.15);color:#FF6B6B;border:1px solid rgba(255,107,107,.3);padding:4px 10px;font-size:11px;border-radius:5px}
 .fc-btn-del:hover{background:rgba(255,107,107,.3)}
+.fc-btn-edit{background:rgba(56,189,248,.12);color:#38bdf8;border:1px solid rgba(56,189,248,.25);padding:4px 9px;font-size:11px;border-radius:5px;cursor:pointer}
+.fc-btn-edit:hover{background:rgba(56,189,248,.25)}
+#fc-edit-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center}
+#fc-edit-modal.open{display:flex}
+#fc-edit-box{background:#1a1a2e;border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:28px 32px;width:400px;max-width:94vw}
+#fc-edit-box h3{margin:0 0 20px;font-size:16px;color:#e2e8f0}
+#fc-edit-box label{font-size:12px;color:#94a3b8;display:block;margin-bottom:4px}
+#fc-edit-box input,#fc-edit-box select{width:100%;box-sizing:border-box;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:7px;color:#e2e8f0;padding:8px 10px;font-size:13px;margin-bottom:14px;outline:none}
+.fc-edit-btns{display:flex;gap:10px;margin-top:4px}
+.fc-edit-save{flex:1;background:#38bdf8;color:#0d0d1a;border:none;border-radius:7px;padding:9px;font-size:13px;font-weight:700;cursor:pointer}
+.fc-edit-cancel{flex:1;background:rgba(255,255,255,.07);color:#94a3b8;border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:9px;font-size:13px;cursor:pointer}
 .fc-kpis{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
 .fc-kpi{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:16px 20px;min-width:150px;flex:1}
 .fc-kpi-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:5px}
@@ -2797,7 +2943,6 @@ function renderOrc2027(){
 
 <div class="fc-view-tabs">
   <button class="fc-vtab fc-active" onclick="fcSetView('lancamentos')">📝 Lançamentos</button>
-  <button class="fc-vtab" onclick="fcSetView('dia')">📅 Saldo Dia a Dia</button>
   <button class="fc-vtab" onclick="fcSetView('mensal')">📆 Resumo Mensal</button>
   <button class="fc-vtab" onclick="fcSetView('grafico')">📈 Gráficos</button>
   <button class="fc-vtab" onclick="fcSetView('relatorio')">🖨️ Rel. Pagamentos</button>
@@ -2965,7 +3110,7 @@ function renderOrc2027(){
   };
 
   window.fcSetView=function(v){
-    document.querySelectorAll('.fc-vtab').forEach((t,i)=>t.classList.toggle('fc-active',['lancamentos','dia','mensal','grafico','relatorio'][i]===v));
+    document.querySelectorAll('.fc-vtab').forEach((t,i)=>t.classList.toggle('fc-active',['lancamentos','mensal','grafico','relatorio'][i]===v));
     document.querySelectorAll('.fc-section').forEach(s=>s.classList.remove('fc-show'));
     document.getElementById('fc-view-'+v).classList.add('fc-show');
     if(v==='dia') fcRenderDia();
@@ -3003,6 +3148,44 @@ function renderOrc2027(){
     const arr=loadLancamentos().filter(l=>l.id!==id);
     saveLancamentos(arr); refreshFluxo();
   };
+
+  // ── Editar Lançamento ────────────────────────────
+  let _fcEditId = null;
+  window.fcOpenEdit=function(id){
+    const arr=loadLancamentos();
+    const l=arr.find(x=>x.id===id);
+    if(!l)return;
+    _fcEditId = id;
+    document.getElementById('fc-edit-data').value  = l.data||'';
+    document.getElementById('fc-edit-desc').value  = l.desc||'';
+    document.getElementById('fc-edit-tipo').value  = l.tipo||'SAÍDA';
+    document.getElementById('fc-edit-conta').value = l.conta||'Itaú';
+    document.getElementById('fc-edit-valor').value = l.valor||'';
+    document.getElementById('fc-edit-cat').value   = l.cat||'';
+    document.getElementById('fc-edit-modal').classList.add('open');
+  };
+  window.fcCloseEdit=function(){
+    _fcEditId=null;
+    document.getElementById('fc-edit-modal').classList.remove('open');
+  };
+  window.fcSaveEdit=function(){
+    if(!_fcEditId)return;
+    const data  = document.getElementById('fc-edit-data').value;
+    const desc  = document.getElementById('fc-edit-desc').value.trim();
+    const tipo  = document.getElementById('fc-edit-tipo').value;
+    const conta = document.getElementById('fc-edit-conta').value;
+    const valor = parseFloat(document.getElementById('fc-edit-valor').value);
+    const cat   = document.getElementById('fc-edit-cat').value.trim();
+    if(!data||!desc||!valor||valor<=0){ alert('Preencha data, descrição e valor válidos.'); return; }
+    const arr=loadLancamentos().map(l=> l.id===_fcEditId ? {...l, data, desc, tipo, conta, valor, cat} : l);
+    saveLancamentos(arr);
+    fcCloseEdit();
+    refreshFluxo();
+  };
+  // Fechar modal clicando fora
+  document.getElementById('fc-edit-modal')?.addEventListener('click',function(e){
+    if(e.target===this) fcCloseEdit();
+  });
 
   // ── Importar Excel ───────────────────────────────
   window.fcImportarExcel=function(input){
@@ -3206,7 +3389,10 @@ function renderOrc2027(){
         <td style="color:#38bdf8">${l.conta}</td>
         <td class="${cls}">${fmtR(l.valor)}</td>
         <td style="text-align:left;font-family:Inter,sans-serif;color:#888">${l.cat||'—'}</td>
-        <td><button class="fc-btn-del" onclick="fcDelLancamento(${l.id})">🗑 Del</button></td>
+        <td style="display:flex;gap:4px">
+          <button class="fc-btn-edit" onclick="fcOpenEdit(${l.id})" title="Editar">✏️</button>
+          <button class="fc-btn-del" onclick="fcDelLancamento(${l.id})" title="Excluir">🗑</button>
+        </td>
       </tr>`;
     });
     tbl.innerHTML=h+'</tbody>';
