@@ -1,5 +1,5 @@
 {
-  "gerado_em": "05/11/2026 00:38",
+  "gerado_em": "05/11/2026 20:50",
   "fonte": "Resultado Gerencial 2026.xlsx",
   "dre": {
     "VIP": {
@@ -994,6 +994,28 @@
               "real": 19736.31
             }
           }
+        },
+        {
+          "mes": "Out",
+          "ano": 2026,
+          "mes_num": 10,
+          "order": 202610,
+          "rPrev": 0,
+          "rReal": 337653.83999999997,
+          "dPrev": 0,
+          "dReal": 452704.0572,
+          "resPrev": 0,
+          "resReal": -115050.21720000001,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 0,
+              "real": 310748.75999999995
+            },
+            "Shopee": {
+              "prev": 0,
+              "real": 26905.08
+            }
+          }
         }
       ]
     },
@@ -1218,9 +1240,9 @@
           "rPrev": 0,
           "rReal": 250324.58,
           "dPrev": 0,
-          "dReal": 211895.12759999998,
+          "dReal": 212876.24759999997,
           "resPrev": 0,
-          "resReal": 38429.45240000001,
+          "resReal": 37448.332400000014,
           "canais": {
             "Mercado Livre": {
               "prev": 0,
@@ -1233,6 +1255,32 @@
             "Loja Fisica": {
               "prev": 0,
               "real": 64721.17
+            }
+          }
+        },
+        {
+          "mes": "Out",
+          "ano": 2026,
+          "mes_num": 10,
+          "order": 202610,
+          "rPrev": 0,
+          "rReal": 266148.23,
+          "dPrev": 0,
+          "dReal": 214940.5832,
+          "resPrev": 0,
+          "resReal": 51207.64679999999,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 0,
+              "real": 180837.21
+            },
+            "Shopee": {
+              "prev": 0,
+              "real": 27998.33
+            },
+            "Loja Fisica": {
+              "prev": 0,
+              "real": 57312.69
             }
           }
         }
@@ -1358,6 +1406,19 @@
           "dReal": 1595.6200000000001,
           "resPrev": 0,
           "resReal": 4201.46,
+          "canais": {}
+        },
+        {
+          "mes": "Out",
+          "ano": 2026,
+          "mes_num": 10,
+          "order": 202610,
+          "rPrev": 0,
+          "rReal": 39411.52,
+          "dPrev": 0,
+          "dReal": 12781.81,
+          "resPrev": 0,
+          "resReal": 26629.71,
           "canais": {}
         }
       ]
@@ -1587,9 +1648,9 @@
           "rPrev": 0,
           "rReal": 596496.97,
           "dPrev": 0,
-          "dReal": 752032.2424,
+          "dReal": 753013.3624,
           "resPrev": 0,
-          "resReal": -155535.2724,
+          "resReal": -156516.39239999998,
           "canais": {
             "Mercado Livre": {
               "prev": 0,
@@ -1602,6 +1663,32 @@
             "Loja Fisica": {
               "prev": 0,
               "real": 64721.17
+            }
+          }
+        },
+        {
+          "mes": "Out",
+          "ano": 2026,
+          "mes_num": 10,
+          "order": 202610,
+          "rPrev": 0,
+          "rReal": 643213.59,
+          "dPrev": 0,
+          "dReal": 680426.4504,
+          "resPrev": 0,
+          "resReal": -37212.86040000003,
+          "canais": {
+            "Mercado Livre": {
+              "prev": 0,
+              "real": 491585.97
+            },
+            "Shopee": {
+              "prev": 0,
+              "real": 54903.41
+            },
+            "Loja Fisica": {
+              "prev": 0,
+              "real": 57312.69
             }
           }
         }
@@ -1629,14 +1716,14 @@
         "Jul": 36921.12
       },
       "GRUPO": {
-        "Mai": 372698.09,
         "Jul": 404779.52999999997,
+        "Jan": 252772.95,
+        "Fev": 231584.11,
+        "Mai": 372698.09,
         "Ago": 162702.7,
         "Abr": 254477.52000000002,
-        "Jun": 342593.48,
-        "Fev": 231584.11,
-        "Jan": 252772.95,
-        "Mar": 279273.57
+        "Mar": 279273.57,
+        "Jun": 342593.48
       }
     },
     "a_pagar": {
@@ -1660,7 +1747,7 @@
     "fixo": [
       {
         "label": "Despesas Pessoal",
-        "valor": 8441.460000000001
+        "valor": 9580.239999999998
       },
       {
         "label": "Retirada (prolabore)",
@@ -1729,9 +1816,9 @@
         "valor": 55000.0
       }
     ],
-    "total_fixo": 45363.46,
+    "total_fixo": 46502.24,
     "total_variavel": 517000.0,
-    "total": 562363.46
+    "total": 563502.24
   },
   "orcamento_2027": [
     {
@@ -1745,7 +1832,7 @@
       "shopeeVendas": 30000.0,
       "lojaVendas": 50000.0,
       "rendimentos": 0.0,
-      "despTotal": 583717.0,
+      "despTotal": 582717.0,
       "dPessoal": 17550.0,
       "dProlabore": 17000.0,
       "dCeo": 6200.0,
@@ -1754,16 +1841,16 @@
       "dTecnologia": 1000.0,
       "dMateria": 292500.0,
       "dVendas": 3500.0,
-      "dMarketing": 6000.0,
+      "dMarketing": 5000.0,
       "dImpostos": 61425.0,
       "dFinanceiras": 500.0,
       "dTaxas": 117000.0,
       "dCancelamentos": 35100.0,
       "dFinanciamentos": 15102.0,
       "dInvestimentos": 0.0,
-      "resultado": 1283.0,
+      "resultado": 2283.0,
       "varCeo": 0.0,
-      "resultadoReal": 1283.0,
+      "resultadoReal": 2283.0,
       "canais": {
         "Mercado Livre": 500000.0,
         "Amazon": 5000.0,
@@ -1782,7 +1869,7 @@
       "shopeeVendas": 30000.0,
       "lojaVendas": 50000.0,
       "rendimentos": 0.0,
-      "despTotal": 584137.0,
+      "despTotal": 583137.0,
       "dPessoal": 17550.0,
       "dProlabore": 17000.0,
       "dCeo": 6200.0,
@@ -1791,16 +1878,16 @@
       "dTecnologia": 1000.0,
       "dMateria": 292500.0,
       "dVendas": 3920.0,
-      "dMarketing": 6000.0,
+      "dMarketing": 5000.0,
       "dImpostos": 61425.0,
       "dFinanceiras": 500.0,
       "dTaxas": 117000.0,
       "dCancelamentos": 35100.0,
       "dFinanciamentos": 15102.0,
       "dInvestimentos": 0.0,
-      "resultado": 863.0,
-      "varCeo": 773.9,
-      "resultadoReal": 89.10000000000002,
+      "resultado": 1863.0,
+      "varCeo": 783.9,
+      "resultadoReal": 1079.1,
       "canais": {
         "Mercado Livre": 500000.0,
         "Amazon": 5000.0,
@@ -1819,7 +1906,7 @@
       "shopeeVendas": 30000.0,
       "lojaVendas": 50000.0,
       "rendimentos": 0.0,
-      "despTotal": 584607.4,
+      "despTotal": 583607.4,
       "dPessoal": 17550.0,
       "dProlabore": 17000.0,
       "dCeo": 6200.0,
@@ -1828,16 +1915,16 @@
       "dTecnologia": 1000.0,
       "dMateria": 292500.0,
       "dVendas": 4390.4,
-      "dMarketing": 6000.0,
+      "dMarketing": 5000.0,
       "dImpostos": 61425.0,
       "dFinanceiras": 500.0,
       "dTaxas": 117000.0,
       "dCancelamentos": 35100.0,
       "dFinanciamentos": 15102.0,
       "dInvestimentos": 0.0,
-      "resultado": 392.5999999999767,
-      "varCeo": 769.1959999999998,
-      "resultadoReal": -376.5960000000231,
+      "resultado": 1392.5999999999767,
+      "varCeo": 779.1959999999998,
+      "resultadoReal": 613.4039999999769,
       "canais": {
         "Mercado Livre": 500000.0,
         "Amazon": 5000.0,
@@ -1856,7 +1943,7 @@
       "shopeeVendas": 33600.0,
       "lojaVendas": 56000.0,
       "rendimentos": 0.0,
-      "despTotal": 622825.498,
+      "despTotal": 621825.498,
       "dPessoal": 19210.5,
       "dProlabore": 17000.0,
       "dCeo": 6200.0,
@@ -1865,16 +1952,16 @@
       "dTecnologia": 1000.0,
       "dMateria": 320175.0,
       "dVendas": 4917.248,
-      "dMarketing": 6000.0,
+      "dMarketing": 5000.0,
       "dImpostos": 67236.75,
       "dFinanceiras": 560.0,
       "dTaxas": 128070.0,
       "dCancelamentos": 25614.0,
       "dFinanciamentos": 15102.0,
       "dInvestimentos": 0.0,
-      "resultado": 17524.50199999998,
-      "varCeo": 998.6325199999998,
-      "resultadoReal": 16525.86947999998,
+      "resultado": 18524.50199999998,
+      "varCeo": 1008.6325199999998,
+      "resultadoReal": 17515.86947999998,
       "canais": {
         "Mercado Livre": 545000.0,
         "Amazon": 5750.0,
@@ -1893,7 +1980,7 @@
       "shopeeVendas": 37200.0,
       "lojaVendas": 57200.0,
       "rendimentos": 0.0,
-      "despTotal": 642101.51776,
+      "despTotal": 641101.51776,
       "dPessoal": 19818.0,
       "dProlabore": 17000.0,
       "dCeo": 6200.0,
@@ -1902,16 +1989,16 @@
       "dTecnologia": 1000.0,
       "dMateria": 330300.0,
       "dVendas": 5507.31776,
-      "dMarketing": 6000.0,
+      "dMarketing": 5000.0,
       "dImpostos": 69363.0,
       "dFinanceiras": 627.2,
       "dTaxas": 132120.0,
       "dCancelamentos": 26424.0,
       "dFinanciamentos": 15102.0,
       "dInvestimentos": 0.0,
-      "resultado": 18498.48224000004,
-      "varCeo": 2059.269644800001,
-      "resultadoReal": 16439.21259520004,
+      "resultado": 19498.48224000004,
+      "varCeo": 2079.269644800001,
+      "resultadoReal": 17419.21259520004,
       "canais": {
         "Mercado Livre": 560000.0,
         "Amazon": 6200.0,
@@ -1930,7 +2017,7 @@
       "shopeeVendas": 40800.0,
       "lojaVendas": 58400.0,
       "rendimentos": 0.0,
-      "despTotal": 661456.4098912,
+      "despTotal": 660456.4098912,
       "dPessoal": 20425.5,
       "dProlabore": 17000.0,
       "dCeo": 6200.0,
@@ -1939,16 +2026,16 @@
       "dTecnologia": 1000.0,
       "dMateria": 340425.0,
       "dVendas": 6168.1958912,
-      "dMarketing": 6000.0,
+      "dMarketing": 5000.0,
       "dImpostos": 71489.25,
       "dFinanceiras": 702.464,
       "dTaxas": 136170.0,
       "dCancelamentos": 27234.0,
       "dFinanciamentos": 15102.0,
       "dInvestimentos": 0.0,
-      "resultado": 19393.59010879998,
-      "varCeo": 2119.6968021759994,
-      "resultadoReal": 17273.89330662398,
+      "resultado": 20393.59010879998,
+      "varCeo": 2139.6968021759994,
+      "resultadoReal": 18253.89330662398,
       "canais": {
         "Mercado Livre": 575000.0,
         "Amazon": 6650.0,
@@ -1967,7 +2054,7 @@
       "shopeeVendas": 44400.0,
       "lojaVendas": 59600.0,
       "rendimentos": 0.0,
-      "despTotal": 668877.639078144,
+      "despTotal": 667877.639078144,
       "dPessoal": 21033.0,
       "dProlabore": 17000.0,
       "dCeo": 6200.0,
@@ -1976,16 +2063,16 @@
       "dTecnologia": 1000.0,
       "dMateria": 350550.0,
       "dVendas": 6908.379398144,
-      "dMarketing": 8000.0,
+      "dMarketing": 7000.0,
       "dImpostos": 73615.5,
       "dFinanceiras": 786.7596800000001,
       "dTaxas": 140220.0,
       "dCancelamentos": 14022.0,
       "dFinanciamentos": 15102.0,
       "dInvestimentos": 0.0,
-      "resultado": 32222.360921856016,
-      "varCeo": 2418.7972184371206,
-      "resultadoReal": 29803.563703418895,
+      "resultado": 33222.360921856016,
+      "varCeo": 2438.7972184371206,
+      "resultadoReal": 30783.563703418895,
       "canais": {
         "Mercado Livre": 590000.0,
         "Amazon": 7100.0,
@@ -2004,7 +2091,7 @@
       "shopeeVendas": 48000.0,
       "lojaVendas": 60800.0,
       "rendimentos": 0.0,
-      "despTotal": 696564.8057675213,
+      "despTotal": 695564.8057675213,
       "dPessoal": 21940.5,
       "dProlabore": 17000.0,
       "dCeo": 6200.0,
@@ -2013,16 +2100,16 @@
       "dTecnologia": 1000.0,
       "dMateria": 365675.0,
       "dVendas": 7737.38492592128,
-      "dMarketing": 8000.0,
+      "dMarketing": 7000.0,
       "dImpostos": 76791.75,
       "dFinanceiras": 881.1708416000001,
       "dTaxas": 146270.0,
       "dCancelamentos": 14627.0,
       "dFinanciamentos": 15102.0,
       "dInvestimentos": 0.0,
-      "resultado": 34785.19423247874,
-      "varCeo": 2533.578884649575,
-      "resultadoReal": 32251.615347829164,
+      "resultado": 35785.19423247874,
+      "varCeo": 2553.578884649575,
+      "resultadoReal": 33231.61534782916,
       "canais": {
         "Mercado Livre": 615000.0,
         "Amazon": 7550.0,
@@ -2041,7 +2128,7 @@
       "shopeeVendas": 51600.0,
       "lojaVendas": 62000.0,
       "rendimentos": 0.0,
-      "despTotal": 724362.7824596239,
+      "despTotal": 723362.7824596239,
       "dPessoal": 22848.0,
       "dProlabore": 17000.0,
       "dCeo": 6200.0,
@@ -2050,16 +2137,16 @@
       "dTecnologia": 1000.0,
       "dMateria": 380800.0,
       "dVendas": 8665.871117031835,
-      "dMarketing": 8000.0,
+      "dMarketing": 7000.0,
       "dImpostos": 79968.0,
       "dFinanceiras": 986.9113425920001,
       "dTaxas": 152320.0,
       "dCancelamentos": 15232.0,
       "dFinanciamentos": 15102.0,
       "dInvestimentos": 0.0,
-      "resultado": 37237.21754037612,
-      "varCeo": 2646.1443508075226,
-      "resultadoReal": 34591.0731895686,
+      "resultado": 38237.21754037612,
+      "varCeo": 2666.1443508075226,
+      "resultadoReal": 35571.0731895686,
       "canais": {
         "Mercado Livre": 640000.0,
         "Amazon": 8000.0,
@@ -2078,7 +2165,7 @@
       "shopeeVendas": 55200.0,
       "lojaVendas": 63200.0,
       "rendimentos": 0.0,
-      "despTotal": 765109.8663547786,
+      "despTotal": 764109.8663547786,
       "dPessoal": 24205.5,
       "dProlabore": 17000.0,
       "dCeo": 6200.0,
@@ -2087,16 +2174,16 @@
       "dTecnologia": 1000.0,
       "dMateria": 403425.0,
       "dVendas": 9705.775651075655,
-      "dMarketing": 8000.0,
+      "dMarketing": 7000.0,
       "dImpostos": 84719.25,
       "dFinanceiras": 1105.3407037030402,
       "dTaxas": 161370.0,
       "dCancelamentos": 16137.0,
       "dFinanciamentos": 15102.0,
       "dInvestimentos": 0.0,
-      "resultado": 41740.13364522136,
-      "varCeo": 2831.2276729044274,
-      "resultadoReal": 38908.905972316934,
+      "resultado": 42740.13364522136,
+      "varCeo": 2851.2276729044274,
+      "resultadoReal": 39888.905972316934,
       "canais": {
         "Mercado Livre": 680000.0,
         "Amazon": 8450.0,
@@ -2115,7 +2202,7 @@
       "shopeeVendas": 58800.0,
       "lojaVendas": 64400.0,
       "rendimentos": 0.0,
-      "despTotal": 805995.9503173521,
+      "despTotal": 804995.9503173521,
       "dPessoal": 25563.0,
       "dProlabore": 17000.0,
       "dCeo": 6200.0,
@@ -2124,16 +2211,16 @@
       "dTecnologia": 1000.0,
       "dMateria": 426050.0,
       "dVendas": 10870.468729204735,
-      "dMarketing": 8000.0,
+      "dMarketing": 7000.0,
       "dImpostos": 89470.5,
       "dFinanceiras": 1237.981588147405,
       "dTaxas": 170420.0,
       "dCancelamentos": 17042.0,
       "dFinanciamentos": 15102.0,
       "dInvestimentos": 0.0,
-      "resultado": 46104.04968264792,
-      "varCeo": 3013.5309936529584,
-      "resultadoReal": 43090.51868899496,
+      "resultado": 47104.04968264792,
+      "varCeo": 3033.5309936529584,
+      "resultadoReal": 44070.51868899496,
       "canais": {
         "Mercado Livre": 720000.0,
         "Amazon": 8900.0,
@@ -2152,7 +2239,7 @@
       "shopeeVendas": 62400.0,
       "lojaVendas": 65600.0,
       "rendimentos": 0.0,
-      "despTotal": 847037.7143554344,
+      "despTotal": 846037.7143554344,
       "dPessoal": 26920.5,
       "dProlabore": 17000.0,
       "dCeo": 6200.0,
@@ -2161,16 +2248,16 @@
       "dTecnologia": 1000.0,
       "dMateria": 448675.0,
       "dVendas": 12174.924976709302,
-      "dMarketing": 8000.0,
+      "dMarketing": 7000.0,
       "dImpostos": 94221.75,
       "dFinanceiras": 1386.5393787250937,
       "dTaxas": 179470.0,
       "dCancelamentos": 17947.0,
       "dFinanciamentos": 15102.0,
       "dInvestimentos": 0.0,
-      "resultado": 50312.28564456559,
-      "varCeo": 3192.720712891312,
-      "resultadoReal": 47119.56493167428,
+      "resultado": 51312.28564456559,
+      "varCeo": 3212.720712891312,
+      "resultadoReal": 48099.56493167428,
       "canais": {
         "Mercado Livre": 760000.0,
         "Amazon": 9350.0,
