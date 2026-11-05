@@ -11,6 +11,7 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
 <script>if(window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';</script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -282,6 +283,9 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
   </button>
   <button class="nav-sub-item" onclick="setPage('rh-dependentes')">
     <span class="nav-icon">👨‍👩‍👧</span> Dependentes
+  </button>
+  <button class="nav-sub-item" onclick="setPage('rh-contracheque')">
+    <span class="nav-icon">🧾</span> Contra-Cheque
   </button>
 </nav>
 
@@ -5015,6 +5019,7 @@ loadData();
     <div class="rh-field"><label>VR / VA (R$/mês)</label><input id="rh-f-vr" type="number" placeholder="0,00" min="0" step="0.01"></div>
     <div class="rh-field"><label>Plano de saúde (R$/mês)</label><input id="rh-f-saude" type="number" placeholder="0,00" min="0" step="0.01"></div>
     <div class="rh-field"><label>Outros benefícios (R$/mês)</label><input id="rh-f-outros-ben" type="number" placeholder="0,00" min="0" step="0.01"></div>
+    <div class="rh-field"><label>Adiantamento (R$/mês)</label><input id="rh-f-adiantamento" type="number" placeholder="0,00" min="0" step="0.01"></div>
     <div class="rh-field"><label>Início das férias</label><input id="rh-f-ferias-ini" type="date"></div>
     <div class="rh-field"><label>Fim das férias</label><input id="rh-f-ferias-fim" type="date"></div>
     <div class="rh-field span2"><label>Observações</label><textarea id="rh-f-obs" placeholder="Observações gerais sobre o funcionário..."></textarea></div>
@@ -5202,6 +5207,7 @@ loadData();
     document.getElementById('rh-f-vr').value      = v('vr');
     document.getElementById('rh-f-saude').value   = v('saude');
     document.getElementById('rh-f-outros-ben').value = v('outrosBen');
+    document.getElementById('rh-f-adiantamento').value = v('adiantamento');
     document.getElementById('rh-f-ferias-ini').value = v('feriasIni');
     document.getElementById('rh-f-ferias-fim').value = v('feriasFim');
     document.getElementById('rh-f-obs').value     = v('obs');
@@ -5246,8 +5252,9 @@ loadData();
       vt:         parseFloat(document.getElementById('rh-f-vt').value)||0,
       vr:         parseFloat(document.getElementById('rh-f-vr').value)||0,
       saude:      parseFloat(document.getElementById('rh-f-saude').value)||0,
-      outrosBen:  parseFloat(document.getElementById('rh-f-outros-ben').value)||0,
-      feriasIni:  document.getElementById('rh-f-ferias-ini').value,
+      outrosBen:   parseFloat(document.getElementById('rh-f-outros-ben').value)||0,
+      adiantamento: parseFloat(document.getElementById('rh-f-adiantamento').value)||0,
+      feriasIni:   document.getElementById('rh-f-ferias-ini').value,
       feriasFim:  document.getElementById('rh-f-ferias-fim').value,
       obs:        document.getElementById('rh-f-obs').value.trim(),
       dependentes: deps
@@ -5463,7 +5470,416 @@ loadData();
     if(p==='rh-salarios')    rhRenderSalPage();
     if(p==='rh-ferias')      rhRenderFerPage();
     if(p==='rh-dependentes') rhRenderDepPage();
+    if(p==='rh-contracheque' && typeof cchequeRender==='function') cchequeRender();
   };
+})();
+</script>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     SUB-PÁGINA: CONTRA-CHEQUE
+══════════════════════════════════════════════════════════════════════════ -->
+<div id="page-rh-contracheque" class="page">
+<style>
+.cc2-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px}
+.cc2-title{font-size:20px;font-weight:700;color:#e2e8f0}
+.cc2-title small{font-size:12px;color:#475569;font-weight:400;margin-left:8px}
+.cc2-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:22px}
+.cc2-sel{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#e2e8f0;padding:8px 12px;font-size:13px;outline:none}
+.cc2-btn{padding:8px 18px;border-radius:8px;border:none;font-size:13px;font-weight:600;cursor:pointer}
+.cc2-btn-calc{background:#38bdf8;color:#0d0d1a}
+.cc2-btn-pdf{background:rgba(220,38,38,.85);color:#fff}
+.cc2-btn-email{background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff}
+.cc2-btn:hover{opacity:.85}
+/* Config EmailJS */
+.cc2-config{background:rgba(124,58,237,.07);border:1px solid rgba(124,58,237,.2);border-radius:12px;padding:16px 20px;margin-bottom:20px}
+.cc2-config summary{font-size:13px;color:#a78bfa;font-weight:600;cursor:pointer;user-select:none}
+.cc2-config-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:12px}
+.cc2-config label{font-size:11px;color:#94a3b8;display:block;margin-bottom:3px}
+.cc2-config input{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:7px;color:#e2e8f0;padding:7px 10px;font-size:12px;outline:none}
+.cc2-config-save{margin-top:10px;background:#7c3aed;color:#fff;border:none;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer}
+/* Holerite */
+.cc2-holerite{background:#fff;color:#111;border-radius:12px;padding:28px 32px;max-width:720px;margin:0 auto;box-shadow:0 4px 32px rgba(0,0,0,.35);font-family:Arial,sans-serif;font-size:13px}
+.cc2-hol-header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #1e293b;padding-bottom:14px;margin-bottom:16px}
+.cc2-hol-empresa{font-size:16px;font-weight:700;color:#1e293b}
+.cc2-hol-empresa small{display:block;font-size:11px;color:#64748b;font-weight:400;margin-top:2px}
+.cc2-hol-periodo{text-align:right;font-size:12px;color:#374151}
+.cc2-hol-func{display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;margin-bottom:16px;padding:12px 14px;background:#f8fafc;border-radius:8px;font-size:12px}
+.cc2-hol-func span{color:#374151} .cc2-hol-func strong{color:#111}
+.cc2-hol-tbl{width:100%;border-collapse:collapse;margin-bottom:16px}
+.cc2-hol-tbl th{background:#1e293b;color:#fff;padding:7px 10px;font-size:11px;text-align:left}
+.cc2-hol-tbl td{padding:6px 10px;border-bottom:1px solid #e2e8f0;font-size:12px}
+.cc2-hol-tbl tr:nth-child(even) td{background:#f8fafc}
+.cc2-hol-tbl .num{text-align:right}
+.cc2-hol-secao{background:#e2e8f0;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#374151;padding:5px 10px}
+.cc2-hol-total{display:flex;justify-content:space-between;align-items:center;background:#1e293b;border-radius:8px;padding:12px 16px;color:#fff;font-weight:700;font-size:15px}
+.cc2-hol-total .liq{color:#4ade80;font-size:18px}
+.cc2-send-status{margin-top:12px;text-align:center;font-size:13px;font-weight:600;padding:10px;border-radius:8px;display:none}
+.cc2-send-ok{background:rgba(74,222,128,.12);color:#4ade80;border:1px solid rgba(74,222,128,.3)}
+.cc2-send-err{background:rgba(248,113,113,.12);color:#f87171;border:1px solid rgba(248,113,113,.3)}
+/* Lista colaboradores */
+.cc2-lista{display:grid;gap:10px;margin-bottom:20px}
+.cc2-row{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px 16px;cursor:pointer;transition:background .15s}
+.cc2-row:hover{background:rgba(56,189,248,.07)}
+.cc2-row.selected{border-color:#38bdf8;background:rgba(56,189,248,.1)}
+.cc2-row-nome{font-weight:600;color:#e2e8f0;font-size:14px}
+.cc2-row-cargo{font-size:12px;color:#64748b;margin-top:2px}
+.cc2-row-sal{font-size:13px;color:#38bdf8;font-weight:700}
+#cc2-container{max-width:760px;margin:0 auto}
+</style>
+
+<div id="cc2-container">
+  <div class="cc2-header">
+    <div class="cc2-title">🧾 Contra-Cheque <small>RH / DP</small></div>
+  </div>
+
+  <!-- Config EmailJS -->
+  <details class="cc2-config" id="cc2-emailjs-config">
+    <summary>⚙️ Configuração EmailJS (clique para expandir)</summary>
+    <div class="cc2-config-grid">
+      <div>
+        <label>Service ID</label>
+        <input id="cc2-ejs-service" placeholder="service_xxxxxxx">
+      </div>
+      <div>
+        <label>Template ID</label>
+        <input id="cc2-ejs-template" placeholder="template_xxxxxxx">
+      </div>
+      <div>
+        <label>Public Key</label>
+        <input id="cc2-ejs-pubkey" placeholder="xxxxxxxxxxxx">
+      </div>
+    </div>
+    <div style="margin-top:8px;font-size:11px;color:#64748b">
+      Crie conta gratuita em <a href="https://emailjs.com" target="_blank" style="color:#a78bfa">emailjs.com</a> → Email Services → Email Templates → Account → Public Key
+    </div>
+    <button class="cc2-config-save" onclick="cc2SaveConfig()">💾 Salvar configuração</button>
+    <span id="cc2-cfg-msg" style="font-size:12px;color:#4ade80;margin-left:12px;display:none">✅ Salvo!</span>
+  </details>
+
+  <!-- Toolbar: mês/ano + botão enviar todos -->
+  <div class="cc2-toolbar">
+    <select id="cc2-mes" class="cc2-sel">
+      <option value="01">Janeiro</option><option value="02">Fevereiro</option>
+      <option value="03">Março</option><option value="04">Abril</option>
+      <option value="05">Maio</option><option value="06">Junho</option>
+      <option value="07">Julho</option><option value="08">Agosto</option>
+      <option value="09">Setembro</option><option value="10">Outubro</option>
+      <option value="11">Novembro</option><option value="12">Dezembro</option>
+    </select>
+    <select id="cc2-ano" class="cc2-sel">
+      <option value="2026">2026</option><option value="2027">2027</option>
+    </select>
+    <button class="cc2-btn cc2-btn-calc" onclick="cchequeRender()">🔄 Atualizar</button>
+    <button class="cc2-btn cc2-btn-email" onclick="cc2EnviarTodos()" style="margin-left:auto">📧 Enviar todos por email</button>
+  </div>
+
+  <!-- Lista de colaboradores -->
+  <div class="cc2-lista" id="cc2-lista"></div>
+
+  <!-- Holerite -->
+  <div id="cc2-holerite-wrap" style="display:none">
+    <div class="cc2-holerite" id="cc2-holerite"></div>
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap">
+      <button class="cc2-btn cc2-btn-pdf" onclick="cc2GerarPDF()">📄 Gerar PDF</button>
+      <button class="cc2-btn cc2-btn-email" onclick="cc2EnviarEmail()">📧 Enviar por Email</button>
+    </div>
+    <div class="cc2-send-status" id="cc2-send-status"></div>
+  </div>
+</div>
+</div><!-- /page-rh-contracheque -->
+
+<script>
+(function(){
+  const RH_KEY  = 'rh_data_v1';
+  const CFG_KEY = 'emailjs_cfg_v1';
+
+  function rhLoad(){ try{ return JSON.parse(localStorage.getItem(RH_KEY)||'[]'); }catch(e){ return []; } }
+  function cfgLoad(){ try{ return JSON.parse(localStorage.getItem(CFG_KEY)||'{}'); }catch(e){ return {}; } }
+  function cfgSave(c){ localStorage.setItem(CFG_KEY, JSON.stringify(c)); }
+
+  const MESES = ['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const fmtR  = v=>'R$ '+(Number(v)||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const fmtD  = s=>{ if(!s)return'—'; const[y,m,d]=s.split('-'); return`${d}/${m}/${y}`; };
+
+  // ── Tabelas vigentes 2026 ──────────────────────────────────────────
+  // INSS (empregado) 2026 — alíquotas progressivas
+  const INSS_FAIXAS = [
+    {ate: 1518.00, aliq: 0.075},
+    {ate: 2793.88, aliq: 0.090},
+    {ate: 4190.83, aliq: 0.120},
+    {ate: 8157.41, aliq: 0.140},
+  ];
+  function calcINSS(bruto){
+    let inss = 0, base = bruto;
+    let prev = 0;
+    for(const f of INSS_FAIXAS){
+      if(base <= 0) break;
+      const faixa = Math.min(bruto, f.ate) - prev;
+      if(faixa > 0) inss += faixa * f.aliq;
+      prev = f.ate;
+      if(bruto <= f.ate) break;
+    }
+    return Math.round(inss * 100) / 100;
+  }
+
+  // IRRF 2026 — tabela progressiva mensal
+  const IRRF_FAIXAS = [
+    {ate: 2259.20, aliq: 0,     deducao: 0},
+    {ate: 2826.65, aliq: 0.075, deducao: 169.44},
+    {ate: 3751.05, aliq: 0.150, deducao: 381.44},
+    {ate: 4664.68, aliq: 0.225, deducao: 662.77},
+    {ate: Infinity, aliq: 0.275, deducao: 896.00},
+  ];
+  const DEDUCAO_DEPENDENTE = 189.59; // por dependente — 2026
+  function calcIRRF(bruto, inss, numDeps){
+    const baseCalc = bruto - inss - (numDeps * DEDUCAO_DEPENDENTE);
+    if(baseCalc <= 0) return 0;
+    for(const f of IRRF_FAIXAS){
+      if(baseCalc <= f.ate){
+        const irrf = baseCalc * f.aliq - f.deducao;
+        return Math.max(0, Math.round(irrf * 100)/100);
+      }
+    }
+    return 0;
+  }
+
+  // ── Calcula holerite de um funcionário ────────────────────────────
+  function calcHolerite(f){
+    const salario   = Number(f.salario)||0;
+    const vt        = Number(f.vt)||0;
+    const vr        = Number(f.vr)||0;
+    const saude     = Number(f.saude)||0;
+    const outros    = Number(f.outrosBen)||0;
+    const adiant    = Number(f.adiantamento)||0;
+    const numDeps   = (f.dependentes||[]).length;
+
+    const inss   = calcINSS(salario);
+    const irrf   = calcIRRF(salario, inss, numDeps);
+    const totalDesc = inss + irrf + adiant + saude + outros;
+    const liquido   = salario + vt + vr - totalDesc;
+
+    return {salario, vt, vr, saude, outros, adiant, inss, irrf, numDeps, totalDesc, liquido};
+  }
+
+  // ── Monta HTML do holerite ─────────────────────────────────────────
+  let _ccFunc = null;
+  function buildHolerite(f, mes, ano){
+    const h = calcHolerite(f);
+    const mesNome = MESES[+mes];
+    return `
+    <div class="cc2-hol-header">
+      <div>
+        <div class="cc2-hol-empresa">Grupo VIP</div>
+        <small class="cc2-hol-empresa">CNPJ: informar · Holerite de Pagamento</small>
+      </div>
+      <div class="cc2-hol-periodo">
+        <strong>Competência:</strong> ${mesNome}/${ano}<br>
+        <span style="font-size:11px;color:#64748b">Emitido em: ${new Date().toLocaleDateString('pt-BR')}</span>
+      </div>
+    </div>
+    <div class="cc2-hol-func">
+      <div><span>Nome:</span> <strong>${f.nome}</strong></div>
+      <div><span>Cargo:</span> <strong>${f.cargo||'—'}</strong></div>
+      <div><span>CPF:</span> <strong>${f.cpf||'—'}</strong></div>
+      <div><span>Departamento:</span> <strong>${f.depto||'—'}</strong></div>
+      <div><span>Admissão:</span> <strong>${fmtD(f.admissao)}</strong></div>
+      <div><span>Contrato:</span> <strong>${f.contrato||'CLT'}</strong></div>
+      <div><span>PIS/PASEP:</span> <strong>${f.pis||'—'}</strong></div>
+      <div><span>Dependentes IRRF:</span> <strong>${h.numDeps}</strong></div>
+    </div>
+    <table class="cc2-hol-tbl">
+      <thead><tr><th>Descrição</th><th class="num">Referência</th><th class="num">Vencimentos</th><th class="num">Descontos</th></tr></thead>
+      <tbody>
+        <tr><td colspan="4" class="cc2-hol-secao">VENCIMENTOS</td></tr>
+        <tr><td>Salário Base</td><td class="num">30 dias</td><td class="num">${fmtR(h.salario)}</td><td></td></tr>
+        ${h.vt>0?`<tr><td>Vale Transporte</td><td class="num">—</td><td class="num">${fmtR(h.vt)}</td><td></td></tr>`:''}
+        ${h.vr>0?`<tr><td>Vale Refeição</td><td class="num">—</td><td class="num">${fmtR(h.vr)}</td><td></td></tr>`:''}
+
+        <tr><td colspan="4" class="cc2-hol-secao">DESCONTOS</td></tr>
+        <tr><td>INSS (Progressive ${((h.inss/h.salario)*100).toFixed(2)}%)</td><td class="num">—</td><td></td><td class="num" style="color:#dc2626">${fmtR(h.inss)}</td></tr>
+        ${h.irrf>0?`<tr><td>IRRF</td><td class="num">—</td><td></td><td class="num" style="color:#dc2626">${fmtR(h.irrf)}</td></tr>`:''}
+        ${h.saude>0?`<tr><td>Plano de Saúde</td><td class="num">—</td><td></td><td class="num" style="color:#dc2626">${fmtR(h.saude)}</td></tr>`:''}
+        ${h.outros>0?`<tr><td>Outros Descontos</td><td class="num">—</td><td></td><td class="num" style="color:#dc2626">${fmtR(h.outros)}</td></tr>`:''}
+        ${h.adiant>0?`<tr><td>Adiantamento</td><td class="num">—</td><td></td><td class="num" style="color:#dc2626">${fmtR(h.adiant)}</td></tr>`:''}
+
+        <tr style="background:#f1f5f9">
+          <td colspan="2" style="font-weight:700">TOTAIS</td>
+          <td class="num" style="font-weight:700;color:#166534">${fmtR(h.salario+(h.vt||0)+(h.vr||0))}</td>
+          <td class="num" style="font-weight:700;color:#991b1b">${fmtR(h.totalDesc)}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="cc2-hol-total">
+      <span>💰 SALÁRIO LÍQUIDO</span>
+      <span class="liq">${fmtR(h.liquido)}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:20px;padding-top:16px;border-top:1px dashed #cbd5e1;font-size:11px;color:#64748b">
+      <div>Assinatura Empresa: __________________________</div>
+      <div>Assinatura Funcionário: ______________________</div>
+    </div>`;
+  }
+
+  // ── Render lista ──────────────────────────────────────────────────
+  window.cchequeRender = function(){
+    // Carrega config salva
+    const cfg = cfgLoad();
+    if(cfg.service) document.getElementById('cc2-ejs-service').value  = cfg.service||'';
+    if(cfg.template)document.getElementById('cc2-ejs-template').value = cfg.template||'';
+    if(cfg.pubkey)  document.getElementById('cc2-ejs-pubkey').value   = cfg.pubkey||'';
+
+    // Mês atual como padrão
+    const hoje = new Date();
+    const selMes = document.getElementById('cc2-mes');
+    const selAno = document.getElementById('cc2-ano');
+    if(!selMes.dataset.init){
+      selMes.value = String(hoje.getMonth()+1).padStart(2,'0');
+      selAno.value = String(hoje.getFullYear());
+      selMes.dataset.init='1';
+    }
+
+    const data = rhLoad().filter(f=>f.status!=='inativo');
+    const lista = document.getElementById('cc2-lista');
+    if(!data.length){
+      lista.innerHTML='<p style="color:#475569">Nenhum funcionário ativo encontrado. Cadastre na aba Funcionários.</p>';
+      return;
+    }
+
+    lista.innerHTML = data.map(f=>{
+      const h = calcHolerite(f);
+      return `<div class="cc2-row" id="cc2-row-${f._id}" onclick="cc2Selecionar('${f._id}')">
+        <div>
+          <div class="cc2-row-nome">${f.nome}</div>
+          <div class="cc2-row-cargo">${f.cargo||'—'} · ${f.depto||'—'} · ${f.email?'📧 '+f.email:'sem email'}</div>
+        </div>
+        <div class="cc2-row-sal">${fmtR(h.liquido)} líquido</div>
+      </div>`;
+    }).join('');
+    document.getElementById('cc2-holerite-wrap').style.display='none';
+  };
+
+  window.cc2Selecionar = function(id){
+    const data = rhLoad();
+    _ccFunc = data.find(f=>f._id===id);
+    if(!_ccFunc) return;
+    document.querySelectorAll('.cc2-row').forEach(r=>r.classList.remove('selected'));
+    document.getElementById('cc2-row-'+id)?.classList.add('selected');
+    const mes = document.getElementById('cc2-mes').value;
+    const ano = document.getElementById('cc2-ano').value;
+    document.getElementById('cc2-holerite').innerHTML = buildHolerite(_ccFunc, mes, ano);
+    document.getElementById('cc2-holerite-wrap').style.display='block';
+    document.getElementById('cc2-holerite-wrap').scrollIntoView({behavior:'smooth', block:'start'});
+  };
+
+  // ── Configuração EmailJS ──────────────────────────────────────────
+  window.cc2SaveConfig = function(){
+    const cfg = {
+      service:  document.getElementById('cc2-ejs-service').value.trim(),
+      template: document.getElementById('cc2-ejs-template').value.trim(),
+      pubkey:   document.getElementById('cc2-ejs-pubkey').value.trim(),
+    };
+    cfgSave(cfg);
+    const msg = document.getElementById('cc2-cfg-msg');
+    msg.style.display='inline'; setTimeout(()=>msg.style.display='none', 2500);
+  };
+
+  // ── Enviar email via EmailJS ──────────────────────────────────────
+  async function enviarEmailFunc(f, mes, ano){
+    const cfg = cfgLoad();
+    if(!cfg.service||!cfg.template||!cfg.pubkey)
+      throw new Error('Configure o EmailJS primeiro (Service ID, Template ID e Public Key).');
+    if(!f.email) throw new Error(`${f.nome} não possui email cadastrado.`);
+    emailjs.init(cfg.pubkey);
+    const h = calcHolerite(f);
+    const mesNome = MESES[+mes];
+    const params = {
+      to_email:    f.email,
+      to_name:     f.nome,
+      empresa:     'Grupo VIP',
+      competencia: `${mesNome}/${ano}`,
+      cargo:       f.cargo||'—',
+      salario_bruto: fmtR(h.salario),
+      vt:          fmtR(h.vt),
+      vr:          fmtR(h.vr),
+      inss:        fmtR(h.inss),
+      irrf:        fmtR(h.irrf),
+      plano_saude: fmtR(h.saude),
+      outros_desc: fmtR(h.outros),
+      adiantamento: fmtR(h.adiant),
+      total_desc:  fmtR(h.totalDesc),
+      salario_liquido: fmtR(h.liquido),
+    };
+    return emailjs.send(cfg.service, cfg.template, params);
+  }
+
+  window.cc2EnviarEmail = async function(){
+    const mes = document.getElementById('cc2-mes').value;
+    const ano = document.getElementById('cc2-ano').value;
+    const statusEl = document.getElementById('cc2-send-status');
+    statusEl.className='cc2-send-status'; statusEl.style.display='none';
+    if(!_ccFunc){ alert('Selecione um colaborador primeiro.'); return; }
+    statusEl.textContent='⏳ Enviando...'; statusEl.className='cc2-send-status'; statusEl.style.display='block';
+    try{
+      await enviarEmailFunc(_ccFunc, mes, ano);
+      statusEl.textContent=`✅ Holerite enviado para ${_ccFunc.email} com sucesso!`;
+      statusEl.className='cc2-send-status cc2-send-ok'; statusEl.style.display='block';
+    } catch(e){
+      statusEl.textContent='❌ Erro: '+(e.message||e.text||JSON.stringify(e));
+      statusEl.className='cc2-send-status cc2-send-err'; statusEl.style.display='block';
+    }
+  };
+
+  window.cc2EnviarTodos = async function(){
+    const data = rhLoad().filter(f=>f.status!=='inativo' && f.email);
+    if(!data.length){ alert('Nenhum funcionário ativo com email cadastrado.'); return; }
+    const mes = document.getElementById('cc2-mes').value;
+    const ano = document.getElementById('cc2-ano').value;
+    const mesNome = MESES[+mes];
+    if(!confirm(`Enviar holerite de ${mesNome}/${ano} para ${data.length} colaborador(es)?`)) return;
+    let ok=0, err=[];
+    for(const f of data){
+      try{ await enviarEmailFunc(f, mes, ano); ok++; }
+      catch(e){ err.push(`${f.nome}: ${e.message||e.text||'erro'}`); }
+    }
+    let msg=`✅ ${ok} holerite(s) enviado(s).`;
+    if(err.length) msg+='\n\n⚠ Erros:\n'+err.join('\n');
+    alert(msg);
+  };
+
+  // ── Gerar PDF ─────────────────────────────────────────────────────
+  window.cc2GerarPDF = function(){
+    if(!_ccFunc){ alert('Selecione um colaborador.'); return; }
+    const mes = document.getElementById('cc2-mes').value;
+    const ano = document.getElementById('cc2-ano').value;
+    const holHtml = buildHolerite(_ccFunc, mes, ano);
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8">
+    <title>Holerite — ${_ccFunc.nome}</title>
+    <style>
+      body{font-family:Arial,sans-serif;font-size:13px;color:#111;margin:0;padding:24px}
+      .cc2-hol-header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #1e293b;padding-bottom:14px;margin-bottom:16px}
+      .cc2-hol-empresa{font-size:16px;font-weight:700;color:#1e293b}
+      .cc2-hol-periodo{text-align:right;font-size:12px;color:#374151}
+      .cc2-hol-func{display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;margin-bottom:16px;padding:12px 14px;background:#f8fafc;border-radius:8px;font-size:12px}
+      .cc2-hol-tbl{width:100%;border-collapse:collapse;margin-bottom:16px}
+      .cc2-hol-tbl th{background:#1e293b;color:#fff;padding:7px 10px;font-size:11px;text-align:left}
+      .cc2-hol-tbl td{padding:6px 10px;border-bottom:1px solid #e2e8f0;font-size:12px}
+      .cc2-hol-tbl tr:nth-child(even) td{background:#f8fafc}
+      .num{text-align:right}
+      .cc2-hol-secao{background:#e2e8f0;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#374151;padding:5px 10px}
+      .cc2-hol-total{display:flex;justify-content:space-between;align-items:center;background:#1e293b;border-radius:8px;padding:12px 16px;color:#fff;font-weight:700;font-size:15px}
+      .liq{color:#4ade80;font-size:18px}
+      @media print{body{padding:10px}}
+    </style></head>
+    <body><div>${holHtml}</div>
+    <script>window.onload=()=>setTimeout(()=>window.print(),400);<\/script>
+    </body></html>`;
+    const blob=new Blob([html],{type:'text/html'});
+    const url=URL.createObjectURL(blob);
+    const win=window.open(url,'_blank');
+    if(!win) alert('Habilite popups para gerar o PDF.');
+  };
+
+  // expõe render para setPage hook
+  window.cchequeRender = window.cchequeRender;
 })();
 </script>
 </body>
