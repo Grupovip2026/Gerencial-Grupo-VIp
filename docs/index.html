@@ -4036,10 +4036,38 @@ loadData();
             }
           }
         });
-        CC[banco].lancamentos = result.lancamentos;
-        CC[banco].result = result;
+        // ── Mescla com lançamentos existentes (preserva histórico) ──
+        const existentes = CC[banco].lancamentos || [];
+        const novos      = result.lancamentos    || [];
+
+        // Chave de deduplicação: data + descrição + valor + tipo
+        const chave = l => `${l._dataISO||l.data}|${l.descricao}|${l.valor}|${l.tipo}`;
+        const chavesExist = new Set(existentes.map(chave));
+
+        // Adiciona só os lançamentos ainda não presentes
+        const aAdicionar = novos.filter(l => !chavesExist.has(chave(l)));
+        const merged = [...existentes, ...aAdicionar];
+
+        // Re-ordena por data
+        merged.sort((a,b)=>{
+          const ia = (a._dataISO||'').split('/').reverse().join('-');
+          const ib = (b._dataISO||'').split('/').reverse().join('-');
+          return ia.localeCompare(ib);
+        });
+
+        // Recalcula saldo progressivo
+        let s = result.saldoAnterior || 0;
+        for(const l of merged){ s += l.tipo==='entrada' ? l.valor : -l.valor; l.saldo = s; }
+
+        CC[banco].lancamentos = merged;
+        CC[banco].result = result;         // resultado/saldos do extrato mais recente
         CC[banco].nome = file.name;
         ccSave();
+        // Informa quantos foram adicionados
+        const msgEl = document.getElementById('cc-processing-'+banco);
+        const addedCount = aAdicionar.length;
+        const skipCount  = novos.length - addedCount;
+        result._mergeInfo = `${addedCount} novo(s) adicionado(s)${skipCount>0?' · '+skipCount+' duplicado(s) ignorado(s)':''}`;
         ccRender(banco, result, file.name);
       } catch(err){
         document.getElementById('cc-processing-'+banco).style.display='none';
@@ -4463,7 +4491,7 @@ loadData();
     const count = CC[banco].lancamentos.length;
     const st = document.getElementById('cc-status-'+banco);
     st.className='cc-status loaded';
-    const sufixo = fromStorage ? ' (salvo)' : '';
+    const sufixo = fromStorage ? ' (salvo)' : (result._mergeInfo ? ' · 🔀 '+result._mergeInfo : '');
     st.innerHTML=`<span class="dot"></span> ${nomeArq || 'Extrato'}${sufixo} · ${count} lançamentos`;
 
     document.getElementById('cc-sal-ent-'+banco).textContent = fmtCC(result.totalEnt);
