@@ -198,7 +198,7 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
 .cc-btn-edit{background:none;border:none;color:#38bdf8;cursor:pointer;font-size:14px;padding:2px 6px;border-radius:4px;opacity:.5;transition:opacity .15s}
 .cc-btn-edit:hover{opacity:1;background:rgba(56,189,248,.12)}
 #cc-edit-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center}
-#cc-edit-modal.open{display:flex}
+#cc-edit-modal.open{display:flex!important}
 #cc-edit-box{background:#1a1a2e;border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:28px 32px;width:400px;max-width:94vw}
 #cc-edit-box h3{margin:0 0 20px;font-size:16px;color:#e2e8f0}
 #cc-edit-box label{font-size:12px;color:#94a3b8;display:block;margin-bottom:4px}
@@ -797,7 +797,7 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
 <div id="page-fluxo" class="page"></div>
 
 <!-- ══ MODAL EDITAR LANÇAMENTO (Fluxo de Caixa) ══ -->
-<div id="fc-edit-modal">
+<div id="fc-edit-modal" style="display:none">
   <div id="fc-edit-box">
     <h3>✏️ Editar Lançamento</h3>
     <label>Data</label>
@@ -826,7 +826,7 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
 </div>
 
 <!-- ══ MODAL EDITAR LANÇAMENTO (Conta Corrente) ══ -->
-<div id="cc-edit-modal">
+<div id="cc-edit-modal" style="display:none">
   <div id="cc-edit-box">
     <h3>✏️ Editar Lançamento</h3>
     <label>Data</label>
@@ -2901,7 +2901,7 @@ function renderOrc2027(){
 .fc-btn-edit{background:rgba(56,189,248,.12);color:#38bdf8;border:1px solid rgba(56,189,248,.25);padding:4px 9px;font-size:11px;border-radius:5px;cursor:pointer}
 .fc-btn-edit:hover{background:rgba(56,189,248,.25)}
 #fc-edit-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center}
-#fc-edit-modal.open{display:flex}
+#fc-edit-modal.open{display:flex!important}
 #fc-edit-box{background:#1a1a2e;border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:28px 32px;width:400px;max-width:94vw}
 #fc-edit-box h3{margin:0 0 20px;font-size:16px;color:#e2e8f0}
 #fc-edit-box label{font-size:12px;color:#94a3b8;display:block;margin-bottom:4px}
