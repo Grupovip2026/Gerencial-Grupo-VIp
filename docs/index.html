@@ -195,6 +195,17 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
 .cc-date-input:focus{outline:none;border-color:#38bdf8}
 .cc-btn-del{background:none;border:none;color:#ff6b6b;cursor:pointer;font-size:14px;padding:2px 6px;border-radius:4px;opacity:.5;transition:opacity .15s}
 .cc-btn-del:hover{opacity:1;background:rgba(255,107,107,.12)}
+.cc-btn-edit{background:none;border:none;color:#38bdf8;cursor:pointer;font-size:14px;padding:2px 6px;border-radius:4px;opacity:.5;transition:opacity .15s}
+.cc-btn-edit:hover{opacity:1;background:rgba(56,189,248,.12)}
+#cc-edit-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center}
+#cc-edit-modal.open{display:flex}
+#cc-edit-box{background:#1a1a2e;border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:28px 32px;width:400px;max-width:94vw}
+#cc-edit-box h3{margin:0 0 20px;font-size:16px;color:#e2e8f0}
+#cc-edit-box label{font-size:12px;color:#94a3b8;display:block;margin-bottom:4px}
+#cc-edit-box input,#cc-edit-box select{width:100%;box-sizing:border-box;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:7px;color:#e2e8f0;padding:8px 10px;font-size:13px;margin-bottom:14px;outline:none}
+.cc-edit-btns{display:flex;gap:10px;margin-top:4px}
+.cc-edit-save{flex:1;background:#38bdf8;color:#0d0d1a;border:none;border-radius:7px;padding:9px;font-size:13px;font-weight:700;cursor:pointer}
+.cc-edit-cancel{flex:1;background:rgba(255,255,255,.07);color:#94a3b8;border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:9px;font-size:13px;cursor:pointer}
 .cc-add-row{background:rgba(255,255,255,.02);border-top:2px dashed rgba(255,255,255,.08);padding:12px 18px}
 .cc-add-row form{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .cc-add-row input,.cc-add-row select{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:6px 10px;color:#ccc;font-size:12px;font-family:'Inter',sans-serif}
@@ -810,6 +821,28 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
     <div class="fc-edit-btns">
       <button class="fc-edit-cancel" onclick="fcCloseEdit()">Cancelar</button>
       <button class="fc-edit-save" onclick="fcSaveEdit()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL EDITAR LANÇAMENTO (Conta Corrente) ══ -->
+<div id="cc-edit-modal">
+  <div id="cc-edit-box">
+    <h3>✏️ Editar Lançamento</h3>
+    <label>Data</label>
+    <input type="date" id="cc-edit-data">
+    <label>Descrição</label>
+    <input type="text" id="cc-edit-desc" placeholder="Descrição">
+    <label>Tipo</label>
+    <select id="cc-edit-tipo">
+      <option value="entrada">Entrada</option>
+      <option value="saida">Saída</option>
+    </select>
+    <label>Valor</label>
+    <input type="number" id="cc-edit-valor" min="0" step="0.01" placeholder="0,00">
+    <div class="cc-edit-btns">
+      <button class="cc-edit-cancel" onclick="ccCloseEdit()">Cancelar</button>
+      <button class="cc-edit-save" onclick="ccSaveEdit()">💾 Salvar</button>
     </div>
   </div>
 </div>
@@ -4594,6 +4627,51 @@ loadData();
     ccRenderTable(banco);
   };
 
+  let _ccEditBanco = null, _ccEditId = null;
+  window.ccOpenEdit = function(banco, id){
+    const l = CC[banco].lancamentos.find(x=>x._id===id);
+    if(!l) return;
+    _ccEditBanco = banco; _ccEditId = id;
+    // converte data DD/MM para YYYY-MM-DD
+    let iso = l._dataISO || '';
+    if(!iso && l.data){
+      const p = l.data.split('/');
+      iso = p.length===2 ? new Date().getFullYear()+'-'+p[1]+'-'+p[0]
+          : p.length===3 ? p[2]+'-'+p[1]+'-'+p[0] : '';
+    }
+    document.getElementById('cc-edit-data').value = iso;
+    document.getElementById('cc-edit-desc').value = l.descricao;
+    document.getElementById('cc-edit-tipo').value = l.tipo;
+    document.getElementById('cc-edit-valor').value = l.valor;
+    document.getElementById('cc-edit-modal').classList.add('open');
+  };
+  window.ccCloseEdit = function(){
+    document.getElementById('cc-edit-modal').classList.remove('open');
+    _ccEditBanco = null; _ccEditId = null;
+  };
+  window.ccSaveEdit = function(){
+    if(!_ccEditBanco || _ccEditId===null) return;
+    const banco = _ccEditBanco;
+    const iso   = document.getElementById('cc-edit-data').value;
+    const desc  = document.getElementById('cc-edit-desc').value.trim();
+    const tipo  = document.getElementById('cc-edit-tipo').value;
+    const val   = parseFloat(document.getElementById('cc-edit-valor').value);
+    if(!iso || !desc || isNaN(val) || val<=0) return;
+    const [ano,mes,dia] = iso.split('-');
+    const dataFmt = dia+'/'+mes;
+    const idx = CC[banco].lancamentos.findIndex(x=>x._id===_ccEditId);
+    if(idx===-1){ ccCloseEdit(); return; }
+    CC[banco].lancamentos[idx] = { ...CC[banco].lancamentos[idx], data: dataFmt, _dataISO: iso, descricao: desc, tipo, valor: val };
+    // reordena e recalcula saldo
+    CC[banco].lancamentos.sort((a,b)=>(a._dataISO||'0000-00-00').localeCompare(b._dataISO||'0000-00-00'));
+    const result = CC[banco].result;
+    let s = result ? (result.saldoAnterior || result.saldoInicial || 0) : 0;
+    for(const l of CC[banco].lancamentos){ s += l.tipo==='entrada'?l.valor:-l.valor; l.saldo=s; }
+    ccSave();
+    ccRenderTable(banco);
+    ccCloseEdit();
+  };
+
   function ccRenderTable(banco){
     const { lancamentos, filtro, search, dt1, dt2, result } = CC[banco];
 
@@ -4668,7 +4746,7 @@ loadData();
         }</td>
         <td class="${l.tipo==='entrada'?'cc-entrada':'cc-saida'}">${fmtCC(l.valor)}</td>
         <td class="cc-saldo-col" style="color:${l.saldo>=0?'#38bdf8':'#ff6b6b'}">${fmtCC(l.saldo)}</td>
-        <td><button class="cc-btn-del" onclick="ccDeleteRow('${banco}',${l._id})" title="Excluir">🗑</button></td>
+        <td style="display:flex;gap:2px"><button class="cc-btn-edit" onclick="ccOpenEdit('${banco}',${l._id})" title="Editar">✏️</button><button class="cc-btn-del" onclick="ccDeleteRow('${banco}',${l._id})" title="Excluir">🗑</button></td>
       </tr>
     `).join('');
   }
