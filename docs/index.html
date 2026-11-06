@@ -4028,38 +4028,48 @@ function renderOrc2027(){
     if(!win){ alert('Habilite popups para gerar o PDF.'); return; }
     win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
 <title>Relatório de Pagamentos</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
   @page{size:A4 landscape;margin:12mm 14mm}
-  body{font-family:'Inter',Arial,sans-serif;font-size:11px;color:#111;background:#fff;margin:0;padding:12px}
-  h2{font-size:15px;margin:0 0 4px 0;color:#111}
-  .sub{font-size:11px;color:#555;margin-bottom:12px}
-  .resumo{display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap}
-  .rc{background:#f5f5f5;border:1px solid #ddd;border-radius:6px;padding:10px 16px;min-width:130px}
-  .rc-lbl{font-size:9px;color:#888;text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px}
-  .rc-val{font-size:16px;font-weight:700}
-  .pos{color:#007a5e}.neg{color:#cc0000}
-  table{width:100%;border-collapse:collapse;font-size:10.5px}
-  th{background:#f0f0f0;color:#333;border:1px solid #ccc;padding:5px 7px;font-size:10px;text-align:left}
-  td{color:#111;border:1px solid #e0e0e0;padding:4px 7px;word-break:break-word}
-  tr.mes-head td{background:#ddeeff;color:#003366;font-weight:700;border:1px solid #aac}
-  tr.total-row td{background:#f8f8f8;font-weight:700;border-top:2px solid #ccc}
-  th:nth-child(1),td:nth-child(1){width:12%}
-  th:nth-child(2),td:nth-child(2){width:36%}
-  th:nth-child(3),td:nth-child(3){width:16%}
-  th:nth-child(4),td:nth-child(4){width:10%;text-align:center}
-  th:nth-child(5),td:nth-child(5){width:14%;text-align:right}
-  th:nth-child(6),td:nth-child(6){width:12%;text-align:right}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact;box-sizing:border-box}
+  body{font-family:'Inter',Arial,sans-serif;font-size:11px;color:#111;background:#fff;margin:0;padding:16px}
+  /* força tudo para tema claro */
+  *{color:#111!important;background:transparent!important;border-color:#ddd!important}
+  h2{font-size:16px;margin:0 0 4px 0;color:#111!important}
+  .sub{font-size:11px;color:#555!important;margin-bottom:12px}
+  /* resumo cards */
+  .fc-relat-card{background:#f5f5f5!important;border:1px solid #ddd!important;border-radius:6px;padding:10px 16px;min-width:130px;display:inline-block;margin-right:8px;margin-bottom:8px}
+  .fc-relat-card-lbl{font-size:9px;color:#888!important;text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px}
+  .fc-relat-card-val{font-size:16px;font-weight:700}
+  /* cabeçalho de conta */
+  div[style*="border-left:3px solid"]{background:#e8f4fd!important;border-left:3px solid #0369a1!important;border-radius:0 6px 6px 0;padding:8px 12px;margin-bottom:0}
+  div[style*="border-left:3px solid"] span{color:#0369a1!important}
+  /* tabela */
+  .fc-tbl-wrap{overflow:visible!important;border:none!important}
+  table,.fc-tbl{width:100%;border-collapse:collapse;font-size:10px}
+  th{background:#e8e8e8!important;color:#333!important;border:1px solid #ccc!important;padding:5px 7px;text-align:left;font-size:9.5px}
+  td{color:#111!important;border:1px solid #e0e0e0!important;padding:4px 7px;word-break:break-word}
+  /* categorias dentro da conta */
+  td[style*="background:rgba"]{background:#f0f0f0!important;font-weight:600}
+  /* tipo badge */
+  .fc-badge-ent,.fc-badge-sai{border-radius:4px;padding:2px 6px;font-size:9px;font-weight:700}
+  .fc-badge-ent{background:#d1fae5!important;color:#065f46!important}
+  .fc-badge-sai{background:#fee2e2!important;color:#991b1b!important}
+  /* cores pos/neg */
+  .fc-pos,.fc-relat-card-val.fc-pos{color:#007a5e!important;font-weight:600}
+  .fc-neg,.fc-relat-card-val.fc-neg{color:#cc0000!important;font-weight:600}
+  /* total row */
+  .fc-total-row td,.fc-tbl tr.fc-total-row td{background:#f0f0f0!important;font-weight:700!important;border-top:2px solid #aaa!important}
   tr{page-break-inside:avoid}
-  button{display:none}
-  .fc-pos{color:#007a5e;font-weight:600}.fc-neg{color:#cc0000;font-weight:600}
-  .fc-mes-head td{background:#ddeeff!important;color:#003366!important;font-weight:700!important}
-  .fc-total-row td{background:#f8f8f8!important;font-weight:700!important}
+  button,.fc-btn-print,.fc-relat-toolbar,.fc-view-tabs{display:none!important}
+  /* força span e div com cor inline para preto */
+  span[style*="color:#94a3b8"],span[style*="color:#38bdf8"],span[style*="color:#aaa"]{color:#555!important}
 </style></head><body>
 <h2>📊 Relatório de Pagamentos — Grupo VIP</h2>
 <div class="sub">Gerado em ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</div>
-<div class="resumo">${resumoHtml}</div>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">${resumoHtml}</div>
 ${html}
-<script>window.onload=()=>setTimeout(()=>{window.print();},400);<\/script>
+<script>window.onload=()=>setTimeout(()=>{window.print();},600);<\/script>
 </body></html>`);
     win.document.close();
   };
