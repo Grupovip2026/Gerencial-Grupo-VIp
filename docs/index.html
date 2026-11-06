@@ -1538,8 +1538,14 @@ function _fcMesTemplatePlano(ano,mesNum){
 function fcInjectDRE(){
   let lancs=[];
   try{ lancs=JSON.parse(localStorage.getItem('fluxo_lancamentos_v1')||'[]'); }catch(e){}
-  if(!lancs.length) return;
-  if(!DATA) return;
+  console.log('[fcInjectDRE] total lancs:', lancs.length);
+  if(!lancs.length){ console.log('[fcInjectDRE] sem lançamentos, saindo'); return; }
+  if(!DATA){ console.log('[fcInjectDRE] DATA nulo, saindo'); return; }
+  const comEmpresa=lancs.filter(l=>l.empresa).length;
+  const comNatureza=lancs.filter(l=>l.natureza).length;
+  console.log('[fcInjectDRE] com empresa:', comEmpresa, '/ com natureza:', comNatureza);
+  const mesesLancs=[...new Set(lancs.filter(l=>l.data).map(l=>l.data.substring(0,7)))];
+  console.log('[fcInjectDRE] meses nos lançamentos:', mesesLancs);
 
   const EMPRESAS=['VIP','VIDAL','V3'];
 
@@ -2497,23 +2503,33 @@ function renderGer(){
 
     // ── DESPESAS ──
     html+=`<tr class="section-head"><td colspan="${cols+2}">📉 DESPESAS</td></tr>`;
-    // Coleta todas as categorias presentes em m.despesas
-    const todasCats=[...new Set(months.flatMap(m=>Object.keys(m.despesas||{})))];
+    const despCats=[
+      {label:'CMV (Matéria Prima)',field:'cmv'},
+      {label:'Despesas de Pessoal',field:'dPessoal'},
+      {label:'Marketing',field:'dMarketing'},
+      {label:'Taxas de Plataforma',field:'dTaxas'},
+      {label:'Financiamentos',field:'dFinanc'},
+      {label:'Impostos',field:'impostos'},
+      {label:'Cancelamentos / Devoluções',field:'devolucoes'},
+      {label:'Outras Despesas',field:'dOutras'}
+    ];
+    // Busca meses do DRE (que tem os campos detalhados)
+    const dreMths=DATA.dre[gerCur]?.months||[];
     let totDespArr=months.map(()=>0);
-    if(todasCats.length){
-      todasCats.forEach(cat=>{
-        const vals=months.map(m=>(m.despesas?.[cat])||0);
-        const tot=vals.reduce((s,v)=>s+v,0);
-        if(!tot)return;
-        vals.forEach((v,i)=>totDespArr[i]+=v);
-        html+=`<tr style="font-size:12px"><td style="padding-left:20px;color:#aaa">${cat}</td>${vals.map(v=>`<td class="${v?'neg':'dim'}">${v?fmt(v):'—'}</td>`).join('')}<td class="neg" style="font-weight:600">${fmt(tot)}</td></tr>`;
+    despCats.forEach(({label,field})=>{
+      const vals=months.map(m=>{
+        // tenta pegar do plano primeiro, senão busca no dre pelo mesmo período
+        if(m[field]!=null) return m[field]||0;
+        const dm=dreMths.find(d=>d.ano===m.ano&&d.mes_num===m.mes_num);
+        return dm?(dm[field]||0):0;
       });
-    } else {
-      // Fallback: sem despesas detalhadas, mostra total
-      totDespArr=months.map(m=>m.dReal);
-      const tot=totDespArr.reduce((s,v)=>s+v,0);
-      html+=`<tr style="font-size:12px"><td style="padding-left:20px;color:#aaa">Total Despesas</td>${totDespArr.map(v=>`<td class="neg">${fmt(v)}</td>`).join('')}<td class="neg">${fmt(tot)}</td></tr>`;
-    }
+      const tot=vals.reduce((s,v)=>s+v,0);
+      if(!tot)return;
+      vals.forEach((v,i)=>totDespArr[i]+=v);
+      html+=`<tr style="font-size:12px"><td style="padding-left:20px;color:#aaa">${label}</td>${vals.map(v=>`<td class="${v?'neg':'dim'}">${v?fmt(v):'—'}</td>`).join('')}<td class="neg" style="font-weight:600">${fmt(tot)}</td></tr>`;
+    });
+    // Se não tinha nada detalhado, usa dReal como fallback
+    if(totDespArr.every(v=>v===0)) totDespArr=months.map(m=>m.dReal||0);
     const totDespSum=totDespArr.reduce((s,v)=>s+v,0);
     html+=`<tr class="total-row"><td>Total Despesas</td>${totDespArr.map(v=>`<td class="neg">${fmt(v)}</td>`).join('')}<td class="neg">${fmt(totDespSum)}</td></tr>`;
 
