@@ -3103,6 +3103,7 @@ function renderOrc2027(){
       </label>
       <button class="fc-btn" style="background:rgba(255,107,107,.1);color:#FF6B6B;border:1px solid rgba(255,107,107,.25)" onclick="fcLimparTudo()">🗑 Limpar tudo</button>
       <button class="fc-btn" style="background:rgba(0,201,167,.1);color:#00C9A7;border:1px solid rgba(0,201,167,.25)" onclick="fcBaixarModelo()">📄 Baixar modelo .xlsx</button>
+      <button class="fc-btn" style="background:rgba(99,102,241,.12);color:#818cf8;border:1px solid rgba(99,102,241,.3)" onclick="fcExportarLancamentos()">⬇️ Exportar lançamentos</button>
       <span id="fc-msg" style="font-size:12px;color:#00C9A7;display:none"></span>
     </div>
   </div>
@@ -3377,6 +3378,7 @@ function renderOrc2027(){
           let cat=findVal('categ','cat','grupo','group');
           let empresa=findVal('empresa','company','centro');
           let natureza=findVal('natureza','nat','nature','field');
+          let idOriginal=findVal('_id','id');
 
           // Normaliza data
           if(data instanceof Date){
@@ -3440,7 +3442,9 @@ function renderOrc2027(){
           let natFinal='';
           for(const[k,v] of Object.entries(natMap)){ if(natN.includes(k)){natFinal=v;break;} }
           if(!natFinal) natFinal=String(natureza||'');
-          novos.push({id:Date.now()+idx, data, desc, tipo, conta, valor, cat:String(cat||''), empresa, natureza:tipo==='SAÍDA'?natFinal:''});
+          // Usa o _id original se existir (reimport), senão gera novo
+          const idFinal = idOriginal ? Number(idOriginal) : Date.now()+idx;
+          novos.push({id:idFinal, data, desc, tipo, conta, valor, cat:String(cat||''), empresa, natureza:tipo==='SAÍDA'?natFinal:''});
           importados++;
         });
 
@@ -3448,10 +3452,19 @@ function renderOrc2027(){
           msg.textContent=`⚠ Nenhum lançamento válido encontrado. Verifique se as colunas são: Data, Descrição, Tipo, Conta, Valor, Categoria.`;
           msg.style.color='#FF6B6B'; return;
         }
-        // Merge: mantém existentes + adiciona novos (sem duplicar por id)
+        // Atualiza os existentes pelo id; adiciona só os genuinamente novos
         const existentes=loadLancamentos();
-        saveLancamentos([...existentes,...novos]);
-        msg.textContent=`✅ ${importados} lançamentos importados!${erros?' ('+erros+' linhas ignoradas)':''}`;
+        const existMap=new Map(existentes.map(l=>[l.id,l]));
+        novos.forEach(n=>{
+          if(existMap.has(n.id)){
+            // Atualiza campos do existente preservando o id
+            existMap.set(n.id,{...existMap.get(n.id),...n});
+          } else {
+            existMap.set(n.id,n);
+          }
+        });
+        saveLancamentos([...existMap.values()]);
+        msg.textContent=`✅ ${importados} lançamentos atualizados!${erros?' ('+erros+' linhas ignoradas)':''}`;
         msg.style.color='#00C9A7';
         refreshFluxo();
       }catch(err){
@@ -3462,6 +3475,42 @@ function renderOrc2027(){
       setTimeout(()=>msg.style.display='none',5000);
     };
     reader.readAsArrayBuffer(file);
+  };
+
+  // ── Exportar lançamentos existentes ─────────────
+  window.fcExportarLancamentos=function(){
+    if(typeof XLSX==='undefined'){alert('Biblioteca não carregada ainda, tente em instantes.');return;}
+    const arr=loadLancamentos();
+    if(!arr.length){alert('Nenhum lançamento para exportar.');return;}
+    const NAT={'cmv':'CMV (Matéria Prima)','dPessoal':'Despesas de Pessoal','dMarketing':'Marketing','dTaxas':'Taxas de Plataforma','dFinanc':'Financiamentos','impostos':'Impostos','devolucoes':'Cancelamentos / Devoluções','dOutras':'Outras Despesas'};
+    const wb2=XLSX.utils.book_new();
+    // ID fica na última coluna (oculta para o usuário mas usada no reimport para não duplicar)
+    const header=['Data','Descrição','Tipo','Conta','Valor','Empresa','Natureza','Categoria','_id'];
+    const linhas=arr
+      .sort((a,b)=>(a.data||'').localeCompare(b.data||''))
+      .map(l=>{
+        let dataFmt=l.data||'';
+        const m=dataFmt.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        if(m) dataFmt=`${m[3]}/${m[2]}/${m[1]}`;
+        return [
+          dataFmt,
+          l.desc||'',
+          l.tipo||'',
+          l.conta||'',
+          Number(l.valor)||0,
+          l.empresa||'',
+          NAT[l.natureza]||l.natureza||'',
+          l.cat||'',
+          l.id
+        ];
+      });
+    const ws2=XLSX.utils.aoa_to_sheet([header,...linhas]);
+    ws2['!cols']=[{wch:14},{wch:40},{wch:10},{wch:10},{wch:14},{wch:10},{wch:26},{wch:20},{wch:16}];
+    // Destaca colunas Empresa e Natureza (índices 5 e 6) em amarelo
+    XLSX.utils.book_append_sheet(wb2,ws2,'Lançamentos');
+    const hoje=new Date();
+    const nomeArq=`lancamentos_${hoje.getFullYear()}${String(hoje.getMonth()+1).padStart(2,'0')}${String(hoje.getDate()).padStart(2,'0')}.xlsx`;
+    XLSX.writeFile(wb2,nomeArq);
   };
 
   // ── Baixar modelo .xlsx ──────────────────────────
@@ -3495,13 +3544,22 @@ function renderOrc2027(){
   function refreshFluxo(){
     fcRenderKpis();
     fcRenderLancamentos();
-    // re-render seção ativa
+    // re-render seção ativa do fluxo
     const ativa=document.querySelector('.fc-section.fc-show');
-    if(!ativa)return;
-    const vid=ativa.id.replace('fc-view-','');
-    if(vid==='dia') fcRenderDia();
-    if(vid==='mensal') fcRenderMensal();
-    if(vid==='grafico') fcRenderGraficos();
+    if(ativa){
+      const vid=ativa.id.replace('fc-view-','');
+      if(vid==='dia') fcRenderDia();
+      if(vid==='mensal') fcRenderMensal();
+      if(vid==='grafico') fcRenderGraficos();
+    }
+    // ── Atualização em tempo real do DRE e Gerencial ──
+    if(typeof fcInjectDRE==='function') fcInjectDRE();
+    // Re-render se a aba DRE ou Gerencial estiver ativa
+    const pg=document.querySelector('.page.active');
+    if(pg){
+      if(pg.id==='page-dre' && typeof renderDre==='function') renderDre();
+      if(pg.id==='page-gerencial' && typeof renderGer==='function') renderGer();
+    }
   }
 
   function fcRenderKpis(){
