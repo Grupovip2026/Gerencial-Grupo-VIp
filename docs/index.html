@@ -1617,6 +1617,12 @@ function fcInjectDRE(){
       }
     });
   });
+
+  // Atualiza filtros de meses para incluir meses recém-criados
+  const dreMonths=DATA.dre[dreCur]?.months||[];
+  dreSel=new Set(dreMonths.map((_,i)=>i));
+  const gerMonths=DATA.plano[gerCur]?.months||[];
+  gerSel=new Set(gerMonths.map((_,i)=>i));
 }
 
 function setPage(p){
