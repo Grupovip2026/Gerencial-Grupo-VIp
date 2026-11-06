@@ -805,7 +805,7 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
     <label>Descrição</label>
     <input type="text" id="fc-edit-desc" placeholder="Descrição">
     <label>Tipo</label>
-    <select id="fc-edit-tipo">
+    <select id="fc-edit-tipo" onchange="fcEditToggleNatureza()">
       <option value="ENTRADA">ENTRADA</option>
       <option value="SAÍDA">SAÍDA</option>
     </select>
@@ -816,6 +816,27 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
     </select>
     <label>Valor</label>
     <input type="number" id="fc-edit-valor" min="0" step="0.01" placeholder="0,00">
+    <label>Empresa</label>
+    <select id="fc-edit-empresa">
+      <option value="">— Todas —</option>
+      <option value="VIP">VIP</option>
+      <option value="VIDAL">Vidal</option>
+      <option value="V3">V3</option>
+    </select>
+    <div id="fc-edit-natureza-wrap">
+      <label>Natureza da Despesa</label>
+      <select id="fc-edit-natureza">
+        <option value="">— Selecione —</option>
+        <option value="cmv">CMV (Matéria Prima)</option>
+        <option value="dPessoal">Despesas de Pessoal</option>
+        <option value="dMarketing">Marketing</option>
+        <option value="dTaxas">Taxas de Plataforma</option>
+        <option value="dFinanc">Financiamentos</option>
+        <option value="impostos">Impostos</option>
+        <option value="devolucoes">Cancelamentos / Devoluções</option>
+        <option value="dOutras">Outras Despesas</option>
+      </select>
+    </div>
     <label>Categoria</label>
     <input type="text" id="fc-edit-cat" placeholder="Categoria">
     <div class="fc-edit-btns">
@@ -1498,6 +1519,62 @@ async function loadData(){
   }
 }
 
+// ── AGREGAÇÃO LANÇAMENTOS → DRE/GERENCIAL ────────────────────────────────────
+// Lê localStorage, agrega por empresa+mês, injeta em DATA.dre[emp].months
+function fcInjectDRE(){
+  let lancs=[];
+  try{ lancs=JSON.parse(localStorage.getItem('fluxo_lancamentos_v1')||'[]'); }catch(e){}
+  if(!lancs.length) return; // sem lançamentos, mantém dados da planilha
+
+  const EMPRESAS=['VIP','VIDAL','V3'];
+  // Mapa campo DRE → campo natureza
+  const DESP_FIELDS=['dPessoal','dMarketing','dTaxas','dFinanc','impostos','devolucoes','dOutras','cmv'];
+
+  EMPRESAS.forEach(emp=>{
+    const co=DATA.dre[emp]; if(!co) return;
+    co.months.forEach(m=>{
+      const ano=m.ano, mesNum=m.mes_num;
+      // Filtra lançamentos desta empresa neste mês/ano
+      const ll=lancs.filter(l=>{
+        if(!l.data) return false;
+        const [y,mo]=l.data.split('-');
+        return parseInt(y)===ano && parseInt(mo)===mesNum && l.empresa===emp;
+      });
+      if(!ll.length) return; // sem lançamentos, mantém planilha
+
+      // Agrupa despesas por natureza
+      const desp={};
+      DESP_FIELDS.forEach(f=>{ desp[f]=0; });
+      ll.filter(l=>l.tipo==='SAÍDA').forEach(l=>{
+        const nat=l.natureza||'dOutras';
+        if(nat in desp) desp[nat]+=Number(l.valor)||0;
+        else desp['dOutras']+=Number(l.valor)||0;
+      });
+
+      // Soma entradas como rBruta
+      const entradas=ll.filter(l=>l.tipo==='ENTRADA').reduce((s,l)=>s+(Number(l.valor)||0),0);
+      if(entradas>0) m.rBruta=entradas;
+
+      // Injeta despesas onde há lançamento (zero não sobrescreve)
+      DESP_FIELDS.forEach(f=>{
+        if(desp[f]>0){
+          if(f==='cmv') m.cmv=desp[f];
+          else if(f==='impostos') m.impostos=desp[f];
+          else if(f==='devolucoes') m.devolucoes=desp[f];
+          else m[f]=desp[f];
+        }
+      });
+
+      // Recalcula derivados
+      m.rLiquida    = m.rBruta - (m.devolucoes||0) - (m.impostos||0);
+      m.lucroBruto  = m.rLiquida - (m.cmv||0);
+      m.ebitda      = m.lucroBruto - (m.dPessoal||0) - (m.dMarketing||0) - (m.dTaxas||0) - (m.dFinanc||0) - (m.dOutras||0);
+      m.ebit        = m.ebitda - (m.depreciacao||0);
+      m.lucroLiquido= m.ebit;
+    });
+  });
+}
+
 function setPage(p){
   document.querySelectorAll('.nav-item,.nav-sub-item').forEach(t=>{
     const oc=t.getAttribute('onclick')||'';
@@ -1506,6 +1583,7 @@ function setPage(p){
   document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
   const pg=document.getElementById('page-'+p);
   if(pg) pg.classList.add('active');
+  if(p==='dre'||p==='gerencial') fcInjectDRE();
   if(p==='orc2027') renderOrc2027();
   if(p==='vendas') renderVendasML();
   if(p==='vendas-vidal') renderVendasVidal();
@@ -3009,9 +3087,11 @@ function renderOrc2027(){
     <div class="fc-form-row">
       <div class="fc-field"><label>Data</label><input type="date" id="fc-data" min="2026-11-01" max="2027-12-31"></div>
       <div class="fc-field"><label>Descrição</label><input type="text" id="fc-desc" placeholder="Ex: Pagamento Fornecedor X"></div>
-      <div class="fc-field"><label>Tipo</label><select id="fc-tipo"><option value="ENTRADA">ENTRADA</option><option value="SAÍDA">SAÍDA</option></select></div>
+      <div class="fc-field"><label>Tipo</label><select id="fc-tipo" onchange="fcToggleNatureza()"><option value="ENTRADA">ENTRADA</option><option value="SAÍDA">SAÍDA</option></select></div>
       <div class="fc-field"><label>Conta</label><select id="fc-conta"><option value="Itaú">Itaú</option><option value="Sicoob">Sicoob</option></select></div>
       <div class="fc-field"><label>Valor (R$)</label><input type="number" id="fc-valor" step="0.01" placeholder="0,00" min="0"></div>
+      <div class="fc-field"><label>Empresa</label><select id="fc-empresa"><option value="">— Todas —</option><option value="VIP">VIP</option><option value="VIDAL">Vidal</option><option value="V3">V3</option></select></div>
+      <div class="fc-field fc-field-natureza" id="fc-field-natureza-wrap"><label>Natureza da Despesa</label><select id="fc-natureza"><option value="">— Selecione —</option><option value="cmv">CMV (Matéria Prima)</option><option value="dPessoal">Despesas de Pessoal</option><option value="dMarketing">Marketing</option><option value="dTaxas">Taxas de Plataforma</option><option value="dFinanc">Financiamentos</option><option value="impostos">Impostos</option><option value="devolucoes">Cancelamentos / Devoluções</option><option value="dOutras">Outras Despesas</option></select></div>
       <div class="fc-field"><label>Categoria</label><input type="text" id="fc-cat" placeholder="Ex: Fornecedores"></div>
     </div>
     <div style="margin-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
@@ -3038,6 +3118,23 @@ function renderOrc2027(){
       <option value="">Todos os tipos</option>
       <option value="ENTRADA">ENTRADA</option>
       <option value="SAÍDA">SAÍDA</option>
+    </select>
+    <select class="fc-field" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:6px;color:#fff;font-size:13px;padding:8px 10px;outline:none" id="fc-filtro-empresa" onchange="fcRenderLancamentos()">
+      <option value="">Todas as empresas</option>
+      <option value="VIP">VIP</option>
+      <option value="VIDAL">Vidal</option>
+      <option value="V3">V3</option>
+    </select>
+    <select class="fc-field" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:6px;color:#fff;font-size:13px;padding:8px 10px;outline:none" id="fc-filtro-natureza" onchange="fcRenderLancamentos()">
+      <option value="">Todas as naturezas</option>
+      <option value="cmv">CMV</option>
+      <option value="dPessoal">Pessoal</option>
+      <option value="dMarketing">Marketing</option>
+      <option value="dTaxas">Taxas Plataforma</option>
+      <option value="dFinanc">Financiamentos</option>
+      <option value="impostos">Impostos</option>
+      <option value="devolucoes">Cancelamentos</option>
+      <option value="dOutras">Outras</option>
     </select>
   </div>
   <div class="fc-tbl-wrap"><table class="fc-tbl" id="fc-tbl-lanc"></table></div>
@@ -3156,13 +3253,28 @@ function renderOrc2027(){
     if(v==='relatorio') fcInitRelatorio();
   };
 
+  window.fcToggleNatureza=function(){
+    const tipo=document.getElementById('fc-tipo').value;
+    const wrap=document.getElementById('fc-field-natureza-wrap');
+    if(wrap) wrap.style.display=tipo==='SAÍDA'?'':'none';
+  };
+  window.fcEditToggleNatureza=function(){
+    const tipo=document.getElementById('fc-edit-tipo').value;
+    const wrap=document.getElementById('fc-edit-natureza-wrap');
+    if(wrap) wrap.style.display=tipo==='SAÍDA'?'':'none';
+  };
+  // inicializa estado do campo natureza
+  setTimeout(()=>{ fcToggleNatureza(); },100);
+
   window.fcAddLancamento=function(){
-    const data  =document.getElementById('fc-data').value;
-    const desc  =document.getElementById('fc-desc').value.trim();
-    const tipo  =document.getElementById('fc-tipo').value;
-    const conta =document.getElementById('fc-conta').value;
-    const valor =parseFloat(document.getElementById('fc-valor').value);
-    const cat   =document.getElementById('fc-cat').value.trim();
+    const data    =document.getElementById('fc-data').value;
+    const desc    =document.getElementById('fc-desc').value.trim();
+    const tipo    =document.getElementById('fc-tipo').value;
+    const conta   =document.getElementById('fc-conta').value;
+    const valor   =parseFloat(document.getElementById('fc-valor').value);
+    const cat     =document.getElementById('fc-cat').value.trim();
+    const empresa =document.getElementById('fc-empresa').value;
+    const natureza=tipo==='SAÍDA'?(document.getElementById('fc-natureza').value||''):'';
     if(!data||!desc||!valor||valor<=0){
       const msg=document.getElementById('fc-msg');
       msg.textContent='⚠ Preencha data, descrição e valor.';
@@ -3170,7 +3282,7 @@ function renderOrc2027(){
       setTimeout(()=>msg.style.display='none',3000); return;
     }
     const arr=loadLancamentos();
-    arr.push({id:Date.now(), data, desc, tipo, conta, valor, cat});
+    arr.push({id:Date.now(), data, desc, tipo, conta, valor, cat, empresa, natureza});
     saveLancamentos(arr);
     document.getElementById('fc-desc').value='';
     document.getElementById('fc-valor').value='';
@@ -3193,12 +3305,15 @@ function renderOrc2027(){
     const l=arr.find(x=>x.id===id);
     if(!l)return;
     _fcEditId = id;
-    document.getElementById('fc-edit-data').value  = l.data||'';
-    document.getElementById('fc-edit-desc').value  = l.desc||'';
-    document.getElementById('fc-edit-tipo').value  = l.tipo||'SAÍDA';
-    document.getElementById('fc-edit-conta').value = l.conta||'Itaú';
-    document.getElementById('fc-edit-valor').value = l.valor||'';
-    document.getElementById('fc-edit-cat').value   = l.cat||'';
+    document.getElementById('fc-edit-data').value     = l.data||'';
+    document.getElementById('fc-edit-desc').value     = l.desc||'';
+    document.getElementById('fc-edit-tipo').value     = l.tipo||'SAÍDA';
+    document.getElementById('fc-edit-conta').value    = l.conta||'Itaú';
+    document.getElementById('fc-edit-valor').value    = l.valor||'';
+    document.getElementById('fc-edit-cat').value      = l.cat||'';
+    document.getElementById('fc-edit-empresa').value  = l.empresa||'';
+    document.getElementById('fc-edit-natureza').value = l.natureza||'';
+    fcEditToggleNatureza();
     document.getElementById('fc-edit-modal').classList.add('open');
   };
   window.fcCloseEdit=function(){
@@ -3207,14 +3322,16 @@ function renderOrc2027(){
   };
   window.fcSaveEdit=function(){
     if(!_fcEditId)return;
-    const data  = document.getElementById('fc-edit-data').value;
-    const desc  = document.getElementById('fc-edit-desc').value.trim();
-    const tipo  = document.getElementById('fc-edit-tipo').value;
-    const conta = document.getElementById('fc-edit-conta').value;
-    const valor = parseFloat(document.getElementById('fc-edit-valor').value);
-    const cat   = document.getElementById('fc-edit-cat').value.trim();
+    const data     = document.getElementById('fc-edit-data').value;
+    const desc     = document.getElementById('fc-edit-desc').value.trim();
+    const tipo     = document.getElementById('fc-edit-tipo').value;
+    const conta    = document.getElementById('fc-edit-conta').value;
+    const valor    = parseFloat(document.getElementById('fc-edit-valor').value);
+    const cat      = document.getElementById('fc-edit-cat').value.trim();
+    const empresa  = document.getElementById('fc-edit-empresa').value;
+    const natureza = tipo==='SAÍDA'?(document.getElementById('fc-edit-natureza').value||''):'';
     if(!data||!desc||!valor||valor<=0){ alert('Preencha data, descrição e valor válidos.'); return; }
-    const arr=loadLancamentos().map(l=> l.id===_fcEditId ? {...l, data, desc, tipo, conta, valor, cat} : l);
+    const arr=loadLancamentos().map(l=> l.id===_fcEditId ? {...l, data, desc, tipo, conta, valor, cat, empresa, natureza} : l);
     saveLancamentos(arr);
     fcCloseEdit();
     refreshFluxo();
@@ -3258,6 +3375,8 @@ function renderOrc2027(){
           let conta=findVal('conta','bank','account');
           let valor=findVal('valor','value','amount','vl');
           let cat=findVal('categ','cat','grupo','group');
+          let empresa=findVal('empresa','company','centro');
+          let natureza=findVal('natureza','nat','nature','field');
 
           // Normaliza data
           if(data instanceof Date){
@@ -3309,7 +3428,19 @@ function renderOrc2027(){
           desc=String(desc||'').trim();
           if(!desc) desc='Importado';
 
-          novos.push({id:Date.now()+idx, data, desc, tipo, conta, valor, cat:String(cat||'')});
+          // Normaliza empresa
+          const empN=String(empresa||'').toLowerCase().trim();
+          if(empN.includes('vidal')) empresa='VIDAL';
+          else if(empN.includes('v3')||empN.includes('v 3')) empresa='V3';
+          else if(empN.includes('vip')) empresa='VIP';
+          else empresa='';
+          // Normaliza natureza
+          const natN=String(natureza||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').trim();
+          const natMap={'cmv':'cmv','materia':'cmv','material':'cmv','pessoal':'dPessoal','salario':'dPessoal','marketing':'dMarketing','taxa':'dTaxas','plataforma':'dTaxas','financ':'dFinanc','imposto':'impostos','cancelamento':'devolucoes','devolucao':'devolucoes','outras':'dOutras','geral':'dOutras'};
+          let natFinal='';
+          for(const[k,v] of Object.entries(natMap)){ if(natN.includes(k)){natFinal=v;break;} }
+          if(!natFinal) natFinal=String(natureza||'');
+          novos.push({id:Date.now()+idx, data, desc, tipo, conta, valor, cat:String(cat||''), empresa, natureza:tipo==='SAÍDA'?natFinal:''});
           importados++;
         });
 
@@ -3338,13 +3469,14 @@ function renderOrc2027(){
     if(typeof XLSX==='undefined'){alert('Biblioteca não carregada ainda, tente em instantes.');return;}
     const wb2=XLSX.utils.book_new();
     const dados=[
-      ['Data','Descrição','Tipo','Conta','Valor','Categoria'],
-      ['01/11/2026','Exemplo Entrada Itaú','ENTRADA','Itaú',5000,'Vendas'],
-      ['05/11/2026','Exemplo Saída Sicoob','SAÍDA','Sicoob',1200.50,'Fornecedores'],
-      ['10/11/2026','Exemplo Entrada Sicoob','ENTRADA','Sicoob',3000,'Transferência'],
+      ['Data','Descrição','Tipo','Conta','Valor','Empresa','Natureza','Categoria'],
+      ['01/11/2026','Venda ML VIP','ENTRADA','Itaú',5000,'VIP','','Vendas'],
+      ['05/11/2026','Pagamento Fornecedor','SAÍDA','Sicoob',1200.50,'VIP','cmv','Fornecedores'],
+      ['10/11/2026','Folha de Pagamento','SAÍDA','Itaú',3000,'VIDAL','dPessoal','RH'],
+      ['15/11/2026','Taxa Mercado Livre','SAÍDA','Itaú',800,'V3','dTaxas','Plataforma'],
     ];
     const ws2=XLSX.utils.aoa_to_sheet(dados);
-    ws2['!cols']=[{wch:14},{wch:36},{wch:10},{wch:10},{wch:14},{wch:20}];
+    ws2['!cols']=[{wch:14},{wch:36},{wch:10},{wch:10},{wch:14},{wch:10},{wch:16},{wch:20}];
     XLSX.utils.book_append_sheet(wb2,ws2,'Lançamentos');
     XLSX.writeFile(wb2,'modelo_fluxo_caixa.xlsx');
   };
@@ -3398,33 +3530,47 @@ function renderOrc2027(){
     }).join('');
   }
 
+  // Mapa de natureza → label legível
+  const NAT_LABEL={'cmv':'CMV','dPessoal':'Pessoal','dMarketing':'Marketing','dTaxas':'Taxas Plat.','dFinanc':'Financ.','impostos':'Impostos','devolucoes':'Cancelamentos','dOutras':'Outras'};
+
   window.fcRenderLancamentos=function(){
     const arr=loadLancamentos();
     const q=(document.getElementById('fc-search')||{}).value||'';
     const fc=(document.getElementById('fc-filtro-conta')||{}).value||'';
     const ft=(document.getElementById('fc-filtro-tipo')||{}).value||'';
+    const fe=(document.getElementById('fc-filtro-empresa')||{}).value||'';
+    const fn=(document.getElementById('fc-filtro-natureza')||{}).value||'';
     const tbl=document.getElementById('fc-tbl-lanc');
     if(!tbl)return;
     const filtered=arr.filter(l=>{
       if(fc&&l.conta!==fc)return false;
       if(ft&&l.tipo!==ft)return false;
-      if(q){const s=q.toLowerCase();if(!(l.desc+l.conta+l.cat).toLowerCase().includes(s))return false;}
+      if(fe&&l.empresa!==fe)return false;
+      if(fn&&l.natureza!==fn)return false;
+      if(q){const s=q.toLowerCase();if(!(l.desc+l.conta+(l.cat||'')+(l.empresa||'')+(l.natureza||'')).toLowerCase().includes(s))return false;}
       return true;
     }).sort((a,b)=>b.data.localeCompare(a.data));
     let h=`<thead><tr>
       <th style="text-align:left">Data</th>
       <th style="text-align:left">Descrição</th>
-      <th>Tipo</th><th>Conta</th><th>Valor</th><th>Categoria</th><th>Ação</th>
+      <th>Tipo</th><th>Conta</th><th>Valor</th>
+      <th>Empresa</th><th>Natureza</th><th>Categoria</th><th>Ação</th>
     </tr></thead><tbody>`;
-    if(!filtered.length){h+='<tr><td colspan="7" style="text-align:center;color:#555;padding:30px">Nenhum lançamento encontrado.</td></tr>';}
+    if(!filtered.length){h+='<tr><td colspan="9" style="text-align:center;color:#555;padding:30px">Nenhum lançamento encontrado.</td></tr>';}
     filtered.forEach(l=>{
       const cls=l.tipo==='ENTRADA'?'fc-pos':'fc-neg';
+      const empColor={'VIP':'#00C9A7','VIDAL':'#6C63FF','V3':'#F5A623'}[l.empresa]||'#666';
+      const empBadge=l.empresa?`<span style="background:${empColor}22;color:${empColor};border:1px solid ${empColor}44;padding:1px 7px;border-radius:10px;font-size:10px;font-weight:700">${l.empresa}</span>`:'<span style="color:#555">—</span>';
+      const natLabel=NAT_LABEL[l.natureza]||'';
+      const natBadge=natLabel?`<span style="background:rgba(99,102,241,.15);color:#818cf8;border:1px solid rgba(99,102,241,.25);padding:1px 7px;border-radius:10px;font-size:10px">${natLabel}</span>`:'<span style="color:#555">—</span>';
       h+=`<tr>
         <td style="text-align:left;font-family:Inter,sans-serif">${brDate(l.data)}</td>
         <td style="text-align:left;font-family:Inter,sans-serif;color:#ddd">${l.desc}</td>
         <td class="${cls}">${l.tipo}</td>
         <td style="color:#38bdf8">${l.conta}</td>
         <td class="${cls}">${fmtR(l.valor)}</td>
+        <td>${empBadge}</td>
+        <td>${natBadge}</td>
         <td style="text-align:left;font-family:Inter,sans-serif;color:#888">${l.cat||'—'}</td>
         <td style="display:flex;gap:4px">
           <button class="fc-btn-edit" onclick="fcOpenEdit(${l.id})" title="Editar">✏️</button>
