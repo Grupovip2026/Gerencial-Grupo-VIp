@@ -1621,8 +1621,10 @@ function fcInjectDRE(){
   // Atualiza filtros de meses para incluir meses recém-criados
   const dreMonths=DATA.dre[dreCur]?.months||[];
   dreSel=new Set(dreMonths.map((_,i)=>i));
+  if(typeof buildDreFilter==='function') buildDreFilter();
   const gerMonths=DATA.plano[gerCur]?.months||[];
   gerSel=new Set(gerMonths.map((_,i)=>i));
+  if(typeof buildGerFilter==='function') buildGerFilter();
 }
 
 function setPage(p){
@@ -1633,8 +1635,8 @@ function setPage(p){
   document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
   const pg=document.getElementById('page-'+p);
   if(pg) pg.classList.add('active');
-  if(p==='dre'){fcInjectDRE();if(typeof renderDre==='function')renderDre();}
-  if(p==='gerencial'){fcInjectDRE();if(typeof renderGer==='function')renderGer();}
+  if(p==='dre'){fcInjectDRE();if(typeof buildDreFilter==='function')buildDreFilter();if(typeof renderDre==='function')renderDre();}
+  if(p==='gerencial'){fcInjectDRE();if(typeof buildGerFilter==='function')buildGerFilter();if(typeof renderGer==='function')renderGer();}
   if(p==='orc2027') renderOrc2027();
   if(p==='vendas') renderVendasML();
   if(p==='vendas-vidal') renderVendasVidal();
