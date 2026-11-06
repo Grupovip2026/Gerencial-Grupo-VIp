@@ -1520,57 +1520,100 @@ async function loadData(){
 }
 
 // ── AGREGAÇÃO LANÇAMENTOS → DRE/GERENCIAL ────────────────────────────────────
-// Lê localStorage, agrega por empresa+mês, injeta em DATA.dre[emp].months
+const _NOMES_MES=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const _DESP_FIELDS=['dPessoal','dMarketing','dTaxas','dFinanc','impostos','devolucoes','dOutras','cmv'];
+
+function _fcMesTemplate(ano,mesNum){
+  // Cria objeto mês zerado para o DRE
+  return {mes:_NOMES_MES[mesNum-1],mes_num:mesNum,ano,order:ano*100+mesNum,
+    rBruta:0,devolucoes:0,impostos:0,rLiquida:0,cmv:0,lucroBruto:0,
+    dPessoal:0,dMarketing:0,dTaxas:0,dFinanc:0,dOutras:0,
+    ebitda:0,depreciacao:0,ebit:0,lucroLiquido:0};
+}
+function _fcMesTemplatePlano(ano,mesNum){
+  return {mes:_NOMES_MES[mesNum-1],mes_num:mesNum,ano,order:ano*100+mesNum,
+    rPrev:0,rReal:0,dPrev:0,dReal:0,resPrev:0,resReal:0,canais:{}};
+}
+
 function fcInjectDRE(){
   let lancs=[];
   try{ lancs=JSON.parse(localStorage.getItem('fluxo_lancamentos_v1')||'[]'); }catch(e){}
-  if(!lancs.length) return; // sem lançamentos, mantém dados da planilha
+  if(!lancs.length) return;
 
   const EMPRESAS=['VIP','VIDAL','V3'];
-  // Mapa campo DRE → campo natureza
-  const DESP_FIELDS=['dPessoal','dMarketing','dTaxas','dFinanc','impostos','devolucoes','dOutras','cmv'];
+
+  // Coleta todos os ano+mês únicos presentes nos lançamentos
+  const periodos=new Set();
+  lancs.forEach(l=>{
+    if(!l.data) return;
+    const [y,mo]=l.data.split('-');
+    if(y&&mo) periodos.add(parseInt(y)*100+parseInt(mo));
+  });
 
   EMPRESAS.forEach(emp=>{
     const co=DATA.dre[emp]; if(!co) return;
-    co.months.forEach(m=>{
-      const ano=m.ano, mesNum=m.mes_num;
-      // Filtra lançamentos desta empresa neste mês/ano
-      const ll=lancs.filter(l=>{
-        if(!l.data) return false;
-        const [y,mo]=l.data.split('-');
-        return parseInt(y)===ano && parseInt(mo)===mesNum && l.empresa===emp;
-      });
-      if(!ll.length) return; // sem lançamentos, mantém planilha
+    const cp=DATA.plano[emp];
 
-      // Agrupa despesas por natureza
-      const desp={};
-      DESP_FIELDS.forEach(f=>{ desp[f]=0; });
+    // Garante que todos os meses dos lançamentos existam em dre e plano
+    periodos.forEach(ym=>{
+      const ano=Math.floor(ym/100), mesNum=ym%100;
+      if(!co.months.find(m=>m.ano===ano&&m.mes_num===mesNum)){
+        co.months.push(_fcMesTemplate(ano,mesNum));
+        co.months.sort((a,b)=>a.order-b.order);
+      }
+      if(cp&&!cp.months.find(m=>m.ano===ano&&m.mes_num===mesNum)){
+        cp.months.push(_fcMesTemplatePlano(ano,mesNum));
+        cp.months.sort((a,b)=>a.order-b.order);
+      }
+    });
+
+    // Para cada mês com lançamentos desta empresa, injeta os valores
+    co.months.forEach(m=>{
+      const ll=lancs.filter(l=>{
+        if(!l.data||!l.empresa) return false;
+        const [y,mo]=l.data.split('-');
+        return parseInt(y)===m.ano && parseInt(mo)===m.mes_num && l.empresa===emp;
+      });
+      if(!ll.length) return;
+
+      // Zera campos que serão recalculados pelos lançamentos
+      _DESP_FIELDS.forEach(f=>{ if(f==='cmv'||f==='impostos'||f==='devolucoes') m[f]=0; else m[f]=0; });
+
+      // Agrupa despesas
       ll.filter(l=>l.tipo==='SAÍDA').forEach(l=>{
         const nat=l.natureza||'dOutras';
-        if(nat in desp) desp[nat]+=Number(l.valor)||0;
-        else desp['dOutras']+=Number(l.valor)||0;
+        const val=Number(l.valor)||0;
+        if(nat==='cmv')        m.cmv       +=val;
+        else if(nat==='impostos')   m.impostos  +=val;
+        else if(nat==='devolucoes') m.devolucoes+=val;
+        else if(nat==='dPessoal')   m.dPessoal  +=val;
+        else if(nat==='dMarketing') m.dMarketing+=val;
+        else if(nat==='dTaxas')     m.dTaxas    +=val;
+        else if(nat==='dFinanc')    m.dFinanc   +=val;
+        else                        m.dOutras   +=val;
       });
 
-      // Soma entradas como rBruta
+      // Entradas → rBruta
       const entradas=ll.filter(l=>l.tipo==='ENTRADA').reduce((s,l)=>s+(Number(l.valor)||0),0);
       if(entradas>0) m.rBruta=entradas;
 
-      // Injeta despesas onde há lançamento (zero não sobrescreve)
-      DESP_FIELDS.forEach(f=>{
-        if(desp[f]>0){
-          if(f==='cmv') m.cmv=desp[f];
-          else if(f==='impostos') m.impostos=desp[f];
-          else if(f==='devolucoes') m.devolucoes=desp[f];
-          else m[f]=desp[f];
-        }
-      });
-
       // Recalcula derivados
-      m.rLiquida    = m.rBruta - (m.devolucoes||0) - (m.impostos||0);
-      m.lucroBruto  = m.rLiquida - (m.cmv||0);
-      m.ebitda      = m.lucroBruto - (m.dPessoal||0) - (m.dMarketing||0) - (m.dTaxas||0) - (m.dFinanc||0) - (m.dOutras||0);
-      m.ebit        = m.ebitda - (m.depreciacao||0);
-      m.lucroLiquido= m.ebit;
+      m.rLiquida   = m.rBruta-(m.devolucoes||0)-(m.impostos||0);
+      m.lucroBruto = m.rLiquida-(m.cmv||0);
+      m.ebitda     = m.lucroBruto-(m.dPessoal||0)-(m.dMarketing||0)-(m.dTaxas||0)-(m.dFinanc||0)-(m.dOutras||0);
+      m.ebit       = m.ebitda-(m.depreciacao||0);
+      m.lucroLiquido=m.ebit;
+
+      // Injeta também no plano (gerencial) — dReal e rReal
+      if(cp){
+        const mp=cp.months.find(x=>x.ano===m.ano&&x.mes_num===m.mes_num);
+        if(mp){
+          if(entradas>0) mp.rReal=entradas;
+          const totalDesp=ll.filter(l=>l.tipo==='SAÍDA').reduce((s,l)=>s+(Number(l.valor)||0),0);
+          if(totalDesp>0) mp.dReal=totalDesp;
+          mp.resReal=(mp.rReal||0)-(mp.dReal||0);
+        }
+      }
     });
   });
 }
