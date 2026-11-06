@@ -2518,8 +2518,6 @@ function renderGer(){
     let totDespArr=months.map(()=>0);
     despCats.forEach(({label,field})=>{
       const vals=months.map(m=>{
-        // tenta pegar do plano primeiro, senão busca no dre pelo mesmo período
-        if(m[field]!=null) return m[field]||0;
         const dm=dreMths.find(d=>d.ano===m.ano&&d.mes_num===m.mes_num);
         return dm?(dm[field]||0):0;
       });
