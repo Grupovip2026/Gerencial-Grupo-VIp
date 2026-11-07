@@ -1569,12 +1569,11 @@ function fcInjectDRE(){
     const cp=DATA.plano[emp];
 
     // Garante que todos os meses dos lançamentos existam em dre e plano
+    // Mas só cria meses que já existem no DRE (não expande além do range configurado)
     periodos.forEach(ym=>{
       const ano=Math.floor(ym/100), mesNum=ym%100;
-      if(!co.months.find(m=>m.ano===ano&&m.mes_num===mesNum)){
-        co.months.push(_fcMesTemplate(ano,mesNum));
-        co.months.sort((a,b)=>a.order-b.order);
-      }
+      // Só injeta em meses que já existem no DRE (não cria novos meses fora do range)
+      if(!co.months.find(m=>m.ano===ano&&m.mes_num===mesNum)) return;
       if(cp&&!cp.months.find(m=>m.ano===ano&&m.mes_num===mesNum)){
         cp.months.push(_fcMesTemplatePlano(ano,mesNum));
         cp.months.sort((a,b)=>a.order-b.order);
