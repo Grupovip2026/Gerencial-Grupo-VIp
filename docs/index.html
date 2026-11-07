@@ -2515,7 +2515,8 @@ function renderGer(){
   mkChart('cResultado','bar',meses,[{label:'Resultado',data:months.map(m=>m.resReal),backgroundColor:months.map(m=>m.resReal>=0?color:'#FF6B6B'),borderRadius:4}]);
   const topLabels=[...new Set(months.flatMap(m=>(m.topicos||[]).map(t=>t.label)))];
   const despTop=topLabels.map(lbl=>({cat:lbl,real:months.reduce((s,m)=>{const t=(m.topicos||[]).find(t=>t.label===lbl);return s+(t?t.real:0);},0)})).filter(d=>d.real>0);
-  if(despTop.length)mkChart('cDespesas','bar',despTop.map(d=>d.cat),[{label:'Realizado',data:despTop.map(d=>d.real),backgroundColor:co.accent,borderRadius:4}],{hbar:true,extra:{indexAxis:'y'}});
+  const accent=gerCur==='GRUPO'?'#c084fc':(DATA.plano[gerCur]?.accent||color);
+  if(despTop.length)mkChart('cDespesas','bar',despTop.map(d=>d.cat),[{label:'Realizado',data:despTop.map(d=>d.real),backgroundColor:accent,borderRadius:4}],{hbar:true,extra:{indexAxis:'y'}});
   const cmap={};months.forEach(m=>{if(!m.canais)return;for(const[cn,cv]of Object.entries(m.canais)){if(!cmap[cn])cmap[cn]={prev:0,real:0};cmap[cn].real+=cv.real||0;}});
   const canais=Object.entries(cmap).map(([canal,v])=>({canal,...v})).filter(c=>c.real>0);
   if(canais.length)mkChart('cCanais','bar',canais.map(c=>c.canal),[{label:'Realizado',data:canais.map(c=>c.real),backgroundColor:color,borderRadius:4}]);
