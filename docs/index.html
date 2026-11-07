@@ -2444,26 +2444,65 @@ function renderVendasVidal(){
 }
 
 // ── GERENCIAL ──────────────────────────────────────────────────────────────────
+function gerMonthsList(){
+  // Retorna lista de meses para o gerCur atual (merged para GRUPO)
+  if(gerCur==='GRUPO'){
+    return mergeMonths(['VIP','VIDAL','V3'].map(k=>DATA.plano[k]?.months||[]));
+  }
+  return DATA.plano[gerCur]?.months||[];
+}
 function setCompany(k){
   if(!DATA)return; gerCur=k;
   document.querySelectorAll('#page-gerencial .tab').forEach((t,i)=>{t.className='tab';if(['VIP','VIDAL','V3','GRUPO'][i]===k)t.classList.add('active-'+k.toLowerCase())});
-  gerSel=new Set((DATA.plano[k]?.months||[]).map((_,i)=>i));
+  gerSel=new Set(gerMonthsList().map((_,i)=>i));
   buildGerFilter();renderGer();
 }
 function buildGerFilter(){
-  const months=DATA.plano[gerCur]?.months||[];
+  const months=gerMonthsList();
   const cls='sel-'+gerCur.toLowerCase();
   document.getElementById('ger-mes-btns').innerHTML=months.map((m,i)=>`<button class="mes-btn ${gerSel.has(i)?cls:''}" onclick="gerToggle(${i})">${m.mes}</button>`).join('');
 }
 function gerToggle(i){if(gerSel.has(i)){if(gerSel.size===1)return;gerSel.delete(i)}else gerSel.add(i);buildGerFilter();renderGer()}
-function gerAll(){gerSel=new Set((DATA.plano[gerCur]?.months||[]).map((_,i)=>i));buildGerFilter();renderGer()}
-function gerClear(){const m=DATA.plano[gerCur]?.months||[];const lr=m.reduce((l,x,i)=>x.rReal>0?i:l,0);gerSel=new Set([lr]);buildGerFilter();renderGer()}
+function gerAll(){gerSel=new Set(gerMonthsList().map((_,i)=>i));buildGerFilter();renderGer()}
+function gerClear(){const m=gerMonthsList();const lr=m.reduce((l,x,i)=>x.rReal>0?i:l,0);gerSel=new Set([lr]);buildGerFilter();renderGer()}
+
+function mergeMonths(monthsArr){
+  // Agrega arrays de meses de múltiplas empresas somando campos numéricos e unindo canais/tópicos
+  const byMesNum={};
+  monthsArr.forEach(months=>{
+    months.forEach(m=>{
+      const key=m.mes_num+'_'+m.ano;
+      if(!byMesNum[key]) byMesNum[key]={mes:m.mes,mes_num:m.mes_num,ano:m.ano,rPrev:0,rReal:0,dPrev:0,dReal:0,resPrev:0,resReal:0,canais:{},topicos:[]};
+      const agg=byMesNum[key];
+      agg.rPrev+=m.rPrev||0; agg.rReal+=m.rReal||0;
+      agg.dPrev+=m.dPrev||0; agg.dReal+=m.dReal||0;
+      agg.resPrev+=m.resPrev||0; agg.resReal+=m.resReal||0;
+      // Canais
+      for(const[cn,cv] of Object.entries(m.canais||{})){
+        if(!agg.canais[cn])agg.canais[cn]={prev:0,real:0};
+        agg.canais[cn].prev+=(cv.prev||0); agg.canais[cn].real+=(cv.real||0);
+      }
+      // Tópicos
+      (m.topicos||[]).forEach(t=>{
+        let at=agg.topicos.find(x=>x.label===t.label);
+        if(!at){at={label:t.label,prev:0,real:0,subs:[]};agg.topicos.push(at);}
+        at.prev+=(t.prev||0); at.real+=(t.real||0);
+        (t.subs||[]).forEach(s=>{
+          let as=at.subs.find(x=>x.label===s.label);
+          if(!as){as={label:s.label,prev:0,real:0};at.subs.push(as);}
+          as.prev+=(s.prev||0); as.real+=(s.real||0);
+        });
+      });
+    });
+  });
+  return Object.values(byMesNum).sort((a,b)=>a.ano!==b.ano?a.ano-b.ano:a.mes_num-b.mes_num);
+}
 
 function renderGer(){
-  const co=DATA.plano[gerCur];if(!co)return;
-  const months=(co.months||[]).filter((_,i)=>gerSel.has(i));
+  const allMonths=gerMonthsList();
+  const months=allMonths.filter((_,i)=>gerSel.has(i));
   if(!months.length)return;
-  const color=co.color;
+  const color=gerCur==='GRUPO'?'#a855f7':(DATA.plano[gerCur]?.color||'#6366f1');
   const totRR=months.reduce((s,m)=>s+m.rReal,0),totRP=months.reduce((s,m)=>s+m.rPrev,0);
   const totDR=months.reduce((s,m)=>s+m.dReal,0),totDP=months.reduce((s,m)=>s+m.dPrev,0);
   const totResR=months.reduce((s,m)=>s+m.resReal,0),totResP=months.reduce((s,m)=>s+m.resPrev,0);
