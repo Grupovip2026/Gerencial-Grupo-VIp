@@ -259,6 +259,12 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
   <button class="nav-item" onclick="setPage('fluxo')">
     <span class="nav-icon">💵</span> Fluxo de Caixa
   </button>
+  <button class="nav-item" onclick="setPage('contas-pagar')">
+    <span class="nav-icon">📤</span> Contas a Pagar
+  </button>
+  <button class="nav-item" onclick="setPage('contas-receber')">
+    <span class="nav-icon">📥</span> Contas a Receber
+  </button>
   <button class="nav-item" onclick="setPage('contacorrente')">
     <span class="nav-icon">🏦</span> Conta Corrente
   </button>
@@ -802,6 +808,8 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
 <div class="footer" id="footer"></div>
 
 <div id="page-fluxo" class="page"></div>
+<div id="page-contas-pagar" class="page"></div>
+<div id="page-contas-receber" class="page"></div>
 
 <!-- ══ MODAL EDITAR LANÇAMENTO (Fluxo de Caixa) ══ -->
 <div id="fc-edit-modal" style="display:none">
@@ -895,6 +903,7 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
 
   <!-- PAINEL ITAÚ -->
   <div class="cc-panel cc-active" id="cc-panel-itau">
+    <pre id="cc-debug-itau" style="display:none;background:#111;color:#0f0;font-size:10px;padding:8px;border-radius:6px;overflow:auto;max-height:200px;white-space:pre-wrap;margin-bottom:8px"></pre>
     <input type="file" id="cc-file-itau" accept=".pdf" style="display:none" onchange="ccProcessPDF(this,'itau')">
     <div class="cc-topbar">
       <div class="cc-status" id="cc-status-itau"><span class="dot"></span> Nenhum extrato carregado</div>
@@ -1653,6 +1662,8 @@ function setPage(p){
   if(p==='vendas') renderVendasML();
   if(p==='vendas-vidal') renderVendasVidal();
   if(p==='fluxo') renderFluxo();
+  if(p==='contas-pagar' && typeof renderContasPagar==='function') renderContasPagar();
+  if(p==='contas-receber' && typeof renderContasReceber==='function') renderContasReceber();
   if(p==='marketing' && typeof renderMarketing==='function') renderMarketing();
   if(p==='rh' && typeof _rhRenderAll==='function') _rhRenderAll();
   if(p==='divida' && typeof fornRender==='function') fornRender();
@@ -3167,10 +3178,9 @@ function renderOrc2027(){
 </style>
 
 <div class="fc-view-tabs">
-  <button class="fc-vtab fc-active" onclick="fcSetView('lancamentos')">📝 Lançamentos</button>
+  <button class="fc-vtab fc-active" onclick="fcSetView('dia')">📅 Dia a Dia</button>
   <button class="fc-vtab" onclick="fcSetView('mensal')">📆 Resumo Mensal</button>
   <button class="fc-vtab" onclick="fcSetView('grafico')">📈 Gráficos</button>
-  <button class="fc-vtab" onclick="fcSetView('relatorio')">🖨️ Rel. Pagamentos</button>
 </div>
 
 <!-- ── Saldo inicial ── -->
@@ -3190,69 +3200,8 @@ function renderOrc2027(){
   </div>
 </div>
 
-<!-- ══ VIEW: LANÇAMENTOS ══ -->
-<div class="fc-section fc-show" id="fc-view-lancamentos">
-  <div class="fc-form">
-    <div class="fc-form-title">+ Novo Lançamento</div>
-    <div class="fc-form-row">
-      <div class="fc-field"><label>Data</label><input type="date" id="fc-data" min="2026-11-01" max="2027-12-31"></div>
-      <div class="fc-field"><label>Descrição</label><input type="text" id="fc-desc" placeholder="Ex: Pagamento Fornecedor X"></div>
-      <div class="fc-field"><label>Tipo</label><select id="fc-tipo" onchange="fcToggleNatureza()"><option value="ENTRADA">ENTRADA</option><option value="SAÍDA">SAÍDA</option></select></div>
-      <div class="fc-field"><label>Conta</label><select id="fc-conta"><option value="Itaú">Itaú</option><option value="Sicoob">Sicoob</option></select></div>
-      <div class="fc-field"><label>Valor (R$)</label><input type="number" id="fc-valor" step="0.01" placeholder="0,00" min="0"></div>
-      <div class="fc-field"><label>Empresa</label><select id="fc-empresa"><option value="">— Todas —</option><option value="VIP">VIP</option><option value="VIDAL">Vidal</option><option value="V3">V3</option></select></div>
-      <div class="fc-field fc-field-natureza" id="fc-field-natureza-wrap"><label>Natureza da Despesa</label><select id="fc-natureza"><option value="">— Selecione —</option><option value="cmv">CMV (Matéria Prima)</option><option value="dPessoal">Despesas de Pessoal</option><option value="dMarketing">Marketing</option><option value="dTaxas">Taxas de Plataforma</option><option value="dFinanc">Financiamentos</option><option value="impostos">Impostos</option><option value="devolucoes">Cancelamentos / Devoluções</option><option value="dOutras">Outras Despesas</option></select></div>
-      <div class="fc-field"><label>Categoria</label><input type="text" id="fc-cat" placeholder="Ex: Fornecedores"></div>
-    </div>
-    <div style="margin-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-      <button class="fc-btn fc-btn-add" onclick="fcAddLancamento()">Adicionar</button>
-      <div style="width:1px;height:28px;background:rgba(255,255,255,.1);margin:0 4px"></div>
-      <label class="fc-btn" style="background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3);cursor:pointer;display:inline-flex;align-items:center;gap:6px">
-        📥 Importar Excel
-        <input type="file" id="fc-xlsx-input" accept=".xlsx,.xls" style="display:none" onchange="fcImportarExcel(this)">
-      </label>
-      <button class="fc-btn" style="background:rgba(255,107,107,.1);color:#FF6B6B;border:1px solid rgba(255,107,107,.25)" onclick="fcLimparTudo()">🗑 Limpar tudo</button>
-      <button class="fc-btn" style="background:rgba(0,201,167,.1);color:#00C9A7;border:1px solid rgba(0,201,167,.25)" onclick="fcBaixarModelo()">📄 Baixar modelo .xlsx</button>
-      <button class="fc-btn" style="background:rgba(99,102,241,.12);color:#818cf8;border:1px solid rgba(99,102,241,.3)" onclick="fcExportarLancamentos()">⬇️ Exportar lançamentos</button>
-      <span id="fc-msg" style="font-size:12px;color:#00C9A7;display:none"></span>
-    </div>
-  </div>
-  <div class="fc-kpis" id="fc-kpis-lanc"></div>
-  <div class="fc-filter-bar">
-    <input class="fc-search" id="fc-search" placeholder="🔍  Buscar descrição, conta ou categoria..." oninput="fcRenderLancamentos()">
-    <select class="fc-field" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:6px;color:#fff;font-size:13px;padding:8px 10px;outline:none" id="fc-filtro-conta" onchange="fcRenderLancamentos()">
-      <option value="">Todas as contas</option>
-      <option value="Itaú">Itaú</option>
-      <option value="Sicoob">Sicoob</option>
-    </select>
-    <select class="fc-field" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:6px;color:#fff;font-size:13px;padding:8px 10px;outline:none" id="fc-filtro-tipo" onchange="fcRenderLancamentos()">
-      <option value="">Todos os tipos</option>
-      <option value="ENTRADA">ENTRADA</option>
-      <option value="SAÍDA">SAÍDA</option>
-    </select>
-    <select class="fc-field" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:6px;color:#fff;font-size:13px;padding:8px 10px;outline:none" id="fc-filtro-empresa" onchange="fcRenderLancamentos()">
-      <option value="">Todas as empresas</option>
-      <option value="VIP">VIP</option>
-      <option value="VIDAL">Vidal</option>
-      <option value="V3">V3</option>
-    </select>
-    <select class="fc-field" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:6px;color:#fff;font-size:13px;padding:8px 10px;outline:none" id="fc-filtro-natureza" onchange="fcRenderLancamentos()">
-      <option value="">Todas as naturezas</option>
-      <option value="cmv">CMV</option>
-      <option value="dPessoal">Pessoal</option>
-      <option value="dMarketing">Marketing</option>
-      <option value="dTaxas">Taxas Plataforma</option>
-      <option value="dFinanc">Financiamentos</option>
-      <option value="impostos">Impostos</option>
-      <option value="devolucoes">Cancelamentos</option>
-      <option value="dOutras">Outras</option>
-    </select>
-  </div>
-  <div class="fc-tbl-wrap"><table class="fc-tbl" id="fc-tbl-lanc"></table></div>
-</div>
-
 <!-- ══ VIEW: SALDO DIA A DIA ══ -->
-<div class="fc-section" id="fc-view-dia">
+<div class="fc-section fc-show" id="fc-view-dia">
   <div class="fc-filter-bar" style="margin-bottom:14px">
     <span style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:1px">Filtrar mês:</span>
     <select style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:6px;color:#fff;font-size:13px;padding:7px 10px;outline:none" id="fc-filtro-mes" onchange="fcRenderDia()">
@@ -3295,33 +3244,6 @@ function renderOrc2027(){
   </div>
 </div>
 
-<!-- ── Relatório de Pagamentos ── -->
-<div class="fc-section" id="fc-view-relatorio">
-  <div class="fc-relat-toolbar">
-    <div class="fc-relat-group">
-      <label class="fc-relat-lbl">📅 Data</label>
-      <input type="date" id="fc-relat-data" class="fc-relat-input" onchange="fcRenderRelatorio()">
-    </div>
-    <div class="fc-relat-group">
-      <label class="fc-relat-lbl">🏦 Conta</label>
-      <select id="fc-relat-conta" class="fc-relat-input" onchange="fcRenderRelatorio()">
-        <option value="">Todas</option>
-        <option value="Itaú">Itaú</option>
-        <option value="Sicoob">Sicoob</option>
-      </select>
-    </div>
-    <div class="fc-relat-group">
-      <label class="fc-relat-lbl">📂 Categoria</label>
-      <select id="fc-relat-cat" class="fc-relat-input" onchange="fcRenderRelatorio()">
-        <option value="">Todas</option>
-      </select>
-    </div>
-    <div class="fc-relat-group" style="align-self:flex-end">
-      <button class="fc-btn fc-btn-print" onclick="fcImprimirRelatorio()">🖨️ Imprimir / PDF</button>
-    </div>
-  </div>
-  <div id="fc-relat-resumo" class="fc-relat-resumo"></div>
-  <div id="fc-relat-corpo"></div>
 </div>`;
 
     // preenche selos de mês no filtro
@@ -3340,11 +3262,8 @@ function renderOrc2027(){
     pg.querySelector('#fc-si-itau').value=sl.itau||0;
     pg.querySelector('#fc-si-sicoob').value=sl.sicoob||0;
 
-    // define data padrão como hoje se dentro do período
-    const hoje=isoDate(new Date());
-    const inp=pg.querySelector('#fc-data');
-    if(hoje>='2026-11-01'&&hoje<='2027-12-31') inp.value=hoje;
-    else inp.value='2026-11-01';
+    // renderiza dia a dia por padrão
+    fcRenderDia();
   }
 
   window.fcSaveSaldos=function(){
@@ -3355,13 +3274,13 @@ function renderOrc2027(){
   };
 
   window.fcSetView=function(v){
-    document.querySelectorAll('.fc-vtab').forEach((t,i)=>t.classList.toggle('fc-active',['lancamentos','mensal','grafico','relatorio'][i]===v));
+    document.querySelectorAll('.fc-vtab').forEach((t,i)=>t.classList.toggle('fc-active',['dia','mensal','grafico'][i]===v));
     document.querySelectorAll('.fc-section').forEach(s=>s.classList.remove('fc-show'));
-    document.getElementById('fc-view-'+v).classList.add('fc-show');
+    const sec=document.getElementById('fc-view-'+v);
+    if(sec) sec.classList.add('fc-show');
     if(v==='dia') fcRenderDia();
     if(v==='mensal') fcRenderMensal();
     if(v==='grafico') fcRenderGraficos();
-    if(v==='relatorio') fcInitRelatorio();
   };
 
   window.fcToggleNatureza=function(){
@@ -3652,8 +3571,6 @@ function renderOrc2027(){
   };
 
   function refreshFluxo(){
-    fcRenderKpis();
-    fcRenderLancamentos();
     // re-render seção ativa do fluxo
     const ativa=document.querySelector('.fc-section.fc-show');
     if(ativa){
@@ -3662,6 +3579,9 @@ function renderOrc2027(){
       if(vid==='mensal') fcRenderMensal();
       if(vid==='grafico') fcRenderGraficos();
     }
+    // atualiza Contas a Pagar / Receber se página ativa
+    if(typeof cpRender==='function') { try{ cpRender(); }catch(e){} }
+    if(typeof crRender==='function') { try{ crRender(); }catch(e){} }
     // ── Atualização em tempo real do DRE e Gerencial ──
     if(typeof fcInjectDRE==='function') fcInjectDRE();
     // Re-render se a aba DRE ou Gerencial estiver ativa
@@ -4335,9 +4255,11 @@ loadData();
           window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
         }
         const { text, rawLines } = await extractPDFText(typedArray);
-        // debug: mostra primeiras linhas no console para diagnóstico
+        // debug: mostra primeiras 20 linhas na tela para diagnóstico
         console.log('[CC] Primeiras 40 linhas extraídas do PDF ('+banco+'):');
         rawLines.slice(0,40).forEach((l,i)=>console.log(i+': '+l));
+        const dbgEl = document.getElementById('cc-debug-'+banco);
+        if(dbgEl){ dbgEl.style.display='block'; dbgEl.textContent = 'DEBUG LINHAS PDF:\n' + rawLines.slice(0,25).map((l,i)=>i+': '+l).join('\n'); }
         const result = parseBankStatement(text, banco);
         // atribui IDs únicos e normaliza _dataISO (YYYY-MM-DD) para filtros
         const anoAtual = new Date().getFullYear();
@@ -6303,6 +6225,345 @@ loadData();
 
   // expõe render para setPage hook
   window.cchequeRender = window.cchequeRender;
+})();
+
+/* ═══════════════════════════════════════════════════
+   CONTAS A PAGAR / CONTAS A RECEBER
+═══════════════════════════════════════════════════ */
+(function(){
+
+  /* ── helpers de dados ───────────────────────────── */
+  function getFcLancamentos(){
+    try{ return JSON.parse(localStorage.getItem('fc_lancamentos')||'[]'); }catch(e){ return []; }
+  }
+  function getCcLancamentos(){
+    // lê todos os bancos em CC
+    let all = [];
+    try{
+      const cc = JSON.parse(localStorage.getItem('cc_data')||'{}');
+      Object.values(cc).forEach(banco=>{
+        if(banco && Array.isArray(banco.lancamentos)){
+          banco.lancamentos.forEach(l=>all.push({...l, _origem:'banco'}));
+        }
+      });
+    }catch(e){}
+    return all;
+  }
+  function getManualCP(){
+    try{ return JSON.parse(localStorage.getItem('cp_manual')||'[]'); }catch(e){ return []; }
+  }
+  function getManualCR(){
+    try{ return JSON.parse(localStorage.getItem('cr_manual')||'[]'); }catch(e){ return []; }
+  }
+  function saveManualCP(arr){
+    localStorage.setItem('cp_manual', JSON.stringify(arr));
+  }
+  function saveManualCR(arr){
+    localStorage.setItem('cr_manual', JSON.stringify(arr));
+  }
+  function fmtMoeda(v){
+    return 'R$ '+(+v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  }
+  function fmtData(d){
+    if(!d) return '-';
+    if(d.includes('T')) d=d.split('T')[0];
+    const [y,m,dd]=d.split('-');
+    return dd+'/'+m+'/'+y;
+  }
+
+  /* ── getAllSaidas: FC saídas + CC saídas + manuais CP ── */
+  function getAllSaidas(){
+    const rows = [];
+    // FC lançamentos tipo saida
+    getFcLancamentos().filter(l=>l.tipo==='saida').forEach(l=>{
+      rows.push({
+        data: l.data||'',
+        descricao: l.descricao||l.categoria||'',
+        categoria: l.categoria||'',
+        valor: Math.abs(+l.valor||0),
+        status: 'realizado',
+        origem: 'Fluxo de Caixa',
+        _id: l.id||null
+      });
+    });
+    // CC banco importações (tipo saída/debito)
+    getCcLancamentos().filter(l=> l.tipo==='saida'||l.tipo==='debito'||l.tipo==='saída'||(+l.valor<0)).forEach(l=>{
+      rows.push({
+        data: l.data||'',
+        descricao: l.descricao||l.historico||'',
+        categoria: l.categoria||'Banco',
+        valor: Math.abs(+l.valor||0),
+        status: 'realizado',
+        origem: l._banco||'Banco',
+        _id: l.id||null
+      });
+    });
+    // manuais CP
+    getManualCP().forEach(l=>{
+      rows.push({...l, origem:'Manual', _manual:true});
+    });
+    return rows.sort((a,b)=>(b.data||'').localeCompare(a.data||''));
+  }
+
+  /* ── getAllEntradas: FC entradas + CC entradas + manuais CR ── */
+  function getAllEntradas(){
+    const rows = [];
+    getFcLancamentos().filter(l=>l.tipo==='entrada').forEach(l=>{
+      rows.push({
+        data: l.data||'',
+        descricao: l.descricao||l.categoria||'',
+        categoria: l.categoria||'',
+        valor: Math.abs(+l.valor||0),
+        status: 'realizado',
+        origem: 'Fluxo de Caixa',
+        _id: l.id||null
+      });
+    });
+    getCcLancamentos().filter(l=> l.tipo==='entrada'||l.tipo==='credito'||l.tipo==='crédito'||(+l.valor>0 && l.tipo!=='saida'&&l.tipo!=='debito')).forEach(l=>{
+      rows.push({
+        data: l.data||'',
+        descricao: l.descricao||l.historico||'',
+        categoria: l.categoria||'Banco',
+        valor: Math.abs(+l.valor||0),
+        status: 'realizado',
+        origem: l._banco||'Banco',
+        _id: l.id||null
+      });
+    });
+    getManualCR().forEach(l=>{
+      rows.push({...l, origem:'Manual', _manual:true});
+    });
+    return rows.sort((a,b)=>(b.data||'').localeCompare(a.data||''));
+  }
+
+  /* ── renderContasPagar ───────────────────────────── */
+  function renderContasPagar(){
+    const el = document.getElementById('page-contas-pagar');
+    if(!el) return;
+
+    const rows = getAllSaidas();
+    const total = rows.reduce((s,r)=>s+(+r.valor||0),0);
+    const pendente = rows.filter(r=>r.status==='pendente').reduce((s,r)=>s+(+r.valor||0),0);
+    const realizado = rows.filter(r=>r.status!=='pendente').reduce((s,r)=>s+(+r.valor||0),0);
+
+    el.innerHTML = `
+<div class="page-header"><h2>📤 Contas a Pagar</h2></div>
+<div style="padding:0 24px 24px">
+
+  <!-- KPIs -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px">
+    <div class="kpi-card"><div class="kpi-label">Total</div><div class="kpi-value" style="color:#ef4444">${fmtMoeda(total)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Realizado</div><div class="kpi-value" style="color:#f97316">${fmtMoeda(realizado)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Pendente</div><div class="kpi-value" style="color:#eab308">${fmtMoeda(pendente)}</div></div>
+  </div>
+
+  <!-- Lançamento manual -->
+  <div class="card" style="margin-bottom:20px">
+    <h4 style="margin:0 0 14px;color:var(--text-secondary);font-size:13px;text-transform:uppercase;letter-spacing:.5px">➕ Novo Lançamento</h4>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 120px 120px auto;gap:10px;align-items:end">
+      <div><label style="font-size:11px;color:var(--text-secondary)">Descrição</label>
+        <input id="cp-desc" class="form-input" placeholder="Ex: Fornecedor X"></div>
+      <div><label style="font-size:11px;color:var(--text-secondary)">Categoria</label>
+        <input id="cp-cat" class="form-input" placeholder="Ex: Matéria prima"></div>
+      <div><label style="font-size:11px;color:var(--text-secondary)">Data venc.</label>
+        <input id="cp-data" type="date" class="form-input"></div>
+      <div><label style="font-size:11px;color:var(--text-secondary)">Valor (R$)</label>
+        <input id="cp-valor" type="number" class="form-input" placeholder="0,00" min="0" step="0.01"></div>
+      <div><label style="font-size:11px;color:var(--text-secondary)">Status</label>
+        <select id="cp-status" class="form-input">
+          <option value="pendente">Pendente</option>
+          <option value="realizado">Pago</option>
+        </select></div>
+      <div><button class="btn-primary" onclick="cpAddManual()" style="height:36px;white-space:nowrap">Adicionar</button></div>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+    <input id="cp-search" class="form-input" placeholder="🔍 Buscar..." style="max-width:220px"
+      oninput="cpRenderTable()">
+    <select id="cp-filtro-status" class="form-input" style="max-width:160px" onchange="cpRenderTable()">
+      <option value="">Todos os status</option>
+      <option value="pendente">Pendente</option>
+      <option value="realizado">Pago</option>
+    </select>
+  </div>
+
+  <!-- Tabela -->
+  <div id="cp-tabela"></div>
+</div>`;
+
+    cpRenderTable();
+  }
+
+  window.cpAddManual = function(){
+    const desc = document.getElementById('cp-desc').value.trim();
+    const cat  = document.getElementById('cp-cat').value.trim();
+    const data = document.getElementById('cp-data').value;
+    const valor= parseFloat(document.getElementById('cp-valor').value||0);
+    const status= document.getElementById('cp-status').value;
+    if(!desc){ alert('Informe a descrição.'); return; }
+    if(!valor){ alert('Informe o valor.'); return; }
+    const arr = getManualCP();
+    arr.push({ id:'cp_'+Date.now(), descricao:desc, categoria:cat, data, valor, status, _manual:true });
+    saveManualCP(arr);
+    renderContasPagar();
+  };
+
+  window.cpDeleteManual = function(id){
+    if(!confirm('Remover este lançamento?')) return;
+    saveManualCP(getManualCP().filter(r=>r.id!==id));
+    renderContasPagar();
+  };
+
+  window.cpRenderTable = function(){
+    const rows = getAllSaidas();
+    const q = (document.getElementById('cp-search')||{}).value||'';
+    const st= (document.getElementById('cp-filtro-status')||{}).value||'';
+    const filtered = rows.filter(r=>{
+      if(q && !((r.descricao||'').toLowerCase().includes(q.toLowerCase())||(r.categoria||'').toLowerCase().includes(q.toLowerCase()))) return false;
+      if(st && r.status!==st) return false;
+      return true;
+    });
+    const el = document.getElementById('cp-tabela');
+    if(!el) return;
+    if(!filtered.length){ el.innerHTML='<div style="color:var(--text-secondary);text-align:center;padding:32px">Nenhum lançamento encontrado.</div>'; return; }
+    el.innerHTML=`<table class="data-table"><thead><tr>
+      <th>Data</th><th>Descrição</th><th>Categoria</th><th>Origem</th><th>Status</th><th style="text-align:right">Valor</th><th></th>
+    </tr></thead><tbody>`+
+    filtered.map(r=>`<tr>
+      <td>${fmtData(r.data)}</td>
+      <td>${r.descricao||'-'}</td>
+      <td>${r.categoria||'-'}</td>
+      <td><span style="font-size:11px;background:var(--bg-secondary);padding:2px 7px;border-radius:10px">${r.origem||'-'}</span></td>
+      <td><span style="font-size:11px;padding:2px 7px;border-radius:10px;background:${r.status==='pendente'?'rgba(234,179,8,.15)':'rgba(34,197,94,.15)'};color:${r.status==='pendente'?'#eab308':'#22c55e'}">${r.status==='pendente'?'Pendente':'Pago'}</span></td>
+      <td style="text-align:right;color:#ef4444;font-weight:600">${fmtMoeda(r.valor)}</td>
+      <td>${r._manual?`<button onclick="cpDeleteManual('${r.id}')" style="background:none;border:none;cursor:pointer;color:#ef4444;font-size:14px" title="Remover">🗑</button>`:''}
+      </td>
+    </tr>`).join('')+
+    `</tbody><tfoot><tr>
+      <td colspan="5" style="text-align:right;font-weight:700;padding:10px 8px">Total filtrado:</td>
+      <td style="text-align:right;font-weight:700;color:#ef4444">${fmtMoeda(filtered.reduce((s,r)=>s+(+r.valor||0),0))}</td>
+      <td></td>
+    </tr></tfoot></table>`;
+  };
+
+  /* ── renderContasReceber ─────────────────────────── */
+  function renderContasReceber(){
+    const el = document.getElementById('page-contas-receber');
+    if(!el) return;
+
+    const rows = getAllEntradas();
+    const total = rows.reduce((s,r)=>s+(+r.valor||0),0);
+    const pendente = rows.filter(r=>r.status==='pendente').reduce((s,r)=>s+(+r.valor||0),0);
+    const realizado = rows.filter(r=>r.status!=='pendente').reduce((s,r)=>s+(+r.valor||0),0);
+
+    el.innerHTML = `
+<div class="page-header"><h2>📥 Contas a Receber</h2></div>
+<div style="padding:0 24px 24px">
+
+  <!-- KPIs -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px">
+    <div class="kpi-card"><div class="kpi-label">Total</div><div class="kpi-value" style="color:#22c55e">${fmtMoeda(total)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Recebido</div><div class="kpi-value" style="color:#3b82f6">${fmtMoeda(realizado)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Pendente</div><div class="kpi-value" style="color:#eab308">${fmtMoeda(pendente)}</div></div>
+  </div>
+
+  <!-- Lançamento manual -->
+  <div class="card" style="margin-bottom:20px">
+    <h4 style="margin:0 0 14px;color:var(--text-secondary);font-size:13px;text-transform:uppercase;letter-spacing:.5px">➕ Novo Lançamento</h4>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 120px 120px auto;gap:10px;align-items:end">
+      <div><label style="font-size:11px;color:var(--text-secondary)">Descrição</label>
+        <input id="cr-desc" class="form-input" placeholder="Ex: Cliente Y"></div>
+      <div><label style="font-size:11px;color:var(--text-secondary)">Categoria</label>
+        <input id="cr-cat" class="form-input" placeholder="Ex: Venda"></div>
+      <div><label style="font-size:11px;color:var(--text-secondary)">Data prev.</label>
+        <input id="cr-data" type="date" class="form-input"></div>
+      <div><label style="font-size:11px;color:var(--text-secondary)">Valor (R$)</label>
+        <input id="cr-valor" type="number" class="form-input" placeholder="0,00" min="0" step="0.01"></div>
+      <div><label style="font-size:11px;color:var(--text-secondary)">Status</label>
+        <select id="cr-status" class="form-input">
+          <option value="pendente">Pendente</option>
+          <option value="realizado">Recebido</option>
+        </select></div>
+      <div><button class="btn-primary" onclick="crAddManual()" style="height:36px;white-space:nowrap">Adicionar</button></div>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+    <input id="cr-search" class="form-input" placeholder="🔍 Buscar..." style="max-width:220px"
+      oninput="crRenderTable()">
+    <select id="cr-filtro-status" class="form-input" style="max-width:160px" onchange="crRenderTable()">
+      <option value="">Todos os status</option>
+      <option value="pendente">Pendente</option>
+      <option value="realizado">Recebido</option>
+    </select>
+  </div>
+
+  <!-- Tabela -->
+  <div id="cr-tabela"></div>
+</div>`;
+
+    crRenderTable();
+  }
+
+  window.crAddManual = function(){
+    const desc = document.getElementById('cr-desc').value.trim();
+    const cat  = document.getElementById('cr-cat').value.trim();
+    const data = document.getElementById('cr-data').value;
+    const valor= parseFloat(document.getElementById('cr-valor').value||0);
+    const status= document.getElementById('cr-status').value;
+    if(!desc){ alert('Informe a descrição.'); return; }
+    if(!valor){ alert('Informe o valor.'); return; }
+    const arr = getManualCR();
+    arr.push({ id:'cr_'+Date.now(), descricao:desc, categoria:cat, data, valor, status, _manual:true });
+    saveManualCR(arr);
+    renderContasReceber();
+  };
+
+  window.crDeleteManual = function(id){
+    if(!confirm('Remover este lançamento?')) return;
+    saveManualCR(getManualCR().filter(r=>r.id!==id));
+    renderContasReceber();
+  };
+
+  window.crRenderTable = function(){
+    const rows = getAllEntradas();
+    const q = (document.getElementById('cr-search')||{}).value||'';
+    const st= (document.getElementById('cr-filtro-status')||{}).value||'';
+    const filtered = rows.filter(r=>{
+      if(q && !((r.descricao||'').toLowerCase().includes(q.toLowerCase())||(r.categoria||'').toLowerCase().includes(q.toLowerCase()))) return false;
+      if(st && r.status!==st) return false;
+      return true;
+    });
+    const el = document.getElementById('cr-tabela');
+    if(!el) return;
+    if(!filtered.length){ el.innerHTML='<div style="color:var(--text-secondary);text-align:center;padding:32px">Nenhum lançamento encontrado.</div>'; return; }
+    el.innerHTML=`<table class="data-table"><thead><tr>
+      <th>Data</th><th>Descrição</th><th>Categoria</th><th>Origem</th><th>Status</th><th style="text-align:right">Valor</th><th></th>
+    </tr></thead><tbody>`+
+    filtered.map(r=>`<tr>
+      <td>${fmtData(r.data)}</td>
+      <td>${r.descricao||'-'}</td>
+      <td>${r.categoria||'-'}</td>
+      <td><span style="font-size:11px;background:var(--bg-secondary);padding:2px 7px;border-radius:10px">${r.origem||'-'}</span></td>
+      <td><span style="font-size:11px;padding:2px 7px;border-radius:10px;background:${r.status==='pendente'?'rgba(234,179,8,.15)':'rgba(34,197,94,.15)'};color:${r.status==='pendente'?'#eab308':'#22c55e'}">${r.status==='pendente'?'Pendente':'Recebido'}</span></td>
+      <td style="text-align:right;color:#22c55e;font-weight:600">${fmtMoeda(r.valor)}</td>
+      <td>${r._manual?`<button onclick="crDeleteManual('${r.id}')" style="background:none;border:none;cursor:pointer;color:#ef4444;font-size:14px" title="Remover">🗑</button>`:''}
+      </td>
+    </tr>`).join('')+
+    `</tbody><tfoot><tr>
+      <td colspan="5" style="text-align:right;font-weight:700;padding:10px 8px">Total filtrado:</td>
+      <td style="text-align:right;font-weight:700;color:#22c55e">${fmtMoeda(filtered.reduce((s,r)=>s+(+r.valor||0),0))}</td>
+      <td></td>
+    </tr></tfoot></table>`;
+  };
+
+  /* ── expõe globals ───────────────────────────────── */
+  window.cpRender = renderContasPagar;
+  window.crRender = renderContasReceber;
+
 })();
 </script>
 </body>
