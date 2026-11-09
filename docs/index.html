@@ -2752,6 +2752,85 @@ window.fornImportarExcel = function(input){
   reader.readAsArrayBuffer(file);
 };
 
+// ── Importar Excel para Contas a Receber ─────────────────────────
+window.crImportarExcel = function(input){
+  const file = input.files[0]; if(!file) return;
+  const normalize = s => String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').trim();
+  const isoFmt = d => {
+    const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), dd=String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${dd}`;
+  };
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      const wb = XLSX.read(e.target.result, {type:'array', cellDates:true});
+      const sheetName = wb.SheetNames.find(n=>normalize(n).includes('rec')||normalize(n).includes('lan'))||wb.SheetNames[0];
+      const ws = wb.Sheets[sheetName];
+      const rows = XLSX.utils.sheet_to_json(ws, {defval:''});
+      const findVal = (row, ...nomes) => {
+        const keys = Object.keys(row);
+        for(const n of nomes){
+          const k = keys.find(k=>normalize(k).includes(normalize(n)));
+          if(k && row[k]!=='') return row[k];
+        }
+        return '';
+      };
+      let importados=0, erros=0;
+      const novos=[];
+      rows.forEach(row=>{
+        let data  = findVal(row,'data','date','vencimento','venc','prazo');
+        let desc  = findVal(row,'descri','desc','historico','memo','cliente','nome');
+        let valor = findVal(row,'valor','value','amount','vl','total');
+        let cat   = findVal(row,'categ','cat','grupo','group','tipo');
+        let status= findVal(row,'status','situacao','pago','recebido');
+
+        // Normaliza data
+        if(data instanceof Date){ data = isoFmt(data); }
+        else if(typeof data==='number'){ data = isoFmt(new Date(Math.round((data-25569)*86400*1000))); }
+        else if(typeof data==='string' && data){
+          const m = data.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+          if(m) data = `${m[3]}-${m[2]}-${m[1]}`;
+        }
+        if(!data){ erros++; return; }
+
+        // Normaliza valor
+        if(typeof valor==='number'){ valor=Math.abs(valor); }
+        else {
+          const s=String(valor).trim();
+          const temVirgula=s.includes(','), temPonto=s.includes('.');
+          if(temVirgula&&temPonto) valor=parseFloat(s.replace(/[R$\s]/g,'').replace(/\./g,'').replace(',','.'));
+          else if(temVirgula) valor=parseFloat(s.replace(/[R$\s]/g,'').replace(',','.'));
+          else valor=parseFloat(s.replace(/[R$\s]/g,''));
+          valor=Math.abs(valor||0);
+        }
+        if(!valor){ erros++; return; }
+
+        // Normaliza status
+        const stN = normalize(String(status));
+        const stFinal = (stN.includes('pago')||stN.includes('receb')||stN.includes('sim')||stN==='s') ? 'pago' : 'aberto';
+
+        novos.push({ id:'crm_'+Date.now()+'_'+Math.floor(Math.random()*9999), desc:String(desc), cat:String(cat), data, valor, status:stFinal, _manual:true });
+        importados++;
+      });
+
+      if(!novos.length){ alert(`Nenhum lançamento válido encontrado. Erros: ${erros}`); input.value=''; return; }
+
+      // Salva na cr_manual (acumula)
+      let existentes = [];
+      try{ existentes = JSON.parse(localStorage.getItem('cr_manual')||'[]'); }catch(e){}
+      localStorage.setItem('cr_manual', JSON.stringify([...existentes, ...novos]));
+
+      alert(`✅ ${importados} recebíveis importados para Contas a Receber!${erros?' ('+erros+' linhas ignoradas)':''}`);
+      input.value='';
+      if(typeof crRender==='function') crRender();
+    } catch(err){
+      alert('Erro ao ler arquivo: '+err.message);
+      input.value='';
+    }
+  };
+  reader.readAsArrayBuffer(file);
+};
+
 window.fornSetTab = function(tab){
   _fornTab = tab;
   document.getElementById('forn-tab-aberto').className = 'forn-tab' + (tab==='aberto'?' active':'');
@@ -6431,22 +6510,63 @@ loadData();
   window.cpDeleteManual = function(id){ if(!confirm('Remover?'))return; saveManualCP(getManualCP().filter(r=>r.id!==id)); cpRender(); };
   window.crDeleteManual = function(id){ if(!confirm('Remover?'))return; saveManualCR(getManualCR().filter(r=>r.id!==id)); crRender(); };
 
-  window.cpEditManual = function(id){
-    const arr = getManualCP();
-    const item = arr.find(r=>String(r.id)===String(id));
+  window.cpEditManual = function(id){ window.cpEditLanc(id, true); };
+
+  /* Editar qualquer lançamento do CP (manual ou do fluxo) */
+  window.cpEditLanc = function(id, isManual){
+    // Busca o item — manual ou do fluxo
+    let item = isManual
+      ? getManualCP().find(r=>String(r.id)===String(id))
+      : getFluxoLanc().find(r=>String(r.id)===String(id));
     if(!item) return;
     const desc  = prompt('Descrição:', item.desc||'');   if(desc===null) return;
     const cat   = prompt('Categoria:', item.cat||'');    if(cat===null) return;
     const data  = prompt('Data (AAAA-MM-DD):', item.data||''); if(data===null) return;
-    const valor = parseFloat(prompt('Valor:', item.valor||0)); if(isNaN(valor)) return;
+    const valor = parseFloat(prompt('Valor (número):', item.valor||0)); if(isNaN(valor)) return;
     const st    = confirm('Marcar como Pago?') ? 'pago' : 'aberto';
-    const idx   = arr.findIndex(r=>String(r.id)===String(id));
-    arr[idx] = {...item, desc, cat, data, valor, status:st};
-    saveManualCP(arr);
+    if(isManual){
+      const arr = getManualCP();
+      const idx = arr.findIndex(r=>String(r.id)===String(id));
+      arr[idx] = {...item, desc, cat, data, valor, status:st};
+      saveManualCP(arr);
+    } else {
+      const arr = getFluxoLanc();
+      const idx = arr.findIndex(r=>String(r.id)===String(id));
+      arr[idx] = {...item, desc, cat, data, valor: String(valor), status:st};
+      saveFluxoLanc(arr);
+    }
     cpRender();
   };
 
-  window.crEditManual = function(id){
+  window.crEditManual = function(id){ window.crEditLanc(id, true); };
+
+  /* Editar qualquer lançamento do CR (manual ou do fluxo) */
+  window.crEditLanc = function(id, isManual){
+    let item = isManual
+      ? getManualCR().find(r=>String(r.id)===String(id))
+      : getFluxoLanc().find(r=>String(r.id)===String(id));
+    if(!item){ console.warn('crEditLanc: item não encontrado', id, isManual); return; }
+    const desc  = prompt('Descrição:', item.desc||'');   if(desc===null) return;
+    const cat   = prompt('Categoria:', item.cat||'');    if(cat===null) return;
+    const data  = prompt('Data (AAAA-MM-DD):', item.data||''); if(data===null) return;
+    const valor = parseFloat(prompt('Valor (número):', item.valor||0)); if(isNaN(valor)) return;
+    const st    = confirm('Marcar como Recebido?') ? 'pago' : 'aberto';
+    if(isManual){
+      const arr = getManualCR();
+      const idx = arr.findIndex(r=>String(r.id)===String(id));
+      arr[idx] = {...item, desc, cat, data, valor, status:st};
+      saveManualCR(arr);
+    } else {
+      const arr = getFluxoLanc();
+      const idx = arr.findIndex(r=>String(r.id)===String(id));
+      arr[idx] = {...item, desc, cat, data, valor: String(valor), status:st};
+      saveFluxoLanc(arr);
+    }
+    crRender();
+  };
+
+  /* antiga crEditManual inline (preservada para compat) */
+  window._crEditManualOld = function(id){
     const arr = getManualCR();
     const item = arr.find(r=>String(r.id)===String(id));
     if(!item) return;
@@ -6605,7 +6725,7 @@ loadData();
         const btn = isPago
           ? `<button class="btn-reabrir" onclick="cpReabrir('${l.id}')">↩ Reabrir</button>`
           : `<button class="btn-baixar" onclick="cpBaixar('${l.id}')">✅ Baixar</button>`;
-        const editBtn2 = l._manual?`<button onclick="cpEditManual('${l.id}')" style="background:none;border:none;cursor:pointer;color:#38bdf8;font-size:13px;margin-right:4px" title="Editar">✏️</button>`:'';
+        const editBtn2 = `<button onclick="cpEditLanc('${l.id}',${!!l._manual})" style="background:none;border:none;cursor:pointer;color:#38bdf8;font-size:13px;margin-right:4px" title="Editar">✏️</button>`;
         const delBtn2 = `<button onclick="cpDeleteLanc('${l.id}',${!!l._manual})" style="background:none;border:none;cursor:pointer;color:#ef4444;font-size:13px" title="Remover">🗑</button>`;
         html+=`<tr${isPago?' style="opacity:.75"':''}><td style="white-space:nowrap">${fmtD(l.data)}</td>
           <td>${l.desc||'—'}</td><td style="font-size:11px;color:#64748b">${l.cat||'—'}</td>
@@ -6697,6 +6817,10 @@ loadData();
     <button onclick="crLimparData()" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:7px;color:#94a3b8;font-size:12px;padding:6px 12px;cursor:pointer">✖ Limpar</button>
     <input class="forn-search" id="cr-search" placeholder="🔍 Buscar descrição..." oninput="_crRenderBody()">
     <button onclick="crGerarPDF()" style="background:linear-gradient(135deg,#16a34a,#15803d);border:none;border-radius:7px;color:#fff;font-size:12px;font-weight:700;padding:7px 14px;cursor:pointer">📄 Gerar PDF</button>
+    <label style="cursor:pointer;background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.35);border-radius:7px;color:#4ade80;font-size:12px;font-weight:700;padding:7px 14px;display:flex;align-items:center;gap:6px" title="Importar planilha Excel com recebíveis">
+      📥 Importar Excel
+      <input type="file" accept=".xlsx,.xls" style="display:none" onchange="crImportarExcel(this)">
+    </label>
   </div>
 
   <!-- KPIs -->
@@ -6819,7 +6943,7 @@ loadData();
         const btn = isRecebido
           ? `<button class="btn-reabrir" onclick="crReabrir('${l.id}')">↩ Reabrir</button>`
           : `<button class="btn-baixar" onclick="crBaixar('${l.id}')">✅ Receber</button>`;
-        const editBtn = l._manual?`<button onclick="crEditManual('${l.id}')" style="background:none;border:none;cursor:pointer;color:#38bdf8;font-size:13px;margin-right:4px" title="Editar">✏️</button>`:'';
+        const editBtn = `<button onclick="crEditLanc('${l.id}',${!!l._manual})" style="background:none;border:none;cursor:pointer;color:#38bdf8;font-size:13px;margin-right:4px" title="Editar">✏️</button>`;
         const delBtn = `<button onclick="crDeleteLanc('${l.id}',${!!l._manual})" style="background:none;border:none;cursor:pointer;color:#ef4444;font-size:13px" title="Remover">🗑</button>`;
         html+=`<tr${isRecebido?' style="opacity:.75"':''}><td style="white-space:nowrap">${fmtD(l.data)}</td>
           <td>${l.desc||'—'}</td><td style="font-size:11px;color:#64748b">${l.cat||'—'}</td>
