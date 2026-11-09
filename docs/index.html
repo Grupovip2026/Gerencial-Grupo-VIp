@@ -4659,19 +4659,24 @@ loadData();
     // valor monetário COM sinal opcional capturado: grupo1=sinal, grupo2=número
     const rValorComSinal = /(-?)([\d]{1,3}(?:\.[\d]{3})*,\d{2})/g;
 
-    // ── Captura "Saldo total" do cabeçalho (antes dos lançamentos) ──
-    // O PDF tem: linha "Saldo total" seguida de linhas com os valores R$ XX,XX
+    // ── Captura "Saldo total" do cabeçalho Itaú ──
+    // PDF.js agrupa itens da mesma linha (mesmo Y) numa única string.
+    // Linha típica: "Saldo total  Limite da conta  Utilizado  Disponível"
+    // Próxima linha: "R$ 52.041,36  R$ 150.000,00  R$ 0,00  R$ 150.000,00"
+    // O primeiro valor monetário dessa linha = Saldo total da conta
     for(let i=0; i<linhas.length; i++){
       const l = linhas[i].trim();
-      if(/^Saldo\s+total$/i.test(l)){
-        // Procura o valor monetário nas próximas linhas (até 5 linhas à frente)
-        for(let j=i+1; j<Math.min(i+6, linhas.length); j++){
-          const lj = linhas[j].trim();
-          // Deve ser um valor como "R$ 52.041,36" ou "52.041,36"
-          const mVal = lj.match(/R?\$?\s*([\d]{1,3}(?:\.[\d]{3})*,\d{2})/);
-          if(mVal){
-            saldoTotalCabecalho = parseValor(mVal[1]);
-            break;
+      if(/Saldo\s+total/i.test(l)){
+        // O valor pode estar na mesma linha ou na próxima
+        const valNaLinha = l.match(/R\$\s*([\d]{1,3}(?:\.[\d]{3})*,\d{2})/);
+        if(valNaLinha){
+          saldoTotalCabecalho = parseValor(valNaLinha[1]);
+        } else {
+          // Próximas linhas até achar R$ XX,XX
+          for(let j=i+1; j<Math.min(i+4, linhas.length); j++){
+            const lj = linhas[j].trim();
+            const mVal = lj.match(/R\$\s*([\d]{1,3}(?:\.[\d]{3})*,\d{2})/);
+            if(mVal){ saldoTotalCabecalho = parseValor(mVal[1]); break; }
           }
         }
         break;
