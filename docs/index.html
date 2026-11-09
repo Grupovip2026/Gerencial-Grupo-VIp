@@ -4650,6 +4650,7 @@ loadData();
   function parseItau(linhas){
     const lancamentos = [];
     let saldoAnterior = 0;
+    let saldoTotalCabecalho = null; // "Saldo total" do cabeçalho Itaú
     const rData      = /^(\d{2}\/\d{2}\/\d{4})/;
     const rCNPJ      = /\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}/;
     const rCPF       = /\d{3}\.\d{3}\.\d{3}-\d{2}/;
@@ -4657,6 +4658,25 @@ loadData();
     const rValorSolo = /^[\d]{1,3}(?:\.[\d]{3})*,\d{2}$/;
     // valor monetário COM sinal opcional capturado: grupo1=sinal, grupo2=número
     const rValorComSinal = /(-?)([\d]{1,3}(?:\.[\d]{3})*,\d{2})/g;
+
+    // ── Captura "Saldo total" do cabeçalho (antes dos lançamentos) ──
+    // O PDF tem: linha "Saldo total" seguida de linhas com os valores R$ XX,XX
+    for(let i=0; i<linhas.length; i++){
+      const l = linhas[i].trim();
+      if(/^Saldo\s+total$/i.test(l)){
+        // Procura o valor monetário nas próximas linhas (até 5 linhas à frente)
+        for(let j=i+1; j<Math.min(i+6, linhas.length); j++){
+          const lj = linhas[j].trim();
+          // Deve ser um valor como "R$ 52.041,36" ou "52.041,36"
+          const mVal = lj.match(/R?\$?\s*([\d]{1,3}(?:\.[\d]{3})*,\d{2})/);
+          if(mVal){
+            saldoTotalCabecalho = parseValor(mVal[1]);
+            break;
+          }
+        }
+        break;
+      }
+    }
 
     for(let i=0; i<linhas.length; i++){
       const l = linhas[i].trim();
@@ -4750,10 +4770,18 @@ loadData();
 
     const totalEnt = lancamentos.filter(l=>l.tipo==='entrada').reduce((s,l)=>s+l.valor,0);
     const totalSai = lancamentos.filter(l=>l.tipo==='saida').reduce((s,l)=>s+l.valor,0);
-    // saldo final = saldo do último lançamento (informado pelo banco) ou recalculado
-    const saldoFinal = lancamentos.length > 0 && lancamentos[lancamentos.length-1].saldo > 0
-      ? lancamentos[lancamentos.length-1].saldo
-      : saldoAnterior + totalEnt - totalSai;
+    // saldo final = "Saldo total" do cabeçalho Itaú (capturado antes dos lançamentos)
+    // ou saldo do último lançamento, ou recalculado
+    let saldoFinal;
+    if(saldoTotalCabecalho !== null){
+      saldoFinal = saldoTotalCabecalho;
+      // se não havia SALDO ANTERIOR no extrato, calcula retroativamente
+      if(saldoAnterior === 0) saldoAnterior = saldoFinal - totalEnt + totalSai;
+    } else if(lancamentos.length > 0 && lancamentos[lancamentos.length-1].saldo > 0){
+      saldoFinal = lancamentos[lancamentos.length-1].saldo;
+    } else {
+      saldoFinal = saldoAnterior + totalEnt - totalSai;
+    }
     return { lancamentos, saldoAnterior, totalEnt, totalSai, saldoFinal };
   }
 
