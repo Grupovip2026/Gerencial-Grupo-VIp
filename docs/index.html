@@ -428,17 +428,17 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
       <option value="Sicoob">Sicoob</option>
     </select>
     <input class="forn-search" id="forn-search" placeholder="🔍 Buscar descrição..." oninput="fornRender()">
+    <label style="cursor:pointer;background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.35);border-radius:7px;color:#38bdf8;font-size:12px;font-weight:700;padding:7px 14px;display:flex;align-items:center;gap:6px" title="Importar planilha Excel com lançamentos">
+      📥 Importar Excel
+      <input type="file" accept=".xlsx,.xls" style="display:none" onchange="fornImportarExcel(this)">
+    </label>
     <button onclick="fornGerarPDF()" style="background:linear-gradient(135deg,#dc2626,#b91c1c);border:none;border-radius:7px;color:#fff;font-size:12px;font-weight:700;padding:7px 14px;cursor:pointer;display:flex;align-items:center;gap:6px">📄 Gerar PDF</button>
   </div>
 </div>
 
 <div class="forn-kpis" id="forn-kpis"></div>
 
-<!-- Abas: A Pagar / Pagas -->
-<div class="forn-tabs">
-  <button class="forn-tab active" id="forn-tab-aberto" onclick="fornSetTab('aberto')">🔴 Contas a Pagar</button>
-  <button class="forn-tab" id="forn-tab-pago" onclick="fornSetTab('pago')">✅ Contas Pagas</button>
-</div>
+
 
 <div id="forn-corpo"></div>
 </div>
@@ -2660,6 +2660,98 @@ window.fornReabrir = function(id){
   const s = fornLoadBaixas(); s.delete(id); fornSaveBaixas(s); fornRender();
 };
 
+// ── Importar Excel para Dívidas Fornecedores ─────────────────────────
+window.fornImportarExcel = function(input){
+  const file = input.files[0]; if(!file) return;
+  const normalize = s => String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').trim();
+  const isoDate = d => {
+    const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), dd=String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${dd}`;
+  };
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      const wb = XLSX.read(e.target.result, {type:'array', cellDates:true});
+      const sheetName = wb.SheetNames.find(n=>normalize(n).includes('lan'))||wb.SheetNames[0];
+      const ws = wb.Sheets[sheetName];
+      const rows = XLSX.utils.sheet_to_json(ws, {defval:''});
+      const findVal = (row, ...nomes) => {
+        const keys = Object.keys(row);
+        for(const n of nomes){
+          const k = keys.find(k=>normalize(k).includes(normalize(n)));
+          if(k && row[k]!=='') return row[k];
+        }
+        return '';
+      };
+      let importados=0, erros=0;
+      const novos=[];
+      rows.forEach(row=>{
+        let data   = findVal(row,'data','date');
+        let desc   = findVal(row,'descri','desc','historico','memo');
+        let tipo   = findVal(row,'tipo','type');
+        let conta  = findVal(row,'conta','bank','account');
+        let valor  = findVal(row,'valor','value','amount','vl');
+        let cat    = findVal(row,'categ','cat','grupo','group');
+        let empresa= findVal(row,'empresa','company','centro');
+        let natureza=findVal(row,'natureza','nat','nature');
+
+        // Normaliza data
+        if(data instanceof Date){ data = isoDate(data); }
+        else if(typeof data==='number'){ data = isoDate(new Date(Math.round((data-25569)*86400*1000))); }
+        else if(typeof data==='string' && data){
+          const m = data.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+          if(m) data = `${m[3]}-${m[2]}-${m[1]}`;
+        }
+        if(!data){ erros++; return; }
+
+        // Normaliza tipo
+        const tipoN = normalize(tipo);
+        if(tipoN.includes('entr')) tipo='ENTRADA';
+        else if(tipoN.includes('sa')||tipoN.includes('debit')||tipoN.includes('paid')) tipo='SAÍDA';
+        else tipo='SAÍDA'; // padrão: despesa
+
+        // Normaliza conta
+        const contaN = normalize(conta);
+        if(contaN.includes('itau')||contaN.includes('itaú')) conta='Itaú';
+        else if(contaN.includes('sic')) conta='Sicoob';
+        // se não reconheceu, mantém como veio
+
+        // Normaliza valor
+        if(typeof valor==='number'){ valor=Math.abs(valor); }
+        else {
+          const s=String(valor).trim();
+          const temVirgula=s.includes(','), temPonto=s.includes('.');
+          if(temVirgula&&temPonto) valor=parseFloat(s.replace(/[R$\s]/g,'').replace(/\./g,'').replace(',','.'));
+          else if(temVirgula) valor=parseFloat(s.replace(/[R$\s]/g,'').replace(',','.'));
+          else valor=parseFloat(s.replace(/[R$\s]/g,''));
+          valor=Math.abs(valor||0);
+        }
+        if(!valor){ erros++; return; }
+
+        novos.push({ id: Date.now()+Math.random(), data, desc:String(desc), tipo, conta, valor, cat:String(cat), empresa:String(empresa), natureza:String(natureza) });
+        importados++;
+      });
+
+      if(!novos.length){ alert(`Nenhum lançamento válido encontrado. Erros: ${erros}`); input.value=''; return; }
+
+      // Salva — ACUMULA com os existentes (evita duplicar por id)
+      let existentes = [];
+      try{ existentes = JSON.parse(localStorage.getItem('fluxo_lancamentos_v1')||'[]'); }catch(e){}
+      // Mescla: mantém existentes + novos
+      const merged = [...existentes, ...novos];
+      localStorage.setItem('fluxo_lancamentos_v1', JSON.stringify(merged));
+
+      alert(`✅ ${importados} lançamentos importados!${erros?' ('+erros+' linhas ignoradas por dados inválidos)':''}`);
+      input.value='';
+      fornRender();
+    } catch(err){
+      alert('Erro ao ler arquivo: '+err.message);
+      input.value='';
+    }
+  };
+  reader.readAsArrayBuffer(file);
+};
+
 window.fornSetTab = function(tab){
   _fornTab = tab;
   document.getElementById('forn-tab-aberto').className = 'forn-tab' + (tab==='aberto'?' active':'');
@@ -2681,8 +2773,6 @@ window.fornLimparData = function(){
 
 window.fornRender = function(){
   const todos   = fornGetLancamentos();
-  const baixas  = fornLoadBaixas();
-  // Todas as despesas (SAÍDA), independente de categoria
   const forn    = todos.filter(l=> l.tipo==='SAÍDA');
 
   const dt1         = document.getElementById('forn-dt1')?.value||'';
@@ -2693,41 +2783,33 @@ window.fornRender = function(){
   const filtrado = forn.filter(l=>{
     if(dt1 && (l.data||'') < dt1) return false;
     if(dt2 && (l.data||'') > dt2) return false;
-    if(filtroConta && l.conta!==filtroConta)               return false;
-    if(q           && !(l.desc||'').toLowerCase().includes(q)) return false;
+    if(filtroConta && l.conta!==filtroConta) return false;
+    if(q && !(l.desc||'').toLowerCase().includes(q)) return false;
     return true;
   });
 
-  const abertos = filtrado.filter(l=>!baixas.has(l.id));
-  const pagos   = filtrado.filter(l=> baixas.has(l.id));
-  const fmtR    = v=>'R$ '+(Number(v)||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-  const fmtD    = s=>{ if(!s)return'—'; const[y,m,d]=s.split('-'); return`${d}/${m}/${y}`; };
-  const totAberto = abertos.reduce((s,l)=>s+(Number(l.valor)||0),0);
-  const totPago   = pagos.reduce((s,l)=>s+(Number(l.valor)||0),0);
+  const fmtR = v=>'R$ '+(Number(v)||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const fmtD = s=>{ if(!s)return'—'; const[y,m,d]=s.split('-'); return`${d}/${m}/${y}`; };
+  const total = filtrado.reduce((s,l)=>s+(Number(l.valor)||0),0);
 
   // KPIs
   document.getElementById('forn-kpis').innerHTML = `
-    <div class="forn-kpi"><div class="forn-kpi-lbl">🔴 Em Aberto</div><div class="forn-kpi-val forn-valor-neg">${fmtR(totAberto)}</div><div style="font-size:11px;color:#64748b;margin-top:4px">${abertos.length} lançamento${abertos.length!==1?'s':''}</div></div>
-    <div class="forn-kpi"><div class="forn-kpi-lbl">✅ Pagos</div><div class="forn-kpi-val forn-valor-pos">${fmtR(totPago)}</div><div style="font-size:11px;color:#64748b;margin-top:4px">${pagos.length} lançamento${pagos.length!==1?'s':''}</div></div>
-    <div class="forn-kpi"><div class="forn-kpi-lbl">💰 Total Despesas</div><div class="forn-kpi-val" style="color:#38bdf8">${fmtR(totAberto+totPago)}</div></div>
-    <div class="forn-kpi"><div class="forn-kpi-lbl">📋 Lançamentos</div><div class="forn-kpi-val" style="color:#e2e8f0">${filtrado.length}</div></div>
+    <div class="forn-kpi"><div class="forn-kpi-lbl">💰 Total Despesas</div><div class="forn-kpi-val forn-valor-neg">${fmtR(total)}</div><div style="font-size:11px;color:#64748b;margin-top:4px">${filtrado.length} lançamento${filtrado.length!==1?'s':''}</div></div>
+    <div class="forn-kpi"><div class="forn-kpi-lbl">📋 Total de Registros</div><div class="forn-kpi-val" style="color:#e2e8f0">${forn.length}</div></div>
   `;
 
-  const lista = _fornTab==='aberto' ? abertos : pagos;
-  const isPago = _fornTab==='pago';
-
-  if(!lista.length){
+  if(!filtrado.length){
     document.getElementById('forn-corpo').innerHTML =
-      `<div class="${isPago?'forn-section-title forn-sec-pago':'forn-section-title forn-sec-aberto'}">${isPago?'✅ Contas Pagas':'🔴 Contas a Pagar'}</div>
-       <p style="color:#475569;padding:20px 14px;font-size:14px">Nenhum lançamento encontrado${forn.length===0?' — adicione lançamentos com categoria <strong>Fornecedores</strong> no Fluxo de Caixa.':''}</p>`;
+      `<div class="forn-section-title forn-sec-aberto">💳 Despesas</div>
+       <p style="color:#475569;padding:20px 14px;font-size:14px">Nenhum lançamento encontrado${forn.length===0?' — importe a planilha Excel para adicionar lançamentos.':''}</p>`;
     return;
   }
 
   // Agrupa por conta
   const porConta = {};
-  lista.forEach(l=>{ const c=l.conta||'Sem conta'; if(!porConta[c]) porConta[c]=[]; porConta[c].push(l); });
+  filtrado.forEach(l=>{ const c=l.conta||'Sem conta'; if(!porConta[c]) porConta[c]=[]; porConta[c].push(l); });
 
-  let html = `<div class="forn-section-title ${isPago?'forn-sec-pago':'forn-sec-aberto'}">${isPago?'✅ Contas Pagas':'🔴 Contas a Pagar'}</div>`;
+  let html = `<div class="forn-section-title forn-sec-aberto">💳 Despesas Lançadas</div>`;
 
   Object.entries(porConta).sort(([a],[b])=>a.localeCompare(b)).forEach(([conta, items])=>{
     const subtotal = items.reduce((s,l)=>s+(Number(l.valor)||0),0);
@@ -2739,46 +2821,34 @@ window.fornRender = function(){
       </div>
       <table class="forn-tbl">
         <thead><tr>
-          <th>Data</th><th>Descrição</th><th style="width:110px">Categoria</th>
-          <th style="width:140px">Valor</th><th style="width:90px">Status</th><th style="width:100px">Ação</th>
+          <th>Data</th><th>Descrição</th><th>Categoria</th><th>Empresa</th><th>Valor</th>
         </tr></thead>
         <tbody>`;
 
     items.sort((a,b)=>(a.data||'').localeCompare(b.data||'')).forEach(l=>{
       const v = Number(l.valor)||0;
-      const badge = isPago
-        ? `<span class="forn-badge-pago">✅ Pago</span>`
-        : `<span class="forn-badge-aberto">🔴 Aberto</span>`;
-      const btn = isPago
-        ? `<button class="btn-reabrir" onclick="fornReabrir(${l.id})">↩ Reabrir</button>`
-        : `<button class="btn-baixar" onclick="fornBaixar(${l.id})">✅ Baixar</button>`;
-      html += `<tr${isPago?' style="opacity:.75"':''}>
+      html += `<tr>
         <td style="white-space:nowrap">${fmtD(l.data)}</td>
         <td>${l.desc||'—'}</td>
         <td style="font-size:11px;color:#64748b">${l.cat||'—'}</td>
+        <td style="font-size:11px;color:#64748b">${l.empresa||'—'}</td>
         <td class="forn-valor-neg">${fmtR(v)}</td>
-        <td>${badge}</td>
-        <td>${btn}</td>
       </tr>`;
     });
 
     html += `
         <tr class="total-row">
-          <td colspan="3" style="text-align:right;font-size:11px;color:#64748b">Subtotal ${conta}</td>
-          <td class="${isPago?'forn-valor-pos':'forn-valor-neg'}">${fmtR(subtotal)}</td>
-          <td colspan="2"></td>
+          <td colspan="4" style="text-align:right;font-size:11px;color:#64748b">Subtotal ${conta}</td>
+          <td class="forn-valor-neg">${fmtR(subtotal)}</td>
         </tr>
-        </tbody>
-      </table>
+        </tbody></table>
     </div>`;
   });
 
-  // Total geral da aba
-  const totAba = lista.reduce((s,l)=>s+(Number(l.valor)||0),0);
   html += `
     <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;margin-top:8px">
-      <span style="font-weight:700;color:#e2e8f0;font-size:14px">💰 TOTAL ${isPago?'PAGO':'A PAGAR'}</span>
-      <span style="font-size:18px;font-weight:800;${isPago?'color:#4ade80':'color:#f87171'}">${fmtR(totAba)}</span>
+      <span style="font-weight:700;color:#e2e8f0;font-size:14px">💰 TOTAL DESPESAS</span>
+      <span style="font-size:18px;font-weight:800;color:#f87171">${fmtR(total)}</span>
     </div>`;
 
   document.getElementById('forn-corpo').innerHTML = html;
@@ -3018,24 +3088,34 @@ function renderOrc2027(){
   // ── calcula saldo acumulado por dia ───────────────
   function calcSaldos(lancamentos, saldoInicialItau, saldoInicialSicoob){
     const dias = gerarDias();
-    // índice por data
-    const entItau={}, saiItau={}, entSic={}, saiSic={};
+    // Entradas e saídas do FC (banco importado)
+    const entDia={}, saiDia={};
     lancamentos.forEach(l=>{
-      if(!l.data||!l.valor||!l.tipo||!l.conta)return;
-      const v=parseMoeda(l.valor);
-      const dt=l.data;
-      if(l.tipo==='ENTRADA'&&l.conta==='Itaú'){entItau[dt]=(entItau[dt]||0)+v;}
-      if(l.tipo==='SAÍDA'  &&l.conta==='Itaú'){saiItau[dt]=(saiItau[dt]||0)+v;}
-      if(l.tipo==='ENTRADA'&&l.conta==='Sicoob'){entSic[dt]=(entSic[dt]||0)+v;}
-      if(l.tipo==='SAÍDA'  &&l.conta==='Sicoob'){saiSic[dt]=(saiSic[dt]||0)+v;}
+      if(!l.data||!l.valor||!l.tipo) return;
+      const v = parseMoeda(l.valor);
+      const dt = l.data;
+      if(l.tipo==='ENTRADA') entDia[dt]=(entDia[dt]||0)+v;
+      if(l.tipo==='SAÍDA')   saiDia[dt]=(saiDia[dt]||0)+v;
     });
-    let sItau=saldoInicialItau, sSic=saldoInicialSicoob;
+    // Previsões do CR (Contas a Receber manuais, status aberto)
+    const crBaixas = new Set(JSON.parse(localStorage.getItem('cr_baixas_v1')||'[]'));
+    const crManual = JSON.parse(localStorage.getItem('cr_manual')||'[]');
+    crManual.filter(r=>r.status!=='pago'&&!crBaixas.has(String(r.id))).forEach(r=>{
+      if(r.data) entDia[r.data]=(entDia[r.data]||0)+(+r.valor||0);
+    });
+    // Previsões do CP (Contas a Pagar manuais, status aberto)
+    const cpBaixas = new Set(JSON.parse(localStorage.getItem('cp_baixas_v1')||'[]'));
+    const cpManual = JSON.parse(localStorage.getItem('cp_manual')||'[]');
+    cpManual.filter(r=>r.status!=='pago'&&!cpBaixas.has(String(r.id))).forEach(r=>{
+      if(r.data) saiDia[r.data]=(saiDia[r.data]||0)+(+r.valor||0);
+    });
+    // Saldo total inicial (Itaú + Sicoob somados)
+    let saldo = saldoInicialItau + saldoInicialSicoob;
     return dias.map(dt=>{
-      const ei=entItau[dt]||0, si=saiItau[dt]||0;
-      const es=entSic[dt]||0, ss=saiSic[dt]||0;
-      sItau=sItau+ei-si;
-      sSic=sSic+es-ss;
-      return {dt, ei, si, sItau, es, ss, sSic};
+      const ent = entDia[dt]||0;
+      const sai = saiDia[dt]||0;
+      saldo = saldo + ent - sai;
+      return {dt, ent, sai, saldo};
     });
   }
 
@@ -3678,12 +3758,15 @@ function renderOrc2027(){
     if(!tbl)return;
     let filtered=saldos;
     if(filtroMes) filtered=filtered.filter(r=>r.dt.startsWith(filtroMes));
-    if(soNeg) filtered=filtered.filter(r=>r.sItau<0||r.sSic<0);
+    if(soNeg) filtered=filtered.filter(r=>r.saldo<0);
 
     let h=`<thead><tr>
       <th style="text-align:left">Data</th>
-      <th>Ent. Itaú</th><th>Saí. Itaú</th><th>Saldo Itaú</th>
-      <th>Ent. Sicoob</th><th>Saí. Sicoob</th><th>Saldo Sicoob</th><th>Alerta</th>
+      <th style="text-align:right">Entradas</th>
+      <th style="text-align:right">Saídas</th>
+      <th style="text-align:right">Saldo do Dia</th>
+      <th style="text-align:right">Saldo Acumulado</th>
+      <th style="text-align:center">Situação</th>
     </tr></thead><tbody>`;
     let prevMes='';
     filtered.forEach(r=>{
@@ -3691,23 +3774,22 @@ function renderOrc2027(){
       if(mes!==prevMes){
         const [y,m]=mes.split('-');
         const NOMES=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-        h+=`<tr class="fc-mes-head"><td colspan="8">📅 ${NOMES[parseInt(m,10)-1]}/${y}</td></tr>`;
+        h+=`<tr class="fc-mes-head"><td colspan="6">📅 ${NOMES[parseInt(m,10)-1]}/${y}</td></tr>`;
         prevMes=mes;
       }
-      const negI=r.sItau<0, negS=r.sSic<0;
-      const alerta=(!negI&&!negS)?'✅':(negI&&negS?'🔴 Ambas':'🔴 '+(negI?'Itaú':'Sicoob'));
-      h+=`<tr>
-        <td style="text-align:left;font-family:Inter,sans-serif;font-weight:${r.dt.endsWith('-01')?'700':'400'};color:${r.dt.endsWith('-01')?'#38bdf8':'#ccc'}">${brDate(r.dt)}</td>
-        <td class="fc-pos">${r.ei?fmtR(r.ei):'—'}</td>
-        <td class="fc-neg">${r.si?fmtR(r.si):'—'}</td>
-        <td class="fc-saldo ${negI?'fc-neg':'fc-sky'}">${fmtR(r.sItau)}</td>
-        <td class="fc-pos">${r.es?fmtR(r.es):'—'}</td>
-        <td class="fc-neg">${r.ss?fmtR(r.ss):'—'}</td>
-        <td class="fc-saldo ${negS?'fc-neg':'fc-sky'}">${fmtR(r.sSic)}</td>
-        <td style="text-align:center">${alerta}</td>
+      const neg=r.saldo<0;
+      const sdDia=r.ent-r.sai;
+      const sit=neg?'🔴 Negativo':'✅';
+      h+=`<tr style="${neg?'background:rgba(239,68,68,.06)':''}">
+        <td style="text-align:left;font-weight:${r.dt.endsWith('-01')?'700':'400'};color:${r.dt.endsWith('-01')?'#38bdf8':'#ccc'}">${brDate(r.dt)}</td>
+        <td class="fc-pos" style="text-align:right">${r.ent?fmtR(r.ent):'—'}</td>
+        <td class="fc-neg" style="text-align:right">${r.sai?fmtR(r.sai):'—'}</td>
+        <td class="${sdDia>=0?'fc-pos':'fc-neg'}" style="text-align:right;font-weight:600">${fmtR(sdDia)}</td>
+        <td class="fc-saldo ${neg?'fc-neg':'fc-sky'}" style="text-align:right;font-weight:700">${fmtR(r.saldo)}</td>
+        <td style="text-align:center">${sit}</td>
       </tr>`;
     });
-    if(!filtered.length) h+='<tr><td colspan="8" style="text-align:center;color:#555;padding:30px">Nenhum dia encontrado.</td></tr>';
+    if(!filtered.length) h+='<tr><td colspan="6" style="text-align:center;color:#555;padding:30px">Nenhum dia encontrado.</td></tr>';
     tbl.innerHTML=h+'</tbody>';
   };
 
@@ -3715,36 +3797,29 @@ function renderOrc2027(){
     const mensal=calcMensal(loadLancamentos());
     const tbl=document.getElementById('fc-tbl-mensal');
     if(!tbl)return;
-    let totEI=0,totSI=0,totES=0,totSS=0;
+    let totE=0,totS=0;
     let h=`<thead><tr>
       <th style="text-align:left">Mês</th>
-      <th>Ent. Itaú</th><th>Saí. Itaú</th><th>Saldo Itaú</th>
-      <th>Ent. Sicoob</th><th>Saí. Sicoob</th><th>Saldo Sicoob</th><th>Saldo Mês</th>
+      <th style="text-align:right">Entradas</th>
+      <th style="text-align:right">Saídas</th>
+      <th style="text-align:right">Saldo do Mês</th>
     </tr></thead><tbody>`;
     mensal.forEach(m=>{
-      const sI=m.ei-m.si, sS=m.es-m.ss, sM=sI+sS;
-      totEI+=m.ei;totSI+=m.si;totES+=m.es;totSS+=m.ss;
+      const ent=m.ei+m.es, sai=m.si+m.ss, sd=ent-sai;
+      totE+=ent; totS+=sai;
       h+=`<tr>
-        <td style="text-align:left;font-family:Inter,sans-serif;font-weight:600;color:#ccc">${m.label}</td>
-        <td class="fc-pos">${fmtR(m.ei)}</td>
-        <td class="fc-neg">${fmtR(m.si)}</td>
-        <td class="${sI<0?'fc-neg':'fc-sky'}">${fmtR(sI)}</td>
-        <td class="fc-pos">${fmtR(m.es)}</td>
-        <td class="fc-neg">${fmtR(m.ss)}</td>
-        <td class="${sS<0?'fc-neg':'fc-sky'}">${fmtR(sS)}</td>
-        <td style="font-weight:700" class="${sM<0?'fc-neg':'fc-pos'}">${fmtR(sM)}</td>
+        <td style="text-align:left;font-weight:600;color:#ccc">${m.label}</td>
+        <td class="fc-pos" style="text-align:right">${fmtR(ent)}</td>
+        <td class="fc-neg" style="text-align:right">${fmtR(sai)}</td>
+        <td style="font-weight:700;text-align:right" class="${sd<0?'fc-neg':'fc-pos'}">${fmtR(sd)}</td>
       </tr>`;
     });
-    const totSI2=totEI-totSI, totSS2=totES-totSS, totM=totSI2+totSS2;
+    const totSd=totE-totS;
     h+=`<tr class="fc-total-row">
-      <td style="text-align:left;font-family:Inter,sans-serif">TOTAL</td>
-      <td class="fc-pos">${fmtR(totEI)}</td>
-      <td class="fc-neg">${fmtR(totSI)}</td>
-      <td class="${totSI2<0?'fc-neg':'fc-sky'}">${fmtR(totSI2)}</td>
-      <td class="fc-pos">${fmtR(totES)}</td>
-      <td class="fc-neg">${fmtR(totSS)}</td>
-      <td class="${totSS2<0?'fc-neg':'fc-sky'}">${fmtR(totSS2)}</td>
-      <td style="font-weight:700" class="${totM<0?'fc-neg':'fc-pos'}">${fmtR(totM)}</td>
+      <td style="text-align:left">TOTAL</td>
+      <td class="fc-pos" style="text-align:right">${fmtR(totE)}</td>
+      <td class="fc-neg" style="text-align:right">${fmtR(totS)}</td>
+      <td style="font-weight:700;text-align:right" class="${totSd<0?'fc-neg':'fc-pos'}">${fmtR(totSd)}</td>
     </tr>`;
     tbl.innerHTML=h+'</tbody>';
   };
@@ -6279,6 +6354,21 @@ loadData();
   window.cpDeleteManual = function(id){ if(!confirm('Remover?'))return; saveManualCP(getManualCP().filter(r=>r.id!==id)); cpRender(); };
   window.crDeleteManual = function(id){ if(!confirm('Remover?'))return; saveManualCR(getManualCR().filter(r=>r.id!==id)); crRender(); };
 
+  window.crEditManual = function(id){
+    const arr = getManualCR();
+    const item = arr.find(r=>r.id===id);
+    if(!item) return;
+    const desc  = prompt('Descrição:', item.desc||'');   if(desc===null) return;
+    const cat   = prompt('Categoria:', item.cat||'');    if(cat===null) return;
+    const data  = prompt('Data (AAAA-MM-DD):', item.data||''); if(data===null) return;
+    const valor = parseFloat(prompt('Valor:', item.valor||0)); if(isNaN(valor)) return;
+    const st    = confirm('Marcar como Recebido?') ? 'pago' : 'aberto';
+    const idx   = arr.findIndex(r=>r.id===id);
+    arr[idx] = {...item, desc, cat, data, valor, status:st};
+    saveManualCR(arr);
+    crRender();
+  };
+
   /* ═══════════════════════════════════════════════════
      CONTAS A PAGAR
   ═══════════════════════════════════════════════════ */
@@ -6636,7 +6726,7 @@ loadData();
         const btn = isRecebido
           ? `<button class="btn-reabrir" onclick="crReabrir('${l.id}')">↩ Reabrir</button>`
           : `<button class="btn-baixar" onclick="crBaixar('${l.id}')">✅ Receber</button>`;
-        const del = l._manual?` <button onclick="crDeleteManual('${l.id}')" style="background:none;border:none;cursor:pointer;color:#ef4444;font-size:13px" title="Remover">🗑</button>`:'';
+        const del = l._manual?` <button onclick="crEditManual('${l.id}')" style="background:none;border:none;cursor:pointer;color:#38bdf8;font-size:13px;margin-right:4px" title="Editar">✏️</button><button onclick="crDeleteManual('${l.id}')" style="background:none;border:none;cursor:pointer;color:#ef4444;font-size:13px" title="Remover">🗑</button>`:'';
         html+=`<tr${isRecebido?' style="opacity:.75"':''}><td style="white-space:nowrap">${fmtD(l.data)}</td>
           <td>${l.desc||'—'}</td><td style="font-size:11px;color:#64748b">${l.cat||'—'}</td>
           <td class="forn-valor-pos">${fmtR(v)}</td><td>${badge}</td><td>${btn}${del}</td></tr>`;
