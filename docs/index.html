@@ -6331,10 +6331,31 @@ loadData();
 
   /* ── dados ────────────────────────────────────────── */
   function getFluxoLanc(){ try{ return JSON.parse(localStorage.getItem('fluxo_lancamentos_v1')||'[]'); }catch(e){ return []; } }
+  function saveFluxoLanc(arr){ localStorage.setItem('fluxo_lancamentos_v1', JSON.stringify(arr)); }
   function getManualCP(){ try{ return JSON.parse(localStorage.getItem('cp_manual')||'[]'); }catch(e){ return []; } }
   function getManualCR(){ try{ return JSON.parse(localStorage.getItem('cr_manual')||'[]'); }catch(e){ return []; } }
   function saveManualCP(arr){ localStorage.setItem('cp_manual', JSON.stringify(arr)); }
   function saveManualCR(arr){ localStorage.setItem('cr_manual', JSON.stringify(arr)); }
+
+  /* Delete de qualquer lançamento (manual ou do fluxo) */
+  window.crDeleteLanc = function(id, isManual){
+    if(!confirm('Remover este lançamento?')) return;
+    if(isManual){
+      saveManualCR(getManualCR().filter(r=>String(r.id)!==String(id)));
+    } else {
+      saveFluxoLanc(getFluxoLanc().filter(r=>String(r.id)!==String(id)));
+    }
+    crRender();
+  };
+  window.cpDeleteLanc = function(id, isManual){
+    if(!confirm('Remover este lançamento?')) return;
+    if(isManual){
+      saveManualCP(getManualCP().filter(r=>String(r.id)!==String(id)));
+    } else {
+      saveFluxoLanc(getFluxoLanc().filter(r=>String(r.id)!==String(id)));
+    }
+    cpRender();
+  };
 
   const fmtR = v=>'R$ '+(Number(v)||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
   const fmtD = s=>{ if(!s)return'—'; const[y,m,d]=(s.split('T')[0]).split('-'); return`${d}/${m}/${y}`; };
@@ -6548,10 +6569,11 @@ loadData();
         const btn = isPago
           ? `<button class="btn-reabrir" onclick="cpReabrir('${l.id}')">↩ Reabrir</button>`
           : `<button class="btn-baixar" onclick="cpBaixar('${l.id}')">✅ Baixar</button>`;
-        const del = l._manual?` <button onclick="cpEditManual('${l.id}')" style="background:none;border:none;cursor:pointer;color:#38bdf8;font-size:13px;margin-right:4px" title="Editar">✏️</button><button onclick="cpDeleteManual('${l.id}')" style="background:none;border:none;cursor:pointer;color:#ef4444;font-size:13px" title="Remover">🗑</button>`:'';
+        const editBtn2 = l._manual?`<button onclick="cpEditManual('${l.id}')" style="background:none;border:none;cursor:pointer;color:#38bdf8;font-size:13px;margin-right:4px" title="Editar">✏️</button>`:'';
+        const delBtn2 = `<button onclick="cpDeleteLanc('${l.id}',${!!l._manual})" style="background:none;border:none;cursor:pointer;color:#ef4444;font-size:13px" title="Remover">🗑</button>`;
         html+=`<tr${isPago?' style="opacity:.75"':''}><td style="white-space:nowrap">${fmtD(l.data)}</td>
           <td>${l.desc||'—'}</td><td style="font-size:11px;color:#64748b">${l.cat||'—'}</td>
-          <td class="forn-valor-neg">${fmtR(v)}</td><td>${badge}</td><td>${btn}${del}</td></tr>`;
+          <td class="forn-valor-neg">${fmtR(v)}</td><td>${badge}</td><td>${btn}${editBtn2}${delBtn2}</td></tr>`;
       });
       html+=`<tr class="total-row"><td colspan="3" style="text-align:right;font-size:11px;color:#64748b">Subtotal ${conta}</td>
         <td class="${isPago?'forn-valor-pos':'forn-valor-neg'}">${fmtR(subtotal)}</td><td colspan="2"></td></tr>
@@ -6761,10 +6783,11 @@ loadData();
         const btn = isRecebido
           ? `<button class="btn-reabrir" onclick="crReabrir('${l.id}')">↩ Reabrir</button>`
           : `<button class="btn-baixar" onclick="crBaixar('${l.id}')">✅ Receber</button>`;
-        const del = l._manual?` <button onclick="crEditManual('${l.id}')" style="background:none;border:none;cursor:pointer;color:#38bdf8;font-size:13px;margin-right:4px" title="Editar">✏️</button><button onclick="crDeleteManual('${l.id}')" style="background:none;border:none;cursor:pointer;color:#ef4444;font-size:13px" title="Remover">🗑</button>`:'';
+        const editBtn = l._manual?`<button onclick="crEditManual('${l.id}')" style="background:none;border:none;cursor:pointer;color:#38bdf8;font-size:13px;margin-right:4px" title="Editar">✏️</button>`:'';
+        const delBtn = `<button onclick="crDeleteLanc('${l.id}',${!!l._manual})" style="background:none;border:none;cursor:pointer;color:#ef4444;font-size:13px" title="Remover">🗑</button>`;
         html+=`<tr${isRecebido?' style="opacity:.75"':''}><td style="white-space:nowrap">${fmtD(l.data)}</td>
           <td>${l.desc||'—'}</td><td style="font-size:11px;color:#64748b">${l.cat||'—'}</td>
-          <td class="forn-valor-pos">${fmtR(v)}</td><td>${badge}</td><td>${btn}${del}</td></tr>`;
+          <td class="forn-valor-pos">${fmtR(v)}</td><td>${badge}</td><td>${btn}${editBtn}${delBtn}</td></tr>`;
       });
       html+=`<tr class="total-row"><td colspan="3" style="text-align:right;font-size:11px;color:#64748b">Subtotal ${conta}</td>
         <td class="forn-valor-pos">${fmtR(subtotal)}</td><td colspan="2"></td></tr>
