@@ -3085,30 +3085,49 @@ function renderOrc2027(){
     return dias;
   }
 
+  // Data de corte: só considerar movimentos a partir desta data
+  // Dias anteriores são zerados (já liquidados), o saldo inicial já reflete o passado
+  const FC_DATA_INICIO = '2026-11-08';
+
   // ── calcula saldo acumulado por dia ───────────────
   function calcSaldos(lancamentos, saldoInicialItau, saldoInicialSicoob){
     const dias = gerarDias();
-    // Entradas e saídas do FC (banco importado)
     const entDia={}, saiDia={};
-    lancamentos.forEach(l=>{
-      if(!l.data||!l.valor||!l.tipo) return;
-      const v = parseMoeda(l.valor);
-      const dt = l.data;
-      if(l.tipo==='ENTRADA') entDia[dt]=(entDia[dt]||0)+v;
-      if(l.tipo==='SAÍDA')   saiDia[dt]=(saiDia[dt]||0)+v;
-    });
-    // Previsões do CR (Contas a Receber manuais, status aberto)
+
+    // ── ENTRADAS do CR (Contas a Receber) — só em aberto, só a partir da data de corte ──
     const crBaixas = new Set(JSON.parse(localStorage.getItem('cr_baixas_v1')||'[]'));
+    // CR do fluxo_lancamentos_v1 (tipo ENTRADA)
+    lancamentos.forEach(l=>{
+      if(!l.data||!l.valor||l.tipo!=='ENTRADA') return;
+      if(l.data < FC_DATA_INICIO) return; // zera passado
+      if(crBaixas.has(String(l.id))) return; // já recebido
+      if(l.status==='pago') return;
+      const v = parseMoeda(l.valor);
+      entDia[l.data]=(entDia[l.data]||0)+v;
+    });
+    // CR manual
     const crManual = JSON.parse(localStorage.getItem('cr_manual')||'[]');
-    crManual.filter(r=>r.status!=='pago'&&!crBaixas.has(String(r.id))).forEach(r=>{
-      if(r.data) entDia[r.data]=(entDia[r.data]||0)+(+r.valor||0);
+    crManual.filter(r=>r.status!=='pago'&&!crBaixas.has(String(r.id))&&r.data>=FC_DATA_INICIO).forEach(r=>{
+      entDia[r.data]=(entDia[r.data]||0)+(+r.valor||0);
     });
-    // Previsões do CP (Contas a Pagar manuais, status aberto)
+
+    // ── SAÍDAS do CP (Contas a Pagar) — só em aberto, só a partir da data de corte ──
     const cpBaixas = new Set(JSON.parse(localStorage.getItem('cp_baixas_v1')||'[]'));
-    const cpManual = JSON.parse(localStorage.getItem('cp_manual')||'[]');
-    cpManual.filter(r=>r.status!=='pago'&&!cpBaixas.has(String(r.id))).forEach(r=>{
-      if(r.data) saiDia[r.data]=(saiDia[r.data]||0)+(+r.valor||0);
+    // CP do fluxo_lancamentos_v1 (tipo SAÍDA) — só os NÃO baixados
+    lancamentos.forEach(l=>{
+      if(!l.data||!l.valor||l.tipo!=='SAÍDA') return;
+      if(l.data < FC_DATA_INICIO) return; // zera passado
+      if(cpBaixas.has(String(l.id))) return; // já pago — não conta como saída futura
+      if(l.status==='pago') return;
+      const v = parseMoeda(l.valor);
+      saiDia[l.data]=(saiDia[l.data]||0)+v;
     });
+    // CP manual — só os NÃO baixados
+    const cpManual = JSON.parse(localStorage.getItem('cp_manual')||'[]');
+    cpManual.filter(r=>r.status!=='pago'&&!cpBaixas.has(String(r.id))&&r.data>=FC_DATA_INICIO).forEach(r=>{
+      saiDia[r.data]=(saiDia[r.data]||0)+(+r.valor||0);
+    });
+
     // Saldo total inicial (Itaú + Sicoob somados)
     let saldo = saldoInicialItau + saldoInicialSicoob;
     return dias.map(dt=>{
@@ -3774,8 +3793,14 @@ function renderOrc2027(){
     const soNeg=(document.getElementById('fc-so-negativo')||{}).checked||false;
     const tbl=document.getElementById('fc-tbl-dia');
     if(!tbl)return;
+
+    // Hoje em formato YYYY-MM-DD
+    const hoje=isoDate(new Date());
+
     let filtered=saldos;
-    if(filtroMes) filtered=filtered.filter(r=>r.dt.startsWith(filtroMes));
+    // Se não há filtro de mês, mostra apenas a partir da data de início (08/11/2026)
+    if(!filtroMes) filtered=filtered.filter(r=>r.dt>=FC_DATA_INICIO);
+    else filtered=filtered.filter(r=>r.dt.startsWith(filtroMes));
     if(soNeg) filtered=filtered.filter(r=>r.saldo<0);
 
     let h=`<thead><tr>
@@ -3797,9 +3822,20 @@ function renderOrc2027(){
       }
       const neg=r.saldo<0;
       const sdDia=r.ent-r.sai;
-      const sit=neg?'🔴 Negativo':'✅';
-      h+=`<tr style="${neg?'background:rgba(239,68,68,.06)':''}">
-        <td style="text-align:left;font-weight:${r.dt.endsWith('-01')?'700':'400'};color:${r.dt.endsWith('-01')?'#38bdf8':'#ccc'}">${brDate(r.dt)}</td>
+      const isHoje=r.dt===hoje;
+      const isFuturo=r.dt>hoje;
+      // Situação
+      let sit='';
+      if(isHoje) sit='📍 Hoje';
+      else if(neg) sit='🔴 Negativo';
+      else if(isFuturo&&(r.ent||r.sai)) sit='🔮 Previsto';
+      else sit='✅';
+      // Estilo da linha
+      let rowStyle='';
+      if(isHoje) rowStyle='background:rgba(56,189,248,.08);border-left:3px solid #38bdf8';
+      else if(neg) rowStyle='background:rgba(239,68,68,.06)';
+      h+=`<tr style="${rowStyle}">
+        <td style="text-align:left;font-weight:${isHoje?'700':r.dt.endsWith('-01')?'700':'400'};color:${isHoje?'#38bdf8':r.dt.endsWith('-01')?'#38bdf8':'#ccc'}">${brDate(r.dt)}${isHoje?' ◀':''}</td>
         <td class="fc-pos" style="text-align:right">${r.ent?fmtR(r.ent):'—'}</td>
         <td class="fc-neg" style="text-align:right">${r.sai?fmtR(r.sai):'—'}</td>
         <td class="${sdDia>=0?'fc-pos':'fc-neg'}" style="text-align:right;font-weight:600">${fmtR(sdDia)}</td>
