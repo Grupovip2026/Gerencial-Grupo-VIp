@@ -3263,20 +3263,20 @@ function renderOrc2027(){
   <button class="fc-vtab" onclick="fcSetView('grafico')">📈 Gráficos</button>
 </div>
 
-<!-- ── Saldo inicial ── -->
-<div class="fc-saldo-inputs">
+<!-- ── Saldo inicial (lido automaticamente do Conta Corrente) ── -->
+<div class="fc-saldo-inputs" id="fc-saldo-cards">
   <div class="fc-saldo-card">
-    <div class="fc-saldo-label">💰 Saldo Inicial Itaú (R$)</div>
-    <input class="fc-saldo-input" id="fc-si-itau" type="number" step="0.01" placeholder="0,00" oninput="fcSaveSaldos()">
+    <div class="fc-saldo-label">🏦 Saldo Itaú (Conta Corrente)</div>
+    <div id="fc-cc-itau" style="font-size:17px;font-family:'DM Mono',monospace;font-weight:700;color:#38bdf8;padding:8px 0">—</div>
   </div>
   <div class="fc-saldo-card">
-    <div class="fc-saldo-label">💰 Saldo Inicial Sicoob (R$)</div>
-    <input class="fc-saldo-input" id="fc-si-sicoob" type="number" step="0.01" placeholder="0,00" oninput="fcSaveSaldos()">
+    <div class="fc-saldo-label">🏦 Saldo Sicoob (Conta Corrente)</div>
+    <div id="fc-cc-sicoob" style="font-size:17px;font-family:'DM Mono',monospace;font-weight:700;color:#38bdf8;padding:8px 0">—</div>
   </div>
   <div class="fc-saldo-card" style="flex:2;background:rgba(56,189,248,.05);border-color:rgba(56,189,248,.15)">
-    <div class="fc-saldo-label">ℹ️ Referência</div>
-    <div style="font-size:12px;color:#666;line-height:1.6">Período: <span style="color:#38bdf8">Nov/2026 — Dez/2027</span><br>
-    Saldo negativo aparece em <span style="color:#FF6B6B">vermelho</span> na aba Dia a Dia</div>
+    <div class="fc-saldo-label">💰 Saldo Total</div>
+    <div id="fc-cc-total" style="font-size:19px;font-family:'DM Mono',monospace;font-weight:700;color:#4ade80;padding:8px 0">—</div>
+    <div style="font-size:11px;color:#555;margin-top:4px">Importado via aba Conta Corrente · Saldo negativo = <span style="color:#FF6B6B">vermelho</span></div>
   </div>
 </div>
 
@@ -3337,20 +3337,37 @@ function renderOrc2027(){
       sel.appendChild(opt); d2=new Date(d2.getFullYear(),d2.getMonth()+1,1);
     }
 
-    // preenche saldos salvos
-    const sl=loadSaldos();
-    pg.querySelector('#fc-si-itau').value=sl.itau||0;
-    pg.querySelector('#fc-si-sicoob').value=sl.sicoob||0;
+    // preenche cards de saldo do CC
+    fcAtualizarSaldoCards();
 
     // renderiza dia a dia por padrão
     fcRenderDia();
   }
 
+  /* Lê saldos finais do Conta Corrente (cc_data_v2) */
+  function getCCSaldos(){
+    try{
+      const cc=JSON.parse(localStorage.getItem('cc_data_v2')||'{}');
+      const itau  =(cc.itau  &&cc.itau.result  &&cc.itau.result.saldoFinal  !=null)?cc.itau.result.saldoFinal  :null;
+      const sicoob=(cc.sicoob&&cc.sicoob.result&&cc.sicoob.result.saldoFinal!=null)?cc.sicoob.result.saldoFinal:null;
+      return {itau, sicoob, total:(itau||0)+(sicoob||0)};
+    }catch(e){ return {itau:null,sicoob:null,total:0}; }
+  }
+
+  /* Atualiza os cards de saldo na UI */
+  window.fcAtualizarSaldoCards=function(){
+    const fmtR=v=>'R$ '+(Number(v)||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+    const s=getCCSaldos();
+    const elI=document.getElementById('fc-cc-itau');
+    const elS=document.getElementById('fc-cc-sicoob');
+    const elT=document.getElementById('fc-cc-total');
+    if(elI) elI.textContent=s.itau!=null?fmtR(s.itau):'Não importado';
+    if(elS) elS.textContent=s.sicoob!=null?fmtR(s.sicoob):'Não importado';
+    if(elT){ elT.textContent=fmtR(s.total); elT.style.color=s.total<0?'#ef4444':'#4ade80'; }
+  };
+
   window.fcSaveSaldos=function(){
-    const itau=parseFloat(document.getElementById('fc-si-itau').value)||0;
-    const sicoob=parseFloat(document.getElementById('fc-si-sicoob').value)||0;
-    saveSaldos({itau,sicoob});
-    refreshFluxo();
+    // mantido para compatibilidade legada - não faz mais nada
   };
 
   window.fcSetView=function(v){
@@ -3674,7 +3691,7 @@ function renderOrc2027(){
 
   function fcRenderKpis(){
     const arr=loadLancamentos();
-    const sl=loadSaldos();
+    const sl=getCCSaldos();
     const entItau=arr.filter(l=>l.tipo==='ENTRADA'&&l.conta==='Itaú').reduce((s,l)=>s+parseMoeda(l.valor),0);
     const saiItau=arr.filter(l=>l.tipo==='SAÍDA'  &&l.conta==='Itaú').reduce((s,l)=>s+parseMoeda(l.valor),0);
     const entSic =arr.filter(l=>l.tipo==='ENTRADA'&&l.conta==='Sicoob').reduce((s,l)=>s+parseMoeda(l.valor),0);
@@ -3750,7 +3767,8 @@ function renderOrc2027(){
   };
 
   window.fcRenderDia=function(){
-    const sl=loadSaldos();
+    fcAtualizarSaldoCards();
+    const sl=getCCSaldos();
     const saldos=calcSaldos(loadLancamentos(), sl.itau||0, sl.sicoob||0);
     const filtroMes=(document.getElementById('fc-filtro-mes')||{}).value||'';
     const soNeg=(document.getElementById('fc-so-negativo')||{}).checked||false;
@@ -3826,7 +3844,7 @@ function renderOrc2027(){
 
   window.fcRenderGraficos=function(){
     const mensal=calcMensal(loadLancamentos());
-    const sl=loadSaldos();
+    const sl=getCCSaldos();
     const labels=mensal.map(m=>m.label);
 
     // Entradas vs Saídas
@@ -4270,6 +4288,8 @@ loadData();
 
   // ── Persistência localStorage ──
   function ccSave(){
+    // Atualiza cards de saldo no Fluxo de Caixa se estiver visível
+    if(typeof fcAtualizarSaldoCards==='function') setTimeout(fcAtualizarSaldoCards, 100);
     try{
       const payload = {
         itau:   { lancamentos: CC.itau.lancamentos,   result: CC.itau.result,   nome: CC.itau.nome   },
@@ -6350,20 +6370,35 @@ loadData();
     _crRenderBody();
   };
 
-  /* ── delete manual ────────────────────────────────── */
+  /* ── delete / edit manual ────────────────────────────── */
   window.cpDeleteManual = function(id){ if(!confirm('Remover?'))return; saveManualCP(getManualCP().filter(r=>r.id!==id)); cpRender(); };
   window.crDeleteManual = function(id){ if(!confirm('Remover?'))return; saveManualCR(getManualCR().filter(r=>r.id!==id)); crRender(); };
 
+  window.cpEditManual = function(id){
+    const arr = getManualCP();
+    const item = arr.find(r=>String(r.id)===String(id));
+    if(!item) return;
+    const desc  = prompt('Descrição:', item.desc||'');   if(desc===null) return;
+    const cat   = prompt('Categoria:', item.cat||'');    if(cat===null) return;
+    const data  = prompt('Data (AAAA-MM-DD):', item.data||''); if(data===null) return;
+    const valor = parseFloat(prompt('Valor:', item.valor||0)); if(isNaN(valor)) return;
+    const st    = confirm('Marcar como Pago?') ? 'pago' : 'aberto';
+    const idx   = arr.findIndex(r=>String(r.id)===String(id));
+    arr[idx] = {...item, desc, cat, data, valor, status:st};
+    saveManualCP(arr);
+    cpRender();
+  };
+
   window.crEditManual = function(id){
     const arr = getManualCR();
-    const item = arr.find(r=>r.id===id);
+    const item = arr.find(r=>String(r.id)===String(id));
     if(!item) return;
     const desc  = prompt('Descrição:', item.desc||'');   if(desc===null) return;
     const cat   = prompt('Categoria:', item.cat||'');    if(cat===null) return;
     const data  = prompt('Data (AAAA-MM-DD):', item.data||''); if(data===null) return;
     const valor = parseFloat(prompt('Valor:', item.valor||0)); if(isNaN(valor)) return;
     const st    = confirm('Marcar como Recebido?') ? 'pago' : 'aberto';
-    const idx   = arr.findIndex(r=>r.id===id);
+    const idx   = arr.findIndex(r=>String(r.id)===String(id));
     arr[idx] = {...item, desc, cat, data, valor, status:st};
     saveManualCR(arr);
     crRender();
@@ -6513,7 +6548,7 @@ loadData();
         const btn = isPago
           ? `<button class="btn-reabrir" onclick="cpReabrir('${l.id}')">↩ Reabrir</button>`
           : `<button class="btn-baixar" onclick="cpBaixar('${l.id}')">✅ Baixar</button>`;
-        const del = l._manual?` <button onclick="cpDeleteManual('${l.id}')" style="background:none;border:none;cursor:pointer;color:#ef4444;font-size:13px" title="Remover">🗑</button>`:'';
+        const del = l._manual?` <button onclick="cpEditManual('${l.id}')" style="background:none;border:none;cursor:pointer;color:#38bdf8;font-size:13px;margin-right:4px" title="Editar">✏️</button><button onclick="cpDeleteManual('${l.id}')" style="background:none;border:none;cursor:pointer;color:#ef4444;font-size:13px" title="Remover">🗑</button>`:'';
         html+=`<tr${isPago?' style="opacity:.75"':''}><td style="white-space:nowrap">${fmtD(l.data)}</td>
           <td>${l.desc||'—'}</td><td style="font-size:11px;color:#64748b">${l.cat||'—'}</td>
           <td class="forn-valor-neg">${fmtR(v)}</td><td>${badge}</td><td>${btn}${del}</td></tr>`;
