@@ -5116,7 +5116,7 @@ loadData();
         }</td>
         <td class="${l.tipo==='entrada'?'cc-entrada':'cc-saida'}">${fmtCC(l.valor)}</td>
         <td class="cc-saldo-col" style="color:${l.saldo>=0?'#38bdf8':'#ff6b6b'}">${fmtCC(l.saldo)}</td>
-        <td style="display:flex;gap:2px"><button class="cc-btn-edit" onclick="ccOpenEdit('${banco}',${l._id})" title="Editar">✏️</button><button class="cc-btn-del" onclick="ccDeleteRow('${banco}',${l._id})" title="Excluir">🗑</button></td>
+        <td style="display:flex;gap:2px"><button class="cc-btn-del" onclick="ccDeleteRow('${banco}',${l._id})" title="Excluir">🗑</button></td>
       </tr>
     `).join('');
   }
