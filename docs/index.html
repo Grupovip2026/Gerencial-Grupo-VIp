@@ -1662,8 +1662,8 @@ function setPage(p){
   if(p==='vendas') renderVendasML();
   if(p==='vendas-vidal') renderVendasVidal();
   if(p==='fluxo') renderFluxo();
-  if(p==='contas-pagar' && typeof renderContasPagar==='function') renderContasPagar();
-  if(p==='contas-receber' && typeof renderContasReceber==='function') renderContasReceber();
+  if(p==='contas-pagar' && typeof cpRender==='function') cpRender();
+  if(p==='contas-receber' && typeof crRender==='function') crRender();
   if(p==='marketing' && typeof renderMarketing==='function') renderMarketing();
   if(p==='rh' && typeof _rhRenderAll==='function') _rhRenderAll();
   if(p==='divida' && typeof fornRender==='function') fornRender();
