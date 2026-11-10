@@ -277,14 +277,53 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
 
   <!-- Comercial -->
   <div class="sidebar-section">Comercial</div>
-  <button class="nav-item" onclick="setPage('vendas')">
+  <button class="nav-item" onclick="setPage('vendas');vendasSetEmpresa('vip')">
     <span class="nav-icon">🛒</span> Vendas VIP
   </button>
-  <button class="nav-item" onclick="setPage('vendas-vidal')">
+  <button class="nav-sub-item" onclick="setPage('vendas');vendasSetEmpresa('vip');vendasSetCanal('ml')">
+    <span class="nav-icon">🟡</span> Mercado Livre
+  </button>
+  <button class="nav-sub-item" onclick="setPage('vendas');vendasSetEmpresa('vip');vendasSetCanal('amazon')">
+    <span class="nav-icon">🟠</span> Amazon
+  </button>
+  <button class="nav-sub-item" onclick="setPage('vendas');vendasSetEmpresa('vip');vendasSetCanal('shopee')">
+    <span class="nav-icon">🟠</span> Shopee
+  </button>
+  <button class="nav-sub-item" onclick="setPage('vendas');vendasSetEmpresa('vip');vendasSetCanal('tiktok')">
+    <span class="nav-icon">⬛</span> TikTok Shop
+  </button>
+  <button class="nav-item" onclick="setPage('vendas');vendasSetEmpresa('vidal')">
     <span class="nav-icon">🛒</span> Vendas Vidal
   </button>
-  <button class="nav-item" style="opacity:.4;cursor:not-allowed" title="Em breve">
+  <button class="nav-sub-item" onclick="setPage('vendas');vendasSetEmpresa('vidal');vendasSetCanal('ml')">
+    <span class="nav-icon">🟡</span> Mercado Livre
+  </button>
+  <button class="nav-sub-item" onclick="setPage('vendas');vendasSetEmpresa('vidal');vendasSetCanal('amazon')">
+    <span class="nav-icon">🟠</span> Amazon
+  </button>
+  <button class="nav-sub-item" onclick="setPage('vendas');vendasSetEmpresa('vidal');vendasSetCanal('shopee')">
+    <span class="nav-icon">🟠</span> Shopee
+  </button>
+  <button class="nav-sub-item" onclick="setPage('vendas');vendasSetEmpresa('vidal');vendasSetCanal('loja')">
+    <span class="nav-icon">🏪</span> Loja Física
+  </button>
+  <button class="nav-sub-item" onclick="setPage('vendas');vendasSetEmpresa('vidal');vendasSetCanal('tiktok')">
+    <span class="nav-icon">⬛</span> TikTok Shop
+  </button>
+  <button class="nav-item" onclick="setPage('vendas');vendasSetEmpresa('v3')">
     <span class="nav-icon">🛒</span> Vendas V3
+  </button>
+  <button class="nav-sub-item" onclick="setPage('vendas');vendasSetEmpresa('v3');vendasSetCanal('ml')">
+    <span class="nav-icon">🟡</span> Mercado Livre
+  </button>
+  <button class="nav-sub-item" onclick="setPage('vendas');vendasSetEmpresa('v3');vendasSetCanal('amazon')">
+    <span class="nav-icon">🟠</span> Amazon
+  </button>
+  <button class="nav-sub-item" onclick="setPage('vendas');vendasSetEmpresa('v3');vendasSetCanal('shopee')">
+    <span class="nav-icon">🟠</span> Shopee
+  </button>
+  <button class="nav-sub-item" onclick="setPage('vendas');vendasSetEmpresa('v3');vendasSetCanal('tiktok')">
+    <span class="nav-icon">⬛</span> TikTok Shop
   </button>
   <button class="nav-item" onclick="setPage('rh')">
     <span class="nav-icon">👥</span> RH / DP
@@ -489,321 +528,158 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
 
 <!-- VENDAS ML -->
 <div id="page-vendas" class="page">
-  <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
-    <div style="font-size:13px;color:#f59e0b;font-weight:600;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);border-radius:8px;padding:6px 14px">🛒 Mercado Livre · VIP MX</div>
-    <div style="font-size:12px;color:#555">Jun – Set 2026 · Apenas vendas concluídas</div>
-    <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
-      <label id="vip-import-btn" style="background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.4);color:#f59e0b;border-radius:7px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .2s"
-        onmouseover="this.style.background='rgba(245,158,11,.28)'" onmouseout="this.style.background='rgba(245,158,11,.15)'">
-        📥 Importar Excel
-        <input type="file" accept=".xlsx,.xls" style="display:none" onchange="vendaVipImportarExcel(this)">
-      </label>
-      <span id="vip-import-status" style="font-size:11px;color:#555"></span>
-    </div>
-  </div>
 
+<!-- ── CABEÇALHO EMPRESA ─────────────────────────────────────────── -->
+<div id="vendas-header" style="margin-bottom:16px">
+  <!-- preenchido por JS -->
+</div>
+
+<!-- ── ABAS DE EMPRESA ───────────────────────────────────────────── -->
+<div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap" id="vendas-empresa-tabs">
+  <button id="vtab-vip"   onclick="vendasSetEmpresa('vip')"   class="vtab vtab-active" style="background:rgba(245,158,11,.18);border:1px solid rgba(245,158,11,.5);color:#f59e0b;border-radius:9px;padding:8px 20px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s">🛒 VIP</button>
+  <button id="vtab-vidal" onclick="vendasSetEmpresa('vidal')" class="vtab" style="background:rgba(108,99,255,.12);border:1px solid rgba(108,99,255,.3);color:#8b83ff;border-radius:9px;padding:8px 20px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s">🛒 Vidal</button>
+  <button id="vtab-v3"    onclick="vendasSetEmpresa('v3')"    class="vtab" style="background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.3);color:#4ade80;border-radius:9px;padding:8px 20px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s">🛒 V3</button>
+</div>
+
+<!-- ── TOTALIZADOR DA EMPRESA ─────────────────────────────────────── -->
+<div id="vendas-totais" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px">
+  <!-- preenchido por JS -->
+</div>
+
+<!-- ── ABAS DE CANAL ─────────────────────────────────────────────── -->
+<div style="display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:12px" id="vendas-canal-tabs">
+  <!-- preenchido por JS -->
+</div>
+
+<!-- ── CONTEÚDO DO CANAL ─────────────────────────────────────────── -->
+<div id="vendas-canal-content">
+  <!-- preenchido por JS -->
+</div>
+
+<!-- container legado ML VIP (mantido para compatibilidade com renderVendasML) -->
+<div id="vendas-vip-ml-legacy" style="display:none">
   <!-- FILTROS -->
   <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
-
-    <!-- Linha 1: Período + Granularidade -->
     <div class="filter-bar" style="flex-wrap:wrap;gap:10px">
       <span class="filter-label">Período:</span>
       <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-        <input type="date" id="ml-dt-ini" value="2026-06-01"
-          style="background:#1a1a2e;color:#e2e8f0;border:1px solid rgba(245,158,11,.35);border-radius:7px;padding:5px 10px;font-size:12px;outline:none;cursor:pointer"
-          onchange="mlAplicarPeriodo()">
+        <input type="date" id="ml-dt-ini" value="2026-06-01" style="background:#1a1a2e;color:#e2e8f0;border:1px solid rgba(245,158,11,.35);border-radius:7px;padding:5px 10px;font-size:12px;outline:none;cursor:pointer" onchange="mlAplicarPeriodo()">
         <span style="color:#555;font-size:12px">até</span>
-        <input type="date" id="ml-dt-fim" value="2026-09-30"
-          style="background:#1a1a2e;color:#e2e8f0;border:1px solid rgba(245,158,11,.35);border-radius:7px;padding:5px 10px;font-size:12px;outline:none;cursor:pointer"
-          onchange="mlAplicarPeriodo()">
+        <input type="date" id="ml-dt-fim" value="2026-09-30" style="background:#1a1a2e;color:#e2e8f0;border:1px solid rgba(245,158,11,.35);border-radius:7px;padding:5px 10px;font-size:12px;outline:none;cursor:pointer" onchange="mlAplicarPeriodo()">
         <button class="mes-btn sel-ml" style="font-size:11px;padding:4px 10px" onclick="mlPeriodoPreset('jun-set')">Jun–Set</button>
         <button class="mes-btn" id="ml-preset-jul-set" style="font-size:11px;padding:4px 10px" onclick="mlPeriodoPreset('jul-set')">Jul–Set</button>
         <button class="mes-btn" id="ml-preset-ago-set" style="font-size:11px;padding:4px 10px" onclick="mlPeriodoPreset('ago-set')">Ago–Set</button>
       </div>
-      <div style="width:1px;background:rgba(255,255,255,.08);margin:0 4px;align-self:stretch"></div>
-      <span class="filter-label">Ver por:</span>
-      <div style="display:flex;gap:6px">
-        <button id="ml-gran-dia"    class="mes-btn" onclick="mlSetGran('dia')">Dia</button>
-        <button id="ml-gran-semana" class="mes-btn sel-ml" onclick="mlSetGran('semana')">Semana</button>
-        <button id="ml-gran-mes"    class="mes-btn" onclick="mlSetGran('mes')">Mês</button>
-      </div>
     </div>
-
-    <!-- Linha 2: Mês + Exibir -->
-    <div class="filter-bar" style="flex-wrap:wrap">
-      <span class="filter-label">Mês:</span>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <button id="ml-f-jun" class="mes-btn sel-ml" onclick="mlToggleMes('Jun')">Jun</button>
-        <button id="ml-f-jul" class="mes-btn sel-ml" onclick="mlToggleMes('Jul')">Jul</button>
-        <button id="ml-f-ago" class="mes-btn sel-ml" onclick="mlToggleMes('Ago')">Ago</button>
-        <button id="ml-f-set" class="mes-btn sel-ml" onclick="mlToggleMes('Set')">Set</button>
-      </div>
-      <div style="width:1px;background:rgba(255,255,255,.08);margin:0 8px;align-self:stretch"></div>
-      <span class="filter-label">Exibir:</span>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <button id="ml-v-receita"  class="mes-btn sel-ml" onclick="mlToggleView('receita')" title="Receita R$">R$</button>
-        <button id="ml-v-pedidos"  class="mes-btn sel-ml" onclick="mlToggleView('pedidos')" title="Qtd. Pedidos">Pedidos</button>
-        <button id="ml-v-ticket"   class="mes-btn sel-ml" onclick="mlToggleView('ticket')"  title="Ticket Médio">Ticket</button>
-        <button id="ml-v-diario"   class="mes-btn sel-ml" onclick="mlToggleView('diario')"  title="Gráfico Diário">Diário</button>
-        <button id="ml-v-semanal"  class="mes-btn sel-ml" onclick="mlToggleView('semanal')" title="Gráfico Semanal">Semanal</button>
-        <button id="ml-v-produtos" class="mes-btn sel-ml" onclick="mlToggleView('produtos')" title="Top Produtos">Produtos</button>
-        <button id="ml-v-geo"      class="mes-btn sel-ml" onclick="mlToggleView('geo')"      title="Localização">📍 Geo</button>
-        <button id="ml-v-cancel"   class="mes-btn sel-ml" onclick="mlToggleView('cancel')"   title="Cancelamentos">⚠️ Cancel.</button>
-      </div>
-      <div class="filter-actions">
-        <button class="filter-action" onclick="mlFilterAll()">Todos</button>
-        <button class="filter-action" onclick="mlFilterClear()">Limpar</button>
-      </div>
+    <div class="filter-bar" style="flex-wrap:wrap;gap:10px">
+      <span class="filter-label">Meses:</span>
+      <div id="ml-mes-btns" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+      <button class="mes-btn" onclick="mlTodosOsMeses()" style="font-size:11px;padding:4px 10px;margin-left:auto">Todos</button>
+      <button class="mes-btn" onclick="mlLimparMeses()" style="font-size:11px;padding:4px 10px">Limpar</button>
+    </div>
+    <div class="filter-bar" style="flex-wrap:wrap;gap:10px">
+      <span class="filter-label">Granularidade:</span>
+      <button class="mes-btn sel-ml" id="ml-gran-mensal" onclick="mlSetGranularidade('mensal')">Mensal</button>
+      <button class="mes-btn" id="ml-gran-semanal" onclick="mlSetGranularidade('semanal')">Semanal</button>
+      <button class="mes-btn" id="ml-gran-diario" onclick="mlSetGranularidade('diario')">Diário</button>
+      <button class="mes-btn" id="ml-gran-anual" onclick="mlSetGranularidade('anual')">Anual</button>
+      <span class="filter-label" style="margin-left:12px">Visualização:</span>
+      <button class="mes-btn sel-ml" id="ml-vis-abs" onclick="mlSetVisualizacao('absoluto')">R$</button>
+      <button class="mes-btn" id="ml-vis-idx" onclick="mlSetVisualizacao('indexado')">Indexado</button>
     </div>
   </div>
-
-  <!-- KPIs topo -->
-  <div id="ml-kpis" class="kpis"></div>
-
-  <!-- Seção: Receita / Pedidos / Ticket -->
-  <div data-ml-section="receita pedidos ticket">
-    <div class="charts-row">
-      <div class="chart-box">
-        <div class="chart-title">Receita por Mês · R$</div>
-        <div class="chart-wrap"><canvas id="cMlMensal"></canvas></div>
-      </div>
-      <div class="chart-box">
-        <div class="chart-title">Pedidos por Mês</div>
-        <div class="chart-wrap"><canvas id="cMlPedidos"></canvas></div>
-      </div>
-    </div>
-    <div class="charts-row">
-      <div class="chart-box">
-        <div class="chart-title">Ticket Médio por Mês · R$</div>
-        <div class="chart-wrap"><canvas id="cMlTicket"></canvas></div>
-      </div>
-      <div class="chart-box">
-        <div class="chart-title">Receita Média por Dia da Semana · R$</div>
-        <div class="chart-wrap"><canvas id="cMlDow"></canvas></div>
-      </div>
-    </div>
-    <div class="table-box">
-      <div class="chart-title">Resumo Mensal</div>
-      <table id="ml-mensal-tbl"></table>
-    </div>
+  <!-- KPIs ML VIP -->
+  <div id="ml-kpis" class="kpi-grid" style="margin-bottom:20px"></div>
+  <!-- Seções ML VIP -->
+  <div class="chart-box" data-ml-section="receita">
+    <div class="chart-title">📈 Receita Bruta</div>
+    <canvas id="cMlReceita"></canvas>
   </div>
-
-  <!-- Seção: Semanal -->
-  <div data-ml-section="semanal">
-    <div class="chart-box" style="margin-bottom:16px">
-      <div class="chart-title">Receita Semanal · Jun–Set 2026</div>
-      <div class="chart-wrap-tall"><canvas id="cMlSemanal"></canvas></div>
-    </div>
-    <div class="table-box">
-      <div class="chart-title">Detalhe Semanal com Variação</div>
-      <table id="ml-semanal-tbl"></table>
-    </div>
+  <div class="chart-box" data-ml-section="receita">
+    <div class="chart-title">📅 Receita por Mês</div>
+    <table id="ml-receita-mensal-tbl" class="data-tbl" style="width:100%"></table>
   </div>
-
-  <!-- Seção: Diário -->
-  <div data-ml-section="diario">
-    <div class="chart-box" style="margin-bottom:16px">
-      <div class="chart-title">Receita Diária · Junho a Setembro 2026</div>
-      <div class="chart-wrap-tall"><canvas id="cMlDiario"></canvas></div>
-    </div>
+  <div class="chart-box" data-ml-section="produtos">
+    <div class="chart-title">🏆 Top Produtos por Receita</div>
+    <canvas id="cMlProdutos"></canvas>
   </div>
-
-  <!-- Seção: Produtos -->
-  <div data-ml-section="produtos">
-    <div class="charts-row">
-      <div class="chart-box">
-        <div class="chart-title">Top 8 Produtos por Receita · R$</div>
-        <div class="chart-wrap-tall"><canvas id="cMlProdutos"></canvas></div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:12px;flex:1">
-        <div class="chart-box" style="flex:1">
-          <div class="chart-title" style="margin-bottom:8px">Insight de Produtos</div>
-          <div id="ml-produto-insight" style="font-size:13px;color:#888;line-height:1.7"></div>
-        </div>
-      </div>
-    </div>
+  <div class="chart-box" data-ml-section="produtos">
+    <div class="chart-title">📦 Detalhe dos Produtos</div>
+    <table id="ml-produtos-tbl" class="data-tbl" style="width:100%"></table>
   </div>
-
-  <!-- Seção: Geo -->
-  <div data-ml-section="geo">
-    <div style="display:flex;align-items:center;gap:10px;margin:16px 0 16px">
-      <div style="font-size:13px;color:#38bdf8;font-weight:600;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.25);border-radius:8px;padding:6px 14px">📍 Localização de Vendas</div>
-    </div>
-    <div id="ml-geo-kpis" class="kpis"></div>
-    <div class="charts-row">
-      <div class="chart-box">
-        <div class="chart-title">Top 10 Estados por Receita · R$</div>
-        <div class="chart-wrap-tall"><canvas id="cMlEstados"></canvas></div>
-      </div>
-      <div class="chart-box">
-        <div class="chart-title">Receita por Região do Brasil</div>
-        <div class="chart-wrap-tall"><canvas id="cMlRegioes"></canvas></div>
-      </div>
-    </div>
-    <div class="chart-box" style="margin-bottom:16px">
-      <div class="chart-title">Top 15 Cidades por Receita · R$</div>
-      <div class="chart-wrap-tall"><canvas id="cMlCidades"></canvas></div>
-    </div>
-    <div class="charts-row">
-      <div class="table-box" style="margin-bottom:0">
-        <div class="chart-title">Ranking por Estado</div>
-        <table id="ml-estados-tbl"></table>
-      </div>
-      <div class="table-box" style="margin-bottom:0">
-        <div class="chart-title">Top 20 Cidades</div>
-        <table id="ml-cidades-tbl"></table>
-      </div>
-    </div>
+  <div class="chart-box" data-ml-section="produtos">
+    <div class="chart-title">💡 Insight de Produtos</div>
+    <div id="ml-produto-insight" style="font-size:13px;color:#94a3b8;line-height:1.6;padding:8px"></div>
   </div>
-
-  <!-- Seção: Cancelamentos -->
-  <div data-ml-section="cancel">
-    <div style="display:flex;align-items:center;gap:10px;margin:16px 0 16px">
-      <div style="font-size:13px;color:#FF6B6B;font-weight:600;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.25);border-radius:8px;padding:6px 14px">⚠️ Cancelamentos & Devoluções</div>
-    </div>
-    <div id="ml-perda-kpis" class="kpis"></div>
-    <div class="charts-row">
-      <div class="chart-box">
-        <div class="chart-title">Qtd. Cancelamentos e Devoluções por Mês</div>
-        <div class="chart-wrap"><canvas id="cMlCancelQtd"></canvas></div>
-      </div>
-      <div class="chart-box">
-        <div class="chart-title">Receita Potencial Perdida por Mês · R$</div>
-        <div class="chart-wrap"><canvas id="cMlCancelVal"></canvas></div>
-      </div>
-    </div>
-    <!-- Tabela detalhada cancelamentos/devoluções -->
-    <div class="table-box">
-      <div class="chart-title">Impacto Mensal — Receita Potencial Perdida</div>
-      <table id="ml-cancel-tbl"></table>
-    </div>
-  </div><!-- /cancel -->
-</div><!-- /page-vendas -->
-
-<!-- ═══════════════════════════════════════════════════════════════════ -->
-<!-- VENDAS VIDAL -->
-<div id="page-vendas-vidal" class="page">
-  <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
-    <div style="font-size:13px;color:#6C63FF;font-weight:600;background:rgba(108,99,255,.1);border:1px solid rgba(108,99,255,.25);border-radius:8px;padding:6px 14px">🛒 Mercado Livre · Vidal MX</div>
-    <div style="font-size:12px;color:#555">Jun – Set 2026 · Apenas vendas concluídas</div>
-    <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
-      <label id="vidal-import-btn" style="background:rgba(108,99,255,.15);border:1px solid rgba(108,99,255,.4);color:#8b83ff;border-radius:7px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .2s"
-        onmouseover="this.style.background='rgba(108,99,255,.28)'" onmouseout="this.style.background='rgba(108,99,255,.15)'">
-        📥 Importar Excel
-        <input type="file" accept=".xlsx,.xls" style="display:none" onchange="vendaVidalImportarExcel(this)">
-      </label>
-      <span id="vidal-import-status" style="font-size:11px;color:#555"></span>
-    </div>
+  <div class="chart-box" data-ml-section="canais">
+    <div class="chart-title">📊 Canal · Receita vs Pedidos</div>
+    <canvas id="cMlCanais"></canvas>
   </div>
+  <div class="chart-box" data-ml-section="canais">
+    <div class="chart-title">📋 Detalhe por Canal</div>
+    <table id="ml-canais-tbl" class="data-tbl" style="width:100%"></table>
+  </div>
+  <div class="chart-box" data-ml-section="devol">
+    <div class="chart-title">↩️ Cancelamentos &amp; Devoluções</div>
+    <div id="ml-cancel-kpis" class="kpi-grid"></div>
+  </div>
+  <div class="chart-box" data-ml-section="devol">
+    <div class="chart-title">📉 Evolução de Cancelamentos</div>
+    <canvas id="cMlCancel"></canvas>
+  </div>
+  <div class="chart-box" data-ml-section="devol">
+    <div class="chart-title">📋 Detalhes por Mês</div>
+    <table id="ml-cancel-tbl" class="data-tbl" style="width:100%"></table>
+  </div>
+</div><!-- /vendas-vip-ml-legacy -->
 
-  <!-- FILTROS VIDAL -->
+<!-- container legado Vidal ML (mantido para compatibilidade com renderVendasVidal) -->
+<div id="vendas-vidal-ml-legacy" style="display:none">
+  <!-- Filtros Vidal -->
   <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
-
-    <!-- Linha 1: Período + Granularidade -->
     <div class="filter-bar" style="flex-wrap:wrap;gap:10px">
       <span class="filter-label">Período:</span>
       <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-        <input type="date" id="vd-dt-ini" value="2026-06-01"
-          style="background:#1a1a2e;color:#e2e8f0;border:1px solid rgba(108,99,255,.35);border-radius:7px;padding:5px 10px;font-size:12px;outline:none;cursor:pointer"
-          onchange="vdAplicarPeriodo()">
+        <input type="date" id="vd-dt-ini" value="2026-06-01" style="background:#1a1a2e;color:#e2e8f0;border:1px solid rgba(108,99,255,.35);border-radius:7px;padding:5px 10px;font-size:12px;outline:none;cursor:pointer" onchange="vdAplicarPeriodo()">
         <span style="color:#555;font-size:12px">até</span>
-        <input type="date" id="vd-dt-fim" value="2026-09-30"
-          style="background:#1a1a2e;color:#e2e8f0;border:1px solid rgba(108,99,255,.35);border-radius:7px;padding:5px 10px;font-size:12px;outline:none;cursor:pointer"
-          onchange="vdAplicarPeriodo()">
-        <button class="mes-btn sel-vidal" style="font-size:11px;padding:4px 10px" onclick="vdPeriodoPreset('jun-set')">Jun–Set</button>
+        <input type="date" id="vd-dt-fim" value="2026-09-30" style="background:#1a1a2e;color:#e2e8f0;border:1px solid rgba(108,99,255,.35);border-radius:7px;padding:5px 10px;font-size:12px;outline:none;cursor:pointer" onchange="vdAplicarPeriodo()">
+        <button class="mes-btn sel-vd" style="font-size:11px;padding:4px 10px" onclick="vdPeriodoPreset('jun-set')">Jun–Set</button>
         <button class="mes-btn" id="vd-preset-jul-set" style="font-size:11px;padding:4px 10px" onclick="vdPeriodoPreset('jul-set')">Jul–Set</button>
         <button class="mes-btn" id="vd-preset-ago-set" style="font-size:11px;padding:4px 10px" onclick="vdPeriodoPreset('ago-set')">Ago–Set</button>
       </div>
-      <div style="width:1px;background:rgba(255,255,255,.08);margin:0 4px;align-self:stretch"></div>
-      <span class="filter-label">Ver por:</span>
-      <div style="display:flex;gap:6px">
-        <button id="vd-gran-dia"    class="mes-btn" onclick="vdSetGran('dia')">Dia</button>
-        <button id="vd-gran-semana" class="mes-btn sel-vidal" onclick="vdSetGran('semana')">Semana</button>
-        <button id="vd-gran-mes"    class="mes-btn" onclick="vdSetGran('mes')">Mês</button>
-      </div>
     </div>
-
-    <!-- Linha 2: Mês + Exibir -->
-    <div class="filter-bar" style="flex-wrap:wrap">
-      <span class="filter-label">Mês:</span>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <button id="vd-f-jun" class="mes-btn sel-vidal" onclick="vdToggleMes('Jun')">Jun</button>
-        <button id="vd-f-jul" class="mes-btn sel-vidal" onclick="vdToggleMes('Jul')">Jul</button>
-        <button id="vd-f-ago" class="mes-btn sel-vidal" onclick="vdToggleMes('Ago')">Ago</button>
-        <button id="vd-f-set" class="mes-btn sel-vidal" onclick="vdToggleMes('Set')">Set</button>
-      </div>
-      <div style="width:1px;background:rgba(255,255,255,.08);margin:0 8px;align-self:stretch"></div>
-      <span class="filter-label">Exibir:</span>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <button id="vd-v-receita"  class="mes-btn sel-vidal" onclick="vdToggleView('receita')">R$</button>
-        <button id="vd-v-pedidos"  class="mes-btn sel-vidal" onclick="vdToggleView('pedidos')">Pedidos</button>
-        <button id="vd-v-ticket"   class="mes-btn sel-vidal" onclick="vdToggleView('ticket')">Ticket</button>
-        <button id="vd-v-diario"   class="mes-btn sel-vidal" onclick="vdToggleView('diario')">Diário</button>
-        <button id="vd-v-semanal"  class="mes-btn sel-vidal" onclick="vdToggleView('semanal')">Semanal</button>
-        <button id="vd-v-produtos" class="mes-btn sel-vidal" onclick="vdToggleView('produtos')">Produtos</button>
-        <button id="vd-v-geo"      class="mes-btn sel-vidal" onclick="vdToggleView('geo')">📍 Geo</button>
-        <button id="vd-v-cancel"   class="mes-btn sel-vidal" onclick="vdToggleView('cancel')">⚠️ Cancel.</button>
-      </div>
-      <div class="filter-actions">
-        <button class="filter-action" onclick="vdFilterAll()">Todos</button>
-        <button class="filter-action" onclick="vdFilterClear()">Limpar</button>
-      </div>
+    <div class="filter-bar" style="flex-wrap:wrap;gap:10px">
+      <span class="filter-label">Meses:</span>
+      <div id="vd-mes-btns" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+      <button class="mes-btn" onclick="vdTodosOsMeses()" style="font-size:11px;padding:4px 10px;margin-left:auto">Todos</button>
+      <button class="mes-btn" onclick="vdLimparMeses()" style="font-size:11px;padding:4px 10px">Limpar</button>
+    </div>
+    <div class="filter-bar" style="flex-wrap:wrap;gap:10px">
+      <span class="filter-label">Granularidade:</span>
+      <button class="mes-btn sel-vd" id="vd-gran-mensal" onclick="vdSetGranularidade('mensal')">Mensal</button>
+      <button class="mes-btn" id="vd-gran-semanal" onclick="vdSetGranularidade('semanal')">Semanal</button>
+      <button class="mes-btn" id="vd-gran-diario" onclick="vdSetGranularidade('diario')">Diário</button>
     </div>
   </div>
-
-  <div id="vd-kpis" class="kpis"></div>
-
-  <div data-vd-section="receita pedidos ticket">
-    <div class="charts-row">
-      <div class="chart-box"><div class="chart-title">Receita por Mês · R$</div><div class="chart-wrap"><canvas id="cVdMensal"></canvas></div></div>
-      <div class="chart-box"><div class="chart-title">Pedidos por Mês</div><div class="chart-wrap"><canvas id="cVdPedidos"></canvas></div></div>
-    </div>
-    <div class="charts-row">
-      <div class="chart-box"><div class="chart-title">Ticket Médio por Mês · R$</div><div class="chart-wrap"><canvas id="cVdTicket"></canvas></div></div>
-      <div class="chart-box"><div class="chart-title">Receita Média por Dia da Semana · R$</div><div class="chart-wrap"><canvas id="cVdDow"></canvas></div></div>
-    </div>
-    <div class="table-box"><div class="chart-title">Resumo Mensal</div><table id="vd-mensal-tbl"></table></div>
+  <!-- KPIs Vidal -->
+  <div id="vidal-kpis" class="kpi-grid" style="margin-bottom:20px"></div>
+  <!-- Gráficos Vidal -->
+  <div class="chart-box">
+    <div class="chart-title" id="vidal-chart-title">📈 Receita Bruta · Vidal</div>
+    <canvas id="cVidalReceita"></canvas>
   </div>
+  <div class="chart-box"><div class="chart-title">📅 Receita por Mês · Vidal</div><table id="vidal-receita-tbl" class="data-tbl" style="width:100%"></table></div>
+  <div class="chart-box"><div class="chart-title">🏆 Top Produtos · Vidal</div><canvas id="cVidalProdutos"></canvas></div>
+  <div class="chart-box"><div class="chart-title">📦 Detalhe Produtos · Vidal</div><table id="vidal-produtos-tbl" class="data-tbl" style="width:100%"></table></div>
+  <div class="chart-box"><div class="chart-title">🌍 Vendas por Estado · Vidal</div><canvas id="cVidalGeo"></canvas></div>
+  <div class="chart-box"><div class="chart-title">📋 Detalhe por Estado · Vidal</div><table id="vidal-geo-tbl" class="data-tbl" style="width:100%"></table></div>
+  <div class="chart-box"><div class="chart-title">↩️ Cancelamentos &amp; Dev. · Vidal</div><div id="vidal-cancel-kpis" class="kpi-grid"></div></div>
+  <div class="chart-box"><div class="chart-title">📉 Evolução Cancel. · Vidal</div><canvas id="cVidalCancel"></canvas></div>
+  <div class="chart-box"><div class="chart-title">📋 Detalhes Cancel. · Vidal</div><table id="vidal-cancel-tbl" class="data-tbl" style="width:100%"></table></div>
+</div><!-- /vendas-vidal-ml-legacy -->
 
-  <div data-vd-section="semanal">
-    <div class="chart-box" style="margin-bottom:16px"><div class="chart-title">Receita Semanal · Jun–Set 2026</div><div class="chart-wrap-tall"><canvas id="cVdSemanal"></canvas></div></div>
-    <div class="table-box"><div class="chart-title">Detalhe Semanal com Variação</div><table id="vd-semanal-tbl"></table></div>
-  </div>
+</div><!-- /page-vendas -->
 
-  <div data-vd-section="diario">
-    <div class="chart-box" style="margin-bottom:16px"><div class="chart-title">Receita Diária · Junho a Setembro 2026</div><div class="chart-wrap-tall"><canvas id="cVdDiario"></canvas></div></div>
-  </div>
-
-  <div data-vd-section="produtos">
-    <div class="chart-box" style="margin-bottom:16px"><div class="chart-title">Top 8 Produtos por Receita · R$</div><div class="chart-wrap-tall"><canvas id="cVdProdutos"></canvas></div></div>
-    <div id="vd-produto-insight" style="margin:0 0 16px;padding:12px 16px;background:rgba(108,99,255,.08);border:1px solid rgba(108,99,255,.2);border-radius:10px;font-size:13px;color:#c4b5fd;line-height:1.5"></div>
-  </div>
-
-  <div data-vd-section="geo">
-    <div style="display:flex;align-items:center;gap:10px;margin:16px 0"><div style="font-size:13px;color:#38bdf8;font-weight:600;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.25);border-radius:8px;padding:6px 14px">📍 Localização de Vendas</div></div>
-    <div id="vd-geo-kpis" class="kpis"></div>
-    <div class="charts-row">
-      <div class="chart-box"><div class="chart-title">Top 10 Estados por Receita · R$</div><div class="chart-wrap-tall"><canvas id="cVdEstados"></canvas></div></div>
-      <div class="chart-box"><div class="chart-title">Receita por Região do Brasil</div><div class="chart-wrap-tall"><canvas id="cVdRegioes"></canvas></div></div>
-    </div>
-    <div class="chart-box" style="margin-bottom:16px"><div class="chart-title">Top 15 Cidades por Receita · R$</div><div class="chart-wrap-tall"><canvas id="cVdCidades"></canvas></div></div>
-    <div class="charts-row">
-      <div class="table-box" style="margin-bottom:0"><div class="chart-title">Ranking por Estado</div><table id="vd-estados-tbl"></table></div>
-      <div class="table-box" style="margin-bottom:0"><div class="chart-title">Top 20 Cidades</div><table id="vd-cidades-tbl"></table></div>
-    </div>
-  </div>
-
-  <div data-vd-section="cancel">
-    <div style="display:flex;align-items:center;gap:10px;margin:16px 0"><div style="font-size:13px;color:#FF6B6B;font-weight:600;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.25);border-radius:8px;padding:6px 14px">⚠️ Cancelamentos & Devoluções</div></div>
-    <div id="vd-perda-kpis" class="kpis"></div>
-    <div class="charts-row">
-      <div class="chart-box"><div class="chart-title">Qtd. Cancelamentos e Devoluções por Mês</div><div class="chart-wrap"><canvas id="cVdCancelQtd"></canvas></div></div>
-      <div class="chart-box"><div class="chart-title">Receita Potencial Perdida por Mês · R$</div><div class="chart-wrap"><canvas id="cVdCancelVal"></canvas></div></div>
-    </div>
-    <div class="table-box"><div class="chart-title">Impacto Mensal — Receita Potencial Perdida</div><table id="vd-cancel-tbl"></table></div>
-  </div>
-</div>
-<!-- /VENDAS VIDAL -->
 
 <div class="footer" id="footer"></div>
 
@@ -1659,8 +1535,7 @@ function setPage(p){
   if(p==='dre'){fcInjectDRE();if(typeof buildDreFilter==='function')buildDreFilter();if(typeof renderDre==='function')renderDre();}
   if(p==='gerencial'){fcInjectDRE();if(typeof buildGerFilter==='function')buildGerFilter();if(typeof renderGer==='function')renderGer();}
   if(p==='orc2027') renderOrc2027();
-  if(p==='vendas') renderVendasML();
-  if(p==='vendas-vidal') renderVendasVidal();
+  if(p==='vendas'){ window._vendasPageActive=true; renderVendasPage(); }
   if(p==='fluxo') renderFluxo();
   if(p==='contas-pagar' && typeof cpRender==='function') cpRender();
   if(p==='contas-receber' && typeof crRender==='function') crRender();
@@ -1680,6 +1555,197 @@ function mkChart(id,type,labels,datasets,opts={}){
       y:{ticks:{color:'#666',font:{size:10},callback:v=>opts.hbar?v:fmtK(typeof v==='number'?v:0)},grid:{color:'rgba(255,255,255,.05)'},border:{display:false}}},
     ...opts.extra}});
 }
+
+
+// ══════════════════════════════════════════════════════════════════════
+// MOTOR DE ABAS DE VENDAS — empresa + canal
+// ══════════════════════════════════════════════════════════════════════
+(function(){
+  const CORES = {
+    vip:   {hex:'#f59e0b', rgb:'245,158,11', nome:'VIP',   emoji:'🛒'},
+    vidal: {hex:'#8b83ff', rgb:'108,99,255', nome:'Vidal', emoji:'🛒'},
+    v3:    {hex:'#4ade80', rgb:'74,222,128', nome:'V3',    emoji:'🛒'},
+  };
+  const CANAIS = {
+    vip:   ['ml','amazon','shopee','tiktok'],
+    vidal: ['ml','amazon','shopee','loja','tiktok'],
+    v3:    ['ml','amazon','shopee','tiktok'],
+  };
+  const CANAL_LABEL = {ml:'🟡 Mercado Livre', amazon:'🟠 Amazon', shopee:'🟠 Shopee', loja:'🏪 Loja Física', tiktok:'⬛ TikTok Shop'};
+
+  let _empresa = 'vip';
+  let _canal   = 'ml';
+
+  window.vendasSetEmpresa = function(emp){
+    _empresa = emp;
+    // Reset canal para o primeiro disponível
+    _canal = CANAIS[emp][0];
+    _renderAll();
+  };
+
+  window.vendasSetCanal = function(canal){
+    _canal = canal;
+    _renderCanal();
+  };
+
+  window.renderVendasPage = function(){
+    _renderAll();
+  };
+
+  function _renderAll(){
+    _renderEmpresaTabs();
+    _renderHeader();
+    _renderTotais();
+    _renderCanalTabs();
+    _renderCanal();
+  }
+
+  function _renderEmpresaTabs(){
+    ['vip','vidal','v3'].forEach(emp=>{
+      const btn = document.getElementById('vtab-'+emp);
+      if(!btn) return;
+      const c = CORES[emp];
+      if(emp===_empresa){
+        btn.style.background = `rgba(${c.rgb},.3)`;
+        btn.style.borderColor = c.hex;
+        btn.style.color = c.hex;
+        btn.style.boxShadow = `0 0 10px rgba(${c.rgb},.25)`;
+      } else {
+        btn.style.background = `rgba(${c.rgb},.08)`;
+        btn.style.borderColor = `rgba(${c.rgb},.25)`;
+        btn.style.color = `rgba(${c.rgb},.6)`;
+        btn.style.boxShadow = 'none';
+      }
+    });
+  }
+
+  function _renderHeader(){
+    const c = CORES[_empresa];
+    const el = document.getElementById('vendas-header');
+    if(!el) return;
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <div style="font-size:15px;color:${c.hex};font-weight:700;background:rgba(${c.rgb},.1);border:1px solid rgba(${c.rgb},.3);border-radius:10px;padding:8px 18px">
+          ${c.emoji} Vendas ${c.nome}
+        </div>
+        <div style="font-size:12px;color:#64748b">Selecione um canal abaixo para ver o relatório detalhado</div>
+        <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+          <label style="background:rgba(${c.rgb},.12);border:1px solid rgba(${c.rgb},.35);color:${c.hex};border-radius:7px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px"
+            title="Importar dados para ${CANAL_LABEL[_canal]||_canal}">
+            📥 Importar Excel
+            <input type="file" accept=".xlsx,.xls" style="display:none" onchange="vendasImportarExcel(this,'${_empresa}','${_canal}')">
+          </label>
+        </div>
+      </div>`;
+  }
+
+  function _getTotaisEmpresa(emp){
+    // Busca nos dados disponíveis
+    const dre = DATA && DATA.dre;
+    if(!dre) return null;
+    const key = emp==='vip'?'VIP':emp==='vidal'?'VIDAL':emp==='v3'?'V3':null;
+    if(!key||!dre[key]) return null;
+    const months = dre[key].months||[];
+    const totR   = months.reduce((s,m)=>s+(m.rBruta||0),0);
+    const totD   = months.reduce((s,m)=>s+(m.devolucoes||0),0);
+    const totL   = months.reduce((s,m)=>s+(m.lucroLiquido||0),0);
+    const melhor = months.reduce((a,b)=>(b.rBruta||0)>(a.rBruta||0)?b:a, months[0]||{});
+    return {totR, totD, totL, melhor, meses:months.length};
+  }
+
+  function _renderTotais(){
+    const el = document.getElementById('vendas-totais');
+    if(!el) return;
+    const c = CORES[_empresa];
+    const t = _getTotaisEmpresa(_empresa);
+    if(!t){ el.innerHTML=''; return; }
+    const fmtR = v=>'R$ '+(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+    el.innerHTML = `
+      <div class="kpi"><div class="kpi-label">💰 Receita Total</div><div class="kpi-value" style="color:${c.hex}">${fmtR(t.totR)}</div><div class="kpi-delta dim">${t.meses} meses registrados</div></div>
+      <div class="kpi"><div class="kpi-label">↩️ Devoluções</div><div class="kpi-value neg">${fmtR(t.totD)}</div><div class="kpi-delta dim">${t.totR?((t.totD/t.totR)*100).toFixed(1):0}% da receita</div></div>
+      <div class="kpi"><div class="kpi-label">📈 Lucro Líquido</div><div class="kpi-value ${t.totL>=0?'pos':'neg'}">${fmtR(t.totL)}</div><div class="kpi-delta dim">Resultado acumulado</div></div>
+      <div class="kpi"><div class="kpi-label">🏆 Melhor Mês</div><div class="kpi-value" style="color:${c.hex}">${t.melhor.mes||'—'}/26</div><div class="kpi-delta dim">${fmtR(t.melhor.rBruta||0)}</div></div>
+    `;
+  }
+
+  function _renderCanalTabs(){
+    const el = document.getElementById('vendas-canal-tabs');
+    if(!el) return;
+    const c = CORES[_empresa];
+    el.innerHTML = CANAIS[_empresa].map(canal=>{
+      const ativo = canal===_canal;
+      return `<button onclick="vendasSetCanal('${canal}')" style="
+        background:${ativo?`rgba(${c.rgb},.2)`:'rgba(255,255,255,.04)'};
+        border:1px solid ${ativo?c.hex:'rgba(255,255,255,.1)'};
+        color:${ativo?c.hex:'#94a3b8'};
+        border-radius:8px;padding:7px 16px;font-size:12px;font-weight:${ativo?700:400};
+        cursor:pointer;transition:all .2s">
+        ${CANAL_LABEL[canal]}
+      </button>`;
+    }).join('');
+  }
+
+  function _renderCanal(){
+    _renderCanalTabs(); // atualiza estados ativos
+    _renderHeader();    // atualiza botão importar com canal atual
+    const c = CORES[_empresa];
+    const el = document.getElementById('vendas-canal-content');
+    if(!el) return;
+
+    // Esconder todos os legados
+    const legVip   = document.getElementById('vendas-vip-ml-legacy');
+    const legVidal = document.getElementById('vendas-vidal-ml-legacy');
+    if(legVip)   legVip.style.display   = 'none';
+    if(legVidal) legVidal.style.display = 'none';
+
+    // VIP · ML — usa renderVendasML existente
+    if(_empresa==='vip' && _canal==='ml'){
+      el.innerHTML='';
+      if(legVip){ legVip.style.display='block'; renderVendasML(); }
+      return;
+    }
+    // Vidal · ML — usa renderVendasVidal existente
+    if(_empresa==='vidal' && _canal==='ml'){
+      el.innerHTML='';
+      if(legVidal){ legVidal.style.display='block'; renderVendasVidal(); }
+      return;
+    }
+
+    // Canais sem dados ainda — tela de placeholder
+    el.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:320px;gap:16px;text-align:center">
+        <div style="font-size:48px;opacity:.4">${CANAL_LABEL[_canal]?.split(' ')[0]||'📊'}</div>
+        <div style="font-size:18px;color:${c.hex};font-weight:700">${CANAL_LABEL[_canal]} · ${CORES[_empresa].nome}</div>
+        <div style="font-size:13px;color:#64748b;max-width:420px;line-height:1.6">
+          Relatório ainda sem dados.<br>
+          Use <strong style="color:${c.hex}">📥 Importar Excel</strong> para carregar a planilha de vendas deste canal.
+        </div>
+        <label style="background:rgba(${c.rgb},.15);border:1px solid rgba(${c.rgb},.4);color:${c.hex};border-radius:9px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;margin-top:8px">
+          📥 Importar planilha de ${CANAL_LABEL[_canal]}
+          <input type="file" accept=".xlsx,.xls" style="display:none" onchange="vendasImportarExcel(this,'${_empresa}','${_canal}')">
+        </label>
+      </div>`;
+  }
+
+  // Stub para importação — será expandido quando recebermos os modelos de cada canal
+  window.vendasImportarExcel = function(input, empresa, canal){
+    // VIP ML — redireciona para o importador existente
+    if(empresa==='vip' && canal==='ml'){
+      if(typeof vendaVipImportarExcel==='function') vendaVipImportarExcel(input);
+      return;
+    }
+    if(empresa==='vidal' && canal==='ml'){
+      if(typeof vendaVidalImportarExcel==='function') vendaVidalImportarExcel(input);
+      return;
+    }
+    alert(`Importação para ${CANAL_LABEL[canal]} · ${CORES[empresa].nome} será habilitada em breve!\nAguardando modelo da planilha.`);
+    input.value='';
+  };
+
+  // Inicializar quando a página carregar
+  window._vendasPageActive = false;
+
+})();
 
 // ── VENDAS ML ─────────────────────────────────────────────────────────────────
 function renderVendasML(){
