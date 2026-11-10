@@ -1668,6 +1668,128 @@ window.VENDAS_ML_VIP_DATA = {
   ]
 };
 
+// ── IMPORTADOR EXCEL ML VIP ──────────────────────────────────────────────────
+function vendaVipImportarExcel(input){
+  const file = input.files && input.files[0];
+  if(!file){ return; }
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      const data = new Uint8Array(e.target.result);
+      const wb = XLSX.read(data, {type:'array'});
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
+      if(rows.length < 2){ alert('Planilha vazia ou sem dados.'); return; }
+
+      const hdr = rows[0].map(h=>String(h||'').trim());
+      const col = nome => hdr.findIndex(h=>h.toLowerCase().includes(nome.toLowerCase()));
+
+      const cReceita   = col('Receita por produtos');
+      const cAcrescimo = col('acréscimo no preço');
+      const cTarifa    = col('Tarifa de venda');
+      const cRecEnvio  = col('Receita por envio');
+      const cTarEnvio  = col('Tarifas de envio');
+      const cCustoPeso = col('medidas e peso declarados');
+      const cDifPeso   = col('diferenças nas medidas');
+      const cDescontos = col('Descontos e bônus');
+      const cCancel    = col('Cancelamentos e reembolsos');
+      const cTotal     = col('Total (BRL)');
+      const cUnidades  = col('Unidades');
+      const cData      = col('Data de venda');
+      const cCidade    = col('Cidade');
+      const cEstado    = col('Estado');
+
+      const MESES = {janeiro:1,fevereiro:2,'março':3,marco:3,abril:4,maio:5,junho:6,
+        julho:7,agosto:8,setembro:9,outubro:10,novembro:11,dezembro:12};
+
+      function parseDt(s){
+        if(!s) return null;
+        s = String(s).toLowerCase();
+        for(const [nm,num] of Object.entries(MESES)){
+          if(s.includes(nm)){
+            const m = s.match(/(\d{4})/);
+            const ano = m ? parseInt(m[1]) : 2026;
+            return ano+'-'+String(num).padStart(2,'0');
+          }
+        }
+        return null;
+      }
+      function n(v){ return parseFloat(String(v||'0').replace(',','.')) || 0; }
+
+      const porMes={}, ests={}, cids={};
+      const tot={receita:0,acrescimo:0,tarifa_venda:0,receita_envio:0,tarifa_envio:0,
+        custo_peso:0,dif_peso:0,descontos:0,cancel:0,total:0,pedidos:0,unidades:0,cancel_count:0};
+
+      for(let i=1;i<rows.length;i++){
+        const r=rows[i];
+        if(!r[0]) continue;
+        const ch=parseDt(r[cData]);
+        if(!ch) continue;
+
+        const rec=n(r[cReceita]), acr=n(r[cAcrescimo]), tar=n(r[cTarifa]);
+        const re2=n(r[cRecEnvio]), te=n(r[cTarEnvio]), cp=n(r[cCustoPeso]);
+        const dp=n(r[cDifPeso]), des=n(r[cDescontos]), cnc=n(r[cCancel]);
+        const tv=n(r[cTotal]), uni=parseInt(r[cUnidades]||1)||1;
+        const isC = cnc!==0 && tv===0;
+
+        if(!porMes[ch]) porMes[ch]={receita:0,acrescimo:0,tarifa_venda:0,receita_envio:0,
+          tarifa_envio:0,custo_peso:0,dif_peso:0,descontos:0,cancel:0,total:0,
+          pedidos:0,unidades:0,cancel_count:0};
+        const m=porMes[ch];
+        m.receita+=rec;m.acrescimo+=acr;m.tarifa_venda+=tar;m.receita_envio+=re2;
+        m.tarifa_envio+=te;m.custo_peso+=cp;m.dif_peso+=dp;m.descontos+=des;
+        m.cancel+=cnc;m.total+=tv;m.pedidos++;m.unidades+=uni;
+        if(isC)m.cancel_count++;
+
+        tot.receita+=rec;tot.acrescimo+=acr;tot.tarifa_venda+=tar;tot.receita_envio+=re2;
+        tot.tarifa_envio+=te;tot.custo_peso+=cp;tot.dif_peso+=dp;tot.descontos+=des;
+        tot.cancel+=cnc;tot.total+=tv;tot.pedidos++;tot.unidades+=uni;
+        if(isC)tot.cancel_count++;
+
+        const est=String(r[cEstado]||'').trim();
+        const cid=String(r[cCidade]||'').trim();
+        if(est){
+          if(!ests[est])ests[est]={nome:est,sigla:'',receita:0,pedidos:0,unidades:0,total:0};
+          ests[est].receita+=rec;ests[est].pedidos++;ests[est].unidades+=uni;ests[est].total+=tv;
+        }
+        if(cid&&est){
+          if(!cids[cid])cids[cid]={nome:cid,estado:est,receita:0,pedidos:0,unidades:0,total:0};
+          cids[cid].receita+=rec;cids[cid].pedidos++;cids[cid].unidades+=uni;cids[cid].total+=tv;
+        }
+      }
+
+      const SIG={'Acre':'AC','Alagoas':'AL','Amapá':'AP','Amazonas':'AM','Bahia':'BA','Ceará':'CE',
+        'Distrito Federal':'DF','Espírito Santo':'ES','Goiás':'GO','Maranhão':'MA','Mato Grosso':'MT',
+        'Mato Grosso do Sul':'MS','Minas Gerais':'MG','Pará':'PA','Paraíba':'PB','Paraná':'PR',
+        'Pernambuco':'PE','Piauí':'PI','Rio de Janeiro':'RJ','Rio Grande do Norte':'RN',
+        'Rio Grande do Sul':'RS','Rondônia':'RO','Roraima':'RR','Santa Catarina':'SC',
+        'São Paulo':'SP','Sergipe':'SE','Tocantins':'TO'};
+
+      const meses = Object.keys(porMes).sort();
+      window.VENDAS_ML_VIP_DATA = {
+        fonte: 'Mercado Livre VIP · ' + meses.length + ' meses',
+        total: tot,
+        por_mes: porMes,
+        por_estado: Object.values(ests)
+          .map(e=>({...e,sigla:SIG[e.nome]||e.nome.substring(0,2).toUpperCase()}))
+          .sort((a,b)=>b.receita-a.receita).slice(0,20),
+        por_cidade: Object.values(cids).sort((a,b)=>b.receita-a.receita).slice(0,25)
+      };
+
+      // Re-renderizar a aba ML VIP
+      const el = document.getElementById('vendas-canal-content');
+      if(el){ el.innerHTML=''; renderVendasMLVip(el); }
+      input.value='';
+      alert('Importado! ' + tot.pedidos + ' pedidos · R$ ' +
+        tot.receita.toLocaleString('pt-BR',{minimumFractionDigits:2}));
+    }catch(err){
+      alert('Erro ao importar: '+err.message);
+      console.error(err);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
 // ── DASHBOARD ML VIP ──────────────────────────────────────────────────────────
 function renderVendasMLVip(container){
   const D = window.VENDAS_ML_VIP_DATA;
@@ -4669,7 +4791,7 @@ ${html}
   };
 
   // Mantém aliases para compatibilidade com botões individuais existentes
-  window.vendaVipImportarExcel = window.gerImportarExcel;
+  // vendaVipImportarExcel é definida separadamente (importador ML VIP)
   window.vendaVidalImportarExcel = window.gerImportarExcel;
   window.vendaImportarAmbos = window.gerImportarExcel;
 
