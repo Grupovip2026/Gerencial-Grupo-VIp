@@ -1668,6 +1668,156 @@ window.VENDAS_ML_VIP_DATA = {
   ]
 };
 
+
+// ── IMPORTADOR EXCEL ML VIP ───────────────────────────────────────────────────
+function vendaVipImportarExcel(input){
+  const file = input.files[0];
+  if(!file){ return; }
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      const data = new Uint8Array(e.target.result);
+      const wb = XLSX.read(data, {type:'array'});
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
+      if(rows.length < 2){ alert('Planilha vazia ou sem dados.'); return; }
+
+      // Mapeamento de colunas (baseado no header do ML)
+      const hdr = rows[0].map(h=>String(h||'').trim());
+      const col = (nome) => hdr.findIndex(h=>h.toLowerCase().includes(nome.toLowerCase()));
+
+      const cReceita    = col('Receita por produtos');
+      const cAcrescimo  = col('acréscimo no preço');
+      const cTarifa     = col('Tarifa de venda');
+      const cRecEnvio   = col('Receita por envio');
+      const cTarEnvio   = col('Tarifas de envio');
+      const cCustoPeso  = col('medidas e peso declarados');
+      const cDifPeso    = col('diferenças nas medidas');
+      const cDescontos  = col('Descontos e bônus');
+      const cCancel     = col('Cancelamentos e reembolsos');
+      const cTotal      = col('Total (BRL)');
+      const cUnidades   = col('Unidades');
+      const cData       = col('Data de venda');
+      const cCidade     = col('Cidade');
+      const cEstado     = col('Estado');
+
+      const MESES_PT = {janeiro:1,fevereiro:2,'março':3,marco:3,abril:4,maio:5,junho:6,
+        julho:7,agosto:8,setembro:9,outubro:10,novembro:11,dezembro:12};
+
+      function parseData(s){
+        if(!s) return null;
+        s = String(s).toLowerCase();
+        for(const [nome,num] of Object.entries(MESES_PT)){
+          if(s.includes(nome)){
+            const m = s.match(/(\d{4})/);
+            const ano = m ? parseInt(m[1]) : 2026;
+            return {ano, mes:num, chave: ano+'-'+String(num).padStart(2,'0')};
+          }
+        }
+        return null;
+      }
+
+      function n(v){ return parseFloat(String(v||'0').replace(',','.')) || 0; }
+
+      const porMes = {};
+      const estados = {};
+      const cidades = {};
+      const total = {receita:0,acrescimo:0,tarifa_venda:0,receita_envio:0,tarifa_envio:0,
+        custo_peso:0,dif_peso:0,descontos:0,cancel:0,total:0,pedidos:0,unidades:0,cancel_count:0};
+
+      for(let i=1; i<rows.length; i++){
+        const r = rows[i];
+        if(!r[0]) continue;
+        const dt = parseData(r[cData]);
+        if(!dt) continue;
+
+        const receita    = n(r[cReceita]);
+        const acrescimo  = n(r[cAcrescimo]);
+        const tarifa     = n(r[cTarifa]);
+        const recEnvio   = n(r[cRecEnvio]);
+        const tarEnvio   = n(r[cTarEnvio]);
+        const custoPeso  = n(r[cCustoPeso]);
+        const difPeso    = n(r[cDifPeso]);
+        const descontos  = n(r[cDescontos]);
+        const cancel     = n(r[cCancel]);
+        const totalVal   = n(r[cTotal]);
+        const unidades   = parseInt(r[cUnidades]||1)||1;
+        const isCancel   = cancel !== 0 && totalVal === 0;
+        const ch         = dt.chave;
+
+        if(!porMes[ch]) porMes[ch]={receita:0,acrescimo:0,tarifa_venda:0,receita_envio:0,
+          tarifa_envio:0,custo_peso:0,dif_peso:0,descontos:0,cancel:0,total:0,
+          pedidos:0,unidades:0,cancel_count:0};
+
+        const m = porMes[ch];
+        m.receita+=receita; m.acrescimo+=acrescimo; m.tarifa_venda+=tarifa;
+        m.receita_envio+=recEnvio; m.tarifa_envio+=tarEnvio; m.custo_peso+=custoPeso;
+        m.dif_peso+=difPeso; m.descontos+=descontos; m.cancel+=cancel;
+        m.total+=totalVal; m.pedidos++; m.unidades+=unidades;
+        if(isCancel) m.cancel_count++;
+
+        total.receita+=receita; total.acrescimo+=acrescimo; total.tarifa_venda+=tarifa;
+        total.receita_envio+=recEnvio; total.tarifa_envio+=tarEnvio; total.custo_peso+=custoPeso;
+        total.dif_peso+=difPeso; total.descontos+=descontos; total.cancel+=cancel;
+        total.total+=totalVal; total.pedidos++; total.unidades+=unidades;
+        if(isCancel) total.cancel_count++;
+
+        const estado = String(r[cEstado]||'').trim();
+        const cidade = String(r[cCidade]||'').trim();
+        if(estado){
+          if(!estados[estado]) estados[estado]={nome:estado,sigla:'',receita:0,pedidos:0,unidades:0,total:0};
+          estados[estado].receita+=receita; estados[estado].pedidos++;
+          estados[estado].unidades+=unidades; estados[estado].total+=totalVal;
+        }
+        if(cidade && estado){
+          if(!cidades[cidade]) cidades[cidade]={nome:cidade,estado,receita:0,pedidos:0,unidades:0,total:0};
+          cidades[cidade].receita+=receita; cidades[cidade].pedidos++;
+          cidades[cidade].unidades+=unidades; cidades[cidade].total+=totalVal;
+        }
+      }
+
+      // Montar meses ordenados
+      const mesesChaves = Object.keys(porMes).sort();
+      const primeiroMes = mesesChaves[0]||'';
+      const ultimoMes   = mesesChaves[mesesChaves.length-1]||'';
+      const fonte = 'Mercado Livre VIP · ' + mesesChaves.length + ' meses importados';
+
+      const siglas = {
+        'Acre':'AC','Alagoas':'AL','Amapá':'AP','Amazonas':'AM','Bahia':'BA','Ceará':'CE',
+        'Distrito Federal':'DF','Espírito Santo':'ES','Goiás':'GO','Maranhão':'MA',
+        'Mato Grosso':'MT','Mato Grosso do Sul':'MS','Minas Gerais':'MG','Pará':'PA',
+        'Paraíba':'PB','Paraná':'PR','Pernambuco':'PE','Piauí':'PI','Rio de Janeiro':'RJ',
+        'Rio Grande do Norte':'RN','Rio Grande do Sul':'RS','Rondônia':'RO','Roraima':'RR',
+        'Santa Catarina':'SC','São Paulo':'SP','Sergipe':'SE','Tocantins':'TO'
+      };
+
+      window.VENDAS_ML_VIP_DATA = {
+        fonte,
+        total,
+        por_mes: porMes,
+        por_estado: Object.values(estados)
+          .map(e=>({...e, sigla: siglas[e.nome]||e.nome.substring(0,2).toUpperCase()}))
+          .sort((a,b)=>b.receita-a.receita)
+          .slice(0,20),
+        por_cidade: Object.values(cidades)
+          .sort((a,b)=>b.receita-a.receita)
+          .slice(0,25)
+      };
+
+      // Re-renderizar
+      const el = document.getElementById('vendas-canal-content');
+      if(el){ el.innerHTML=''; renderVendasMLVip(el); }
+      input.value='';
+      alert('✅ Importado com sucesso!\n' + total.pedidos + ' pedidos · R$ ' +
+        total.receita.toLocaleString('pt-BR',{minimumFractionDigits:2}) + ' em receita');
+    }catch(err){
+      alert('Erro ao importar: '+err.message);
+      console.error(err);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
 // ── DASHBOARD ML VIP ──────────────────────────────────────────────────────────
 function renderVendasMLVip(container){
   const D = window.VENDAS_ML_VIP_DATA;
