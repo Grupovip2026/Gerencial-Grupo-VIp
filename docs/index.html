@@ -1866,18 +1866,18 @@ function renderVendasMLVip(container, filtroMeses){
   }
 
   // ── FILTRO DE MESES ──
-  const filtroHtml = `
-  <div id="mlvip-filtro" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;align-items:center">
-    <span style="font-size:11px;color:#888;margin-right:4px">Filtrar meses:</span>
-    <button onclick="mlvipFiltroTodos()" style="font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid #555;background:#1e1e2e;color:#aaa;cursor:pointer">Todos</button>
-    ${todosMeses.map(([ch]) => {
-      const ativo = mesesSel.has(ch);
-      return \`<button onclick="mlvipFiltroToggle('\${ch}')"
-        style="font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid \${ativo?'#f59e0b':'#444'};
-        background:\${ativo?'rgba(245,158,11,.15)':'#1e1e2e'};color:\${ativo?'#f59e0b':'#888'};cursor:pointer">
-        \${chaveParaLabel(ch)}</button>\`;
-    }).join('')}
-  </div>`;
+  var filtroHtml = '<div id="mlvip-filtro" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;align-items:center">';
+  filtroHtml += '<span style="font-size:11px;color:#888;margin-right:4px">Filtrar meses:</span>';
+  filtroHtml += '<button onclick="mlvipFiltroTodos()" style="font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid #555;background:#1e1e2e;color:#aaa;cursor:pointer">Todos</button>';
+  todosMeses.forEach(function(entry){
+    var ch = entry[0];
+    var ativo = mesesSel.has(ch);
+    var cor = ativo ? '#f59e0b' : '#888';
+    var borda = ativo ? '#f59e0b' : '#444';
+    var bg = ativo ? 'rgba(245,158,11,.15)' : '#1e1e2e';
+    filtroHtml += '<button onclick="mlvipFiltroToggle(' + JSON.stringify(ch) + ')" style="font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid ' + borda + ';background:' + bg + ';color:' + cor + ';cursor:pointer">' + chaveParaLabel(ch) + '</button>';
+  });
+  filtroHtml += '</div>'
 
   // ── KPI CARDS ──
   const kpis = `
