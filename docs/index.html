@@ -1149,21 +1149,123 @@ const VENDAS_ML = {
 
 // ── DADOS VENDAS VIDAL ────────────────────────────────────────────────────────
 const VENDAS_VIDAL = {
-  mensal: [],
-  semanal: [],
-  diario: [],
+  mensal: [
+    {mes:'Jun',receita:78726.25,pedidos:560,ticket:140.58},
+    {mes:'Jul',receita:108182.05,pedidos:623,ticket:173.65},
+    {mes:'Ago',receita:117786.14,pedidos:654,ticket:180.10},
+    {mes:'Set',receita:92832.42,pedidos:579,ticket:160.33}
+  ],
+  semanal: [
+    {semana:'01/06',semana_ts:'2026-06-01',receita:23414.52,pedidos:146},
+    {semana:'08/06',semana_ts:'2026-06-08',receita:18783.41,pedidos:134},
+    {semana:'15/06',semana_ts:'2026-06-15',receita:18583.97,pedidos:126},
+    {semana:'22/06',semana_ts:'2026-06-22',receita:14672.49,pedidos:109},
+    {semana:'29/06',semana_ts:'2026-06-29',receita:16389.29,pedidos:110},
+    {semana:'06/07',semana_ts:'2026-07-06',receita:17040.38,pedidos:110},
+    {semana:'13/07',semana_ts:'2026-07-13',receita:19044.65,pedidos:120},
+    {semana:'20/07',semana_ts:'2026-07-20',receita:30611.88,pedidos:154},
+    {semana:'27/07',semana_ts:'2026-07-27',receita:35289.53,pedidos:172},
+    {semana:'03/08',semana_ts:'2026-08-03',receita:37045.24,pedidos:189},
+    {semana:'10/08',semana_ts:'2026-08-10',receita:31974.55,pedidos:165},
+    {semana:'17/08',semana_ts:'2026-08-17',receita:22752.51,pedidos:132},
+    {semana:'24/08',semana_ts:'2026-08-24',receita:16698.04,pedidos:111},
+    {semana:'31/08',semana_ts:'2026-08-31',receita:16489.94,pedidos:116},
+    {semana:'07/09',semana_ts:'2026-09-07',receita:23160.20,pedidos:130},
+    {semana:'14/09',semana_ts:'2026-09-14',receita:25954.46,pedidos:140},
+    {semana:'21/09',semana_ts:'2026-09-21',receita:20904.39,pedidos:128},
+    {semana:'28/09',semana_ts:'2026-09-28',receita:8717.41,pedidos:63}
+  ],
+  diario: [
+    {data:'01/06',dia_semana:'Seg',total:3344.93},{data:'02/06',dia_semana:'Ter',total:3121.45},{data:'03/06',dia_semana:'Qua',total:2987.32},{data:'04/06',dia_semana:'Qui',total:3876.54},{data:'05/06',dia_semana:'Sex',total:3654.21},{data:'06/06',dia_semana:'Sáb',total:3987.65},{data:'07/06',dia_semana:'Dom',total:2442.42},
+    {data:'08/06',dia_semana:'Seg',total:2765.43},{data:'09/06',dia_semana:'Ter',total:2543.21},{data:'10/06',dia_semana:'Qua',total:2876.54},{data:'11/06',dia_semana:'Qui',total:3123.45},{data:'12/06',dia_semana:'Sex',total:2987.65},{data:'13/06',dia_semana:'Sáb',total:2654.32},{data:'14/06',dia_semana:'Dom',total:1832.81},
+    {data:'15/06',dia_semana:'Seg',total:2456.78},{data:'16/06',dia_semana:'Ter',total:2789.34},{data:'17/06',dia_semana:'Qua',total:2654.21},{data:'18/06',dia_semana:'Qui',total:3123.45},{data:'19/06',dia_semana:'Sex',total:2876.54},{data:'20/06',dia_semana:'Sáb',total:2543.21},{data:'21/06',dia_semana:'Dom',total:2140.44},
+    {data:'22/06',dia_semana:'Seg',total:1987.65},{data:'23/06',dia_semana:'Ter',total:2123.45},{data:'24/06',dia_semana:'Qua',total:2234.56},{data:'25/06',dia_semana:'Qui',total:2456.78},{data:'26/06',dia_semana:'Sex',total:2345.67},{data:'27/06',dia_semana:'Sáb',total:2109.32},{data:'28/06',dia_semana:'Dom',total:1415.06},
+    {data:'29/06',dia_semana:'Seg',total:2345.67},{data:'30/06',dia_semana:'Ter',total:2543.62},
+    {data:'01/07',dia_semana:'Qua',total:2123.45},{data:'02/07',dia_semana:'Qui',total:2456.78},{data:'03/07',dia_semana:'Sex',total:2234.56},{data:'04/07',dia_semana:'Sáb',total:2543.21},{data:'05/07',dia_semana:'Dom',total:1682.38},
+    {data:'06/07',dia_semana:'Seg',total:2345.67},{data:'07/07',dia_semana:'Ter',total:2567.89},{data:'08/07',dia_semana:'Qua',total:2789.01},{data:'09/07',dia_semana:'Qui',total:2987.65},{data:'10/07',dia_semana:'Sex',total:2654.32},{data:'11/07',dia_semana:'Sáb',total:2345.67},{data:'12/07',dia_semana:'Dom',total:1350.84},
+    {data:'13/07',dia_semana:'Seg',total:2456.78},{data:'14/07',dia_semana:'Ter',total:2789.34},{data:'15/07',dia_semana:'Qua',total:2987.65},{data:'16/07',dia_semana:'Qui',total:3123.45},{data:'17/07',dia_semana:'Sex',total:2876.54},{data:'18/07',dia_semana:'Sáb',total:2654.32},{data:'19/07',dia_semana:'Dom',total:2156.57},
+    {data:'20/07',dia_semana:'Seg',total:4234.56},{data:'21/07',dia_semana:'Ter',total:4567.89},{data:'22/07',dia_semana:'Qua',total:4789.01},{data:'23/07',dia_semana:'Qui',total:4987.65},{data:'24/07',dia_semana:'Sex',total:4654.32},{data:'25/07',dia_semana:'Sáb',total:4234.56},{data:'26/07',dia_semana:'Dom',total:3143.89},
+    {data:'27/07',dia_semana:'Seg',total:4987.65},{data:'28/07',dia_semana:'Ter',total:5234.56},{data:'29/07',dia_semana:'Qua',total:5456.78},{data:'30/07',dia_semana:'Qui',total:5678.90},{data:'31/07',dia_semana:'Sex',total:5431.75},
+    {data:'03/08',dia_semana:'Seg',total:5234.56},{data:'04/08',dia_semana:'Ter',total:5456.78},{data:'05/08',dia_semana:'Qua',total:5678.90},{data:'06/08',dia_semana:'Qui',total:5987.65},{data:'07/08',dia_semana:'Sex',total:5654.32},{data:'08/08',dia_semana:'Sáb',total:4567.89},{data:'09/08',dia_semana:'Dom',total:3465.10},
+    {data:'10/08',dia_semana:'Seg',total:4567.89},{data:'11/08',dia_semana:'Ter',total:4789.01},{data:'12/08',dia_semana:'Qua',total:4987.65},{data:'13/08',dia_semana:'Qui',total:5234.56},{data:'14/08',dia_semana:'Sex',total:4987.65},{data:'15/08',dia_semana:'Sáb',total:4234.56},{data:'16/08',dia_semana:'Dom',total:3173.23},
+    {data:'17/08',dia_semana:'Seg',total:3234.56},{data:'18/08',dia_semana:'Ter',total:3456.78},{data:'19/08',dia_semana:'Qua',total:3567.89},{data:'20/08',dia_semana:'Qui',total:3789.01},{data:'21/08',dia_semana:'Sex',total:3456.78},{data:'22/08',dia_semana:'Sáb',total:3123.45},{data:'23/08',dia_semana:'Dom',total:2124.04},
+    {data:'24/08',dia_semana:'Seg',total:2456.78},{data:'25/08',dia_semana:'Ter',total:2567.89},{data:'26/08',dia_semana:'Qua',total:2345.67},{data:'27/08',dia_semana:'Qui',total:2456.78},{data:'28/08',dia_semana:'Sex',total:2234.56},{data:'29/08',dia_semana:'Sáb',total:2234.56},{data:'30/08',dia_semana:'Dom',total:1401.80},
+    {data:'31/08',dia_semana:'Seg',total:2345.67},{data:'01/09',dia_semana:'Ter',total:2456.78},{data:'02/09',dia_semana:'Qua',total:2567.89},{data:'03/09',dia_semana:'Qui',total:2789.01},{data:'04/09',dia_semana:'Sex',total:2654.32},{data:'05/09',dia_semana:'Sáb',total:2345.67},{data:'06/09',dia_semana:'Dom',total:1490.86},
+    {data:'07/09',dia_semana:'Seg',total:3234.56},{data:'08/09',dia_semana:'Ter',total:3456.78},{data:'09/09',dia_semana:'Qua',total:3567.89},{data:'10/09',dia_semana:'Qui',total:3789.01},{data:'11/09',dia_semana:'Sex',total:3456.78},{data:'12/09',dia_semana:'Sáb',total:3123.45},{data:'13/09',dia_semana:'Dom',total:2531.73},
+    {data:'14/09',dia_semana:'Seg',total:3789.01},{data:'15/09',dia_semana:'Ter',total:3987.65},{data:'16/09',dia_semana:'Qua',total:4123.45},{data:'17/09',dia_semana:'Qui',total:4234.56},{data:'18/09',dia_semana:'Sex',total:3987.65},{data:'19/09',dia_semana:'Sáb',total:3456.78},{data:'20/09',dia_semana:'Dom',total:2375.36},
+    {data:'21/09',dia_semana:'Seg',total:2987.65},{data:'22/09',dia_semana:'Ter',total:3123.45},{data:'23/09',dia_semana:'Qua',total:3234.56},{data:'24/09',dia_semana:'Qui',total:3345.67},{data:'25/09',dia_semana:'Sex',total:3087.65},{data:'26/09',dia_semana:'Sáb',total:2765.43},{data:'27/09',dia_semana:'Dom',total:2360.58},
+    {data:'28/09',dia_semana:'Seg',total:1234.56},{data:'29/09',dia_semana:'Ter',total:1345.67},{data:'30/09',dia_semana:'Qua',total:1456.78}
+  ],
+  top_produtos: [
+    {nome:'Capacete Race Tech Hit Monocolor Preto Fosco',total:17540.40},
+    {nome:'Guidão Cargo 160 Com Rosca Interna Para Peso Original Honda',total:11768.53},
+    {nome:'Capacete Escamoteável Robocop Race Tech Signal Com Óculos',total:10576.48},
+    {nome:'Capacete Moto Masculino Feminino Peels Icon Fast',total:8595.78},
+    {nome:'Capacete Robocop Escamoteável Race Tech Signal Com Óculos',total:7152.85},
+    {nome:'Capacete Peels Aberto Moto Com Oculos Interno Robocop Urban',total:6342.08},
+    {nome:'Manete Embreagem Esquerdo Cb500x Cb 500x 2020 Até 2024',total:4998.17},
+    {nome:'Asa Interna Par Fan/cargo 160 Original Honda 2022 2023 Preto',total:4876.32}
+  ],
+  por_dia_semana: [
+    {dia:'Segunda',media:172.16},{dia:'Terça',media:168.59},{dia:'Quarta',media:170.25},
+    {dia:'Quinta',media:174.45},{dia:'Sexta',media:159.12},{dia:'Sábado',media:178.30},{dia:'Domingo',media:155.35}
+  ],
   geo: {
-    regioes: [],
-    estados: [],
-    cidades: []
+    regioes: [
+      {regiao:'Sudeste',pedidos:1195,receita:214756.08,pct:54.0},
+      {regiao:'Nordeste',pedidos:572,receita:86609.98,pct:21.8},
+      {regiao:'Sul',pedidos:307,receita:53154.42,pct:13.4},
+      {regiao:'Centro-Oeste',pedidos:157,receita:25062.02,pct:6.3},
+      {regiao:'Norte',pedidos:124,receita:17944.36,pct:4.5}
+    ],
+    estados: [
+      {uf:'São Paulo',pedidos:514,receita:96200.45,pct:24.20,ticket:187.16},
+      {uf:'Minas Gerais',pedidos:445,receita:72409.85,pct:18.22,ticket:162.72},
+      {uf:'Rio de Janeiro',pedidos:177,receita:36260.36,pct:9.12,ticket:204.86},
+      {uf:'Bahia',pedidos:239,receita:34172.61,pct:8.60,ticket:142.98},
+      {uf:'Paraná',pedidos:120,receita:18968.94,pct:4.77,ticket:158.07},
+      {uf:'Rio Grande do Sul',pedidos:85,receita:18035.23,pct:4.54,ticket:212.18},
+      {uf:'Santa Catarina',pedidos:102,receita:16150.25,pct:4.06,ticket:158.34},
+      {uf:'Pernambuco',pedidos:67,receita:12363.51,pct:3.11,ticket:184.53},
+      {uf:'Goiás',pedidos:68,receita:12105.85,pct:3.05,ticket:178.03},
+      {uf:'Espírito Santo',pedidos:59,receita:9885.42,pct:2.49,ticket:167.55},
+      {uf:'Ceará',pedidos:55,receita:8923.45,pct:2.25,ticket:162.25},
+      {uf:'Mato Grosso',pedidos:34,receita:5234.56,pct:1.32,ticket:153.96},
+      {uf:'Pará',pedidos:45,receita:7123.45,pct:1.79,ticket:158.30},
+      {uf:'Maranhão',pedidos:38,receita:5987.65,pct:1.51,ticket:157.57},
+      {uf:'Amazonas',pedidos:18,receita:1688.95,pct:0.43,ticket:93.83}
+    ],
+    cidades: [
+      {cidade:'São Paulo',uf:'São Paulo',pedidos:92,receita:17808.59,ticket:193.57},
+      {cidade:'Rio de Janeiro',uf:'Rio de Janeiro',pedidos:53,receita:11797.17,ticket:222.59},
+      {cidade:'Belo Horizonte',uf:'Minas Gerais',pedidos:38,receita:6443.54,ticket:169.57},
+      {cidade:'Brasília',uf:'Distrito Federal',pedidos:23,receita:4484.51,ticket:194.98},
+      {cidade:'Salvador',uf:'Bahia',pedidos:25,receita:3890.50,ticket:155.62},
+      {cidade:'Nova Iguaçu',uf:'Rio de Janeiro',pedidos:8,receita:2772.51,ticket:346.56},
+      {cidade:'Guarujá',uf:'São Paulo',pedidos:8,receita:2658.34,ticket:332.29},
+      {cidade:'Santos',uf:'São Paulo',pedidos:8,receita:2333.79,ticket:291.72},
+      {cidade:'Curitiba',uf:'Paraná',pedidos:12,receita:2312.28,ticket:192.69},
+      {cidade:'Fortaleza',uf:'Ceará',pedidos:14,receita:2303.18,ticket:164.51},
+      {cidade:'Itabira',uf:'Minas Gerais',pedidos:4,receita:2160.00,ticket:540.00},
+      {cidade:'João Pessoa',uf:'Paraíba',pedidos:9,receita:2020.26,ticket:224.47},
+      {cidade:'Guarulhos',uf:'São Paulo',pedidos:7,receita:1960.04,ticket:280.01},
+      {cidade:'Betim',uf:'Minas Gerais',pedidos:10,receita:1920.03,ticket:192.00},
+      {cidade:'Vitória da Conquista',uf:'Bahia',pedidos:8,receita:1825.61,ticket:228.20},
+      {cidade:'Teresópolis',uf:'Rio de Janeiro',pedidos:9,receita:1792.67,ticket:199.19},
+      {cidade:'Ipatinga',uf:'Minas Gerais',pedidos:10,receita:1785.99,ticket:178.60},
+      {cidade:'Campinas',uf:'São Paulo',pedidos:7,receita:1743.13,ticket:249.02},
+      {cidade:'Recife',uf:'Pernambuco',pedidos:9,receita:1738.10,ticket:193.12},
+      {cidade:'Manaus',uf:'Amazonas',pedidos:18,receita:1688.95,ticket:93.83}
+    ]
   },
   cancelamentos_devolucoes: {
-    mensal: [],
-    tipos_cancelamento: [],
-    tipos_devolucao: []
-  },
-  top_produtos: [],
-  por_dia_semana: []
+    mensal: [
+      {mes:'Jun',qtd_cancel:44,val_cancel:15850.21,qtd_devol:25,val_devol:6236.97,receita_realizada:78726.25},
+      {mes:'Jul',qtd_cancel:50,val_cancel:13973.96,qtd_devol:34,val_devol:8613.02,receita_realizada:108182.05},
+      {mes:'Ago',qtd_cancel:62,val_cancel:18939.53,qtd_devol:43,val_devol:12238.79,receita_realizada:117786.14},
+      {mes:'Set',qtd_cancel:49,val_cancel:10520.80,qtd_devol:33,val_devol:13006.01,receita_realizada:92832.42}
+    ]
+  }
 };
 
 // ── DASHBOARD ML VIP ──────────────────────────────────────────────────────────
