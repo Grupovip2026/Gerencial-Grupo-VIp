@@ -541,7 +541,7 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
   <button id="vtab-v3"    onclick="vendasSetEmpresa('v3')"    class="vtab" style="background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.3);color:#4ade80;border-radius:9px;padding:8px 20px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s">🛒 V3</button>
 </div>
 
-<!-- ── TOTALIZADOR DA EMPRESA ─────────────────────────────────────── -->
+<!-- ── TOTALIZADOR DA EMPRESA (oculto quando canal ML VIP ativo) ─── -->
 <div id="vendas-totais" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px">
   <!-- preenchido por JS -->
 </div>
@@ -1562,9 +1562,14 @@ function mkChart(id,type,labels,datasets,opts={}){
     // VIP · ML — dashboard rico com dados da planilha
     if(_empresa==='vip' && _canal==='ml'){
       el.innerHTML='';
+      // Ocultar totalizador de empresa (o dashboard ML VIP tem os seus próprios KPIs)
+      const totDiv = document.getElementById('vendas-totais');
+      if(totDiv) totDiv.style.display='none';
       renderVendasMLVip(el);
       return;
     }
+    // Restaurar totalizador para outros canais
+    { const totDiv = document.getElementById('vendas-totais'); if(totDiv) totDiv.style.display=''; }
     // Vidal · ML — usa renderVendasVidal existente
     if(_empresa==='vidal' && _canal==='ml'){
       el.innerHTML='';
@@ -1707,29 +1712,42 @@ function vendaVipImportarExcel(input){
         s = String(s).toLowerCase();
         for(const [nm,num] of Object.entries(MESES)){
           if(s.includes(nm)){
-            const m = s.match(/(\d{4})/);
-            const ano = m ? parseInt(m[1]) : 2026;
+            const m2 = s.match(/([0-9]{4})/);
+            const ano = m2 ? parseInt(m2[1]) : 2026;
             return ano+'-'+String(num).padStart(2,'0');
           }
         }
         return null;
       }
-      function n(v){ return parseFloat(String(v||'0').replace(',','.')) || 0; }
+      function nv(v){ return parseFloat(String(v||'0').replace(',','.')) || 0; }
 
-      const porMes={}, ests={}, cids={};
-      const tot={receita:0,acrescimo:0,tarifa_venda:0,receita_envio:0,tarifa_envio:0,
-        custo_peso:0,dif_peso:0,descontos:0,cancel:0,total:0,pedidos:0,unidades:0,cancel_count:0};
+      // Carregar dados existentes ou iniciar do zero
+      const existing = window.VENDAS_ML_VIP_DATA || {total:{receita:0,acrescimo:0,tarifa_venda:0,
+        receita_envio:0,tarifa_envio:0,custo_peso:0,dif_peso:0,descontos:0,cancel:0,total:0,
+        pedidos:0,unidades:0,cancel_count:0}, por_mes:{}, por_estado:[], por_cidade:[]};
 
+      const porMes = Object.assign({}, existing.por_mes || {});
+      const ests = {};
+      const cids = {};
+      // Recarregar estados/cidades do existente
+      (existing.por_estado||[]).forEach(e=>{ ests[e.nome]={...e}; });
+      (existing.por_cidade||[]).forEach(c=>{ cids[c.nome]={...c}; });
+
+      const tot = Object.assign({receita:0,acrescimo:0,tarifa_venda:0,receita_envio:0,
+        tarifa_envio:0,custo_peso:0,dif_peso:0,descontos:0,cancel:0,total:0,
+        pedidos:0,unidades:0,cancel_count:0}, existing.total || {});
+
+      let novos = 0;
       for(let i=1;i<rows.length;i++){
         const r=rows[i];
         if(!r[0]) continue;
         const ch=parseDt(r[cData]);
         if(!ch) continue;
 
-        const rec=n(r[cReceita]), acr=n(r[cAcrescimo]), tar=n(r[cTarifa]);
-        const re2=n(r[cRecEnvio]), te=n(r[cTarEnvio]), cp=n(r[cCustoPeso]);
-        const dp=n(r[cDifPeso]), des=n(r[cDescontos]), cnc=n(r[cCancel]);
-        const tv=n(r[cTotal]), uni=parseInt(r[cUnidades]||1)||1;
+        const rec=nv(r[cReceita]), acr=nv(r[cAcrescimo]), tar=nv(r[cTarifa]);
+        const re2=nv(r[cRecEnvio]), te=nv(r[cTarEnvio]), cp=nv(r[cCustoPeso]);
+        const dp=nv(r[cDifPeso]), des=nv(r[cDescontos]), cnc=nv(r[cCancel]);
+        const tv=nv(r[cTotal]), uni=parseInt(r[cUnidades]||1)||1;
         const isC = cnc!==0 && tv===0;
 
         if(!porMes[ch]) porMes[ch]={receita:0,acrescimo:0,tarifa_venda:0,receita_envio:0,
@@ -1756,6 +1774,7 @@ function vendaVipImportarExcel(input){
           if(!cids[cid])cids[cid]={nome:cid,estado:est,receita:0,pedidos:0,unidades:0,total:0};
           cids[cid].receita+=rec;cids[cid].pedidos++;cids[cid].unidades+=uni;cids[cid].total+=tv;
         }
+        novos++;
       }
 
       const SIG={'Acre':'AC','Alagoas':'AL','Amapá':'AP','Amazonas':'AM','Bahia':'BA','Ceará':'CE',
@@ -1776,11 +1795,12 @@ function vendaVipImportarExcel(input){
         por_cidade: Object.values(cids).sort((a,b)=>b.receita-a.receita).slice(0,25)
       };
 
-      // Re-renderizar a aba ML VIP
+      // Re-renderizar
       const el = document.getElementById('vendas-canal-content');
       if(el){ el.innerHTML=''; renderVendasMLVip(el); }
       input.value='';
-      alert('Importado! ' + tot.pedidos + ' pedidos · R$ ' +
+      alert('✅ Importado e acumulado!\n' + novos + ' registros · Total acumulado: ' +
+        tot.pedidos + ' pedidos · R$ ' +
         tot.receita.toLocaleString('pt-BR',{minimumFractionDigits:2}));
     }catch(err){
       alert('Erro ao importar: '+err.message);
@@ -1791,295 +1811,200 @@ function vendaVipImportarExcel(input){
 }
 
 // ── DASHBOARD ML VIP ──────────────────────────────────────────────────────────
-function renderVendasMLVip(container){
+function renderVendasMLVip(container, filtroMeses){
   const D = window.VENDAS_ML_VIP_DATA;
-  const T = D.total;
-  const meses = Object.entries(D.por_mes);
-  const nMeses = meses.length;
+  if(!D || !D.por_mes || Object.keys(D.por_mes).length === 0){
+    container.innerHTML = '<p style="padding:2rem;color:#999;text-align:center">Sem dados — importe a planilha de Vendas ML VIP.</p>';
+    return;
+  }
+
+  // Todos os meses disponíveis (ordenados)
+  const todosMeses = Object.entries(D.por_mes).sort((a,b)=>a[0].localeCompare(b[0]));
+
+  // Filtro ativo: se não passado, seleciona todos
+  const mesesSel = filtroMeses || new Set(todosMeses.map(m=>m[0]));
+
+  // Meses filtrados
+  const meses = todosMeses.filter(m => mesesSel.has(m[0]));
+
+  // Totais calculados dos meses selecionados
+  const T = meses.reduce((acc, [,m]) => {
+    acc.receita      += m.receita||0;
+    acc.acrescimo    += m.acrescimo||0;
+    acc.tarifa_venda += m.tarifa_venda||0;
+    acc.receita_envio+= m.receita_envio||0;
+    acc.tarifa_envio += m.tarifa_envio||0;
+    acc.custo_peso   += m.custo_peso||0;
+    acc.dif_peso     += m.dif_peso||0;
+    acc.descontos    += m.descontos||0;
+    acc.cancel       += m.cancel||0;
+    acc.total        += m.total||0;
+    acc.pedidos      += m.pedidos||0;
+    acc.unidades     += m.unidades||0;
+    acc.cancel_count += m.cancel_count||0;
+    return acc;
+  }, {receita:0,acrescimo:0,tarifa_venda:0,receita_envio:0,tarifa_envio:0,
+      custo_peso:0,dif_peso:0,descontos:0,cancel:0,total:0,
+      pedidos:0,unidades:0,cancel_count:0});
 
   const fmtR = v => 'R$'+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
   const fmtN = v => v.toLocaleString('pt-BR');
   const fmtP = v => v.toFixed(1)+'%';
-  const cor = '#f59e0b';
 
-  // Ticket médio e taxa média de comissão
-  const ticketMedio = T.receita / T.pedidos;
-  const taxaVenda   = Math.abs(T.tarifa_venda) / T.receita * 100;
-  const taxaFrete   = Math.abs(T.tarifa_envio) / T.receita * 100;
-  const taxaTotal   = (Math.abs(T.tarifa_venda)+Math.abs(T.tarifa_envio)) / T.receita * 100;
-  const margemLiq   = T.total / T.receita * 100;
-  const txCancel    = T.cancel_count / T.pedidos * 100;
+  const ticketMedio = T.pedidos ? T.receita / T.pedidos : 0;
+  const taxaVenda   = T.receita ? Math.abs(T.tarifa_venda) / T.receita * 100 : 0;
+  const taxaFrete   = T.receita ? Math.abs(T.tarifa_envio) / T.receita * 100 : 0;
+  const margemLiq   = T.receita ? T.total / T.receita * 100 : 0;
+  const txCancel    = T.pedidos ? T.cancel_count / T.pedidos * 100 : 0;
 
-  // Mês de pico
-  const picoMes = meses.reduce((best,m) => m[1].receita>best[1].receita ? m : best, meses[0]);
-  const picoLabel = {
-    '2026-01':'Jan/26','2026-02':'Fev/26','2026-03':'Mar/26',
-    '2026-04':'Abr/26','2026-05':'Mai/26','2026-06':'Jun/26','2026-07':'Jul/26'
-  };
+  const picoMes = meses.length ? meses.reduce((best,m) => m[1].receita>best[1].receita ? m : best, meses[0]) : null;
+
+  function chaveParaLabel(ch){
+    const [ano,mes] = ch.split('-');
+    const nomes = ['','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    return nomes[parseInt(mes)]+'/'+String(ano).slice(2);
+  }
+
+  // ── FILTRO DE MESES ──
+  const filtroHtml = `
+  <div id="mlvip-filtro" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;align-items:center">
+    <span style="font-size:11px;color:#888;margin-right:4px">Filtrar meses:</span>
+    <button onclick="mlvipFiltroTodos()" style="font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid #555;background:#1e1e2e;color:#aaa;cursor:pointer">Todos</button>
+    ${todosMeses.map(([ch]) => {
+      const ativo = mesesSel.has(ch);
+      return \`<button onclick="mlvipFiltroToggle('\${ch}')"
+        style="font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid \${ativo?'#f59e0b':'#444'};
+        background:\${ativo?'rgba(245,158,11,.15)':'#1e1e2e'};color:\${ativo?'#f59e0b':'#888'};cursor:pointer">
+        \${chaveParaLabel(ch)}</button>\`;
+    }).join('')}
+  </div>`;
 
   // ── KPI CARDS ──
   const kpis = `
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-bottom:24px">
     ${[
-      {ico:'💰',label:'Receita Bruta',val:fmtR(T.receita),sub:'Jan–Jul 2026',color:'#f59e0b'},
+      {ico:'💰',label:'Receita Bruta',val:fmtR(T.receita),sub:meses.length+' meses',color:'#f59e0b'},
       {ico:'💵',label:'Total Líquido',val:fmtR(T.total),sub:fmtP(margemLiq)+' da receita',color:'#4ade80'},
       {ico:'📦',label:'Total Pedidos',val:fmtN(T.pedidos),sub:fmtN(T.unidades)+' unidades',color:'#60a5fa'},
-      {ico:'🎫',label:'Ticket Médio',val:fmtR(ticketMedio),sub:'por pedido',color:'#c084fc'},
-      {ico:'🏷️',label:'Tarifa ML',val:fmtP(taxaVenda),sub:fmtR(Math.abs(T.tarifa_venda)),color:'#f87171'},
+      {ico:'🏷️',label:'Ticket Médio',val:fmtR(ticketMedio),sub:'por pedido',color:'#c084fc'},
+      {ico:'📋',label:'Tarifa ML',val:fmtP(taxaVenda),sub:fmtR(Math.abs(T.tarifa_venda)),color:'#f87171'},
       {ico:'🚚',label:'Tarifa Frete',val:fmtP(taxaFrete),sub:fmtR(Math.abs(T.tarifa_envio)),color:'#fb923c'},
-      {ico:'📉',label:'Cancelamentos',val:fmtR(Math.abs(T.cancel)),sub:fmtN(T.cancel_count)+' pedidos ('+fmtP(txCancel)+')',color:'#f43f5e'},
-      {ico:'🏆',label:'Melhor Mês',val:picoLabel[picoMes[0]],sub:fmtR(picoMes[1].receita)+' · '+fmtN(picoMes[1].pedidos)+' ped.',color:'#34d399'},
+      {ico:'↩️',label:'Cancelamentos',val:fmtR(Math.abs(T.cancel)),sub:fmtN(T.cancel_count)+' ped. ('+fmtP(txCancel)+')',color:'#f87171'},
+      {ico:'🏆',label:'Melhor Mês',val:picoMes?chaveParaLabel(picoMes[0]):'—',sub:picoMes?fmtR(picoMes[1].receita):'',color:'#f59e0b'},
     ].map(k=>`
-      <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px;position:relative;overflow:hidden">
+      <div style="background:#1e1e2e;border-radius:12px;padding:16px;border:1px solid #2a2a3e;position:relative;overflow:hidden">
         <div style="font-size:22px;margin-bottom:6px">${k.ico}</div>
-        <div style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">${k.label}</div>
-        <div style="font-size:18px;font-weight:800;color:${k.color};line-height:1.1">${k.val}</div>
-        <div style="font-size:11px;color:#64748b;margin-top:4px">${k.sub}</div>
-        <div style="position:absolute;top:-10px;right:-10px;font-size:52px;opacity:.05">${k.ico}</div>
+        <div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">${k.label}</div>
+        <div style="font-size:18px;font-weight:700;color:${k.color}">${k.val}</div>
+        <div style="font-size:11px;color:#666;margin-top:4px">${k.sub}</div>
       </div>`).join('')}
   </div>`;
 
-  // ── GRÁFICO EVOLUÇÃO MENSAL ──
-  const mesLabels = meses.map(([k])=>picoLabel[k]);
-  const maxR = Math.max(...meses.map(([,v])=>v.receita));
-  const barW = 100/nMeses;
-
-  const chartMensal = `
-  <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:20px;margin-bottom:20px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div>
-        <div style="font-size:14px;font-weight:700;color:#e2e8f0">📈 Evolução Mensal</div>
-        <div style="font-size:11px;color:#64748b">Receita bruta · pedidos · líquido</div>
-      </div>
-      <div style="display:flex;gap:12px;font-size:11px">
-        <span style="color:${cor}">■ Receita</span>
-        <span style="color:#4ade80">■ Líquido</span>
-        <span style="color:#60a5fa">● Pedidos</span>
-      </div>
+  // ── EVOLUÇÃO MENSAL ──
+  const evolHtml = meses.length > 0 ? `
+  <div style="background:#1e1e2e;border-radius:12px;padding:20px;border:1px solid #2a2a3e;margin-bottom:20px">
+    <h3 style="margin:0 0 16px;font-size:14px;color:#ccc">📈 Evolução Mensal</h3>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead>
+          <tr style="border-bottom:1px solid #2a2a3e">
+            ${['Mês','Pedidos','Unid.','Receita Bruta','Tarifa ML','Tarifa Frete','Cancelam.','Total Líq.','Margem'].map(h=>
+              `<th style="padding:8px;text-align:right;color:#888;white-space:nowrap;first-child:{text-align:left}">${h}</th>`
+            ).join('')}
+          </tr>
+        </thead>
+        <tbody>
+          ${meses.map(([ch,m])=>{
+            const mg = m.receita ? (m.total/m.receita*100) : 0;
+            return `<tr style="border-bottom:1px solid #1a1a2e">
+              <td style="padding:8px;color:#f59e0b;font-weight:600;white-space:nowrap">${chaveParaLabel(ch)}</td>
+              <td style="padding:8px;text-align:right;color:#ccc">${fmtN(m.pedidos)}</td>
+              <td style="padding:8px;text-align:right;color:#888">${fmtN(m.unidades)}</td>
+              <td style="padding:8px;text-align:right;color:#f59e0b">${fmtR(m.receita)}</td>
+              <td style="padding:8px;text-align:right;color:#f87171">${fmtR(Math.abs(m.tarifa_venda))}</td>
+              <td style="padding:8px;text-align:right;color:#fb923c">${fmtR(Math.abs(m.tarifa_envio))}</td>
+              <td style="padding:8px;text-align:right;color:#f87171">${fmtR(Math.abs(m.cancel))}</td>
+              <td style="padding:8px;text-align:right;color:#4ade80;font-weight:600">${fmtR(m.total)}</td>
+              <td style="padding:8px;text-align:right;color:${mg>=70?'#4ade80':mg>=50?'#fbbf24':'#f87171'}">${fmtP(mg)}</td>
+            </tr>`;
+          }).join('')}
+          <tr style="border-top:2px solid #3a3a4e;font-weight:700">
+            <td style="padding:8px;color:#fff">TOTAL</td>
+            <td style="padding:8px;text-align:right;color:#fff">${fmtN(T.pedidos)}</td>
+            <td style="padding:8px;text-align:right;color:#fff">${fmtN(T.unidades)}</td>
+            <td style="padding:8px;text-align:right;color:#f59e0b">${fmtR(T.receita)}</td>
+            <td style="padding:8px;text-align:right;color:#f87171">${fmtR(Math.abs(T.tarifa_venda))}</td>
+            <td style="padding:8px;text-align:right;color:#fb923c">${fmtR(Math.abs(T.tarifa_envio))}</td>
+            <td style="padding:8px;text-align:right;color:#f87171">${fmtR(Math.abs(T.cancel))}</td>
+            <td style="padding:8px;text-align:right;color:#4ade80">${fmtR(T.total)}</td>
+            <td style="padding:8px;text-align:right;color:${margemLiq>=70?'#4ade80':margemLiq>=50?'#fbbf24':'#f87171'}">${fmtP(margemLiq)}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-    <div style="display:flex;align-items:flex-end;gap:6px;height:160px;padding:0 4px">
-      ${meses.map(([mes,v])=>{
-        const hR = (v.receita/maxR*140).toFixed(1);
-        const hL = (v.total/maxR*140).toFixed(1);
-        const isMelhor = mes===picoMes[0];
-        return `
-        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0">
-          <div style="font-size:9px;color:#64748b;margin-bottom:4px">${fmtR(v.receita).replace('R$','')}</div>
-          <div style="display:flex;align-items:flex-end;gap:2px;height:140px">
-            <div style="width:16px;height:${hR}px;background:${isMelhor?cor:'rgba(245,158,11,.5)'};border-radius:4px 4px 0 0;transition:all .3s" title="Receita: ${fmtR(v.receita)}"></div>
-            <div style="width:16px;height:${hL}px;background:rgba(74,222,128,.7);border-radius:4px 4px 0 0;transition:all .3s" title="Líquido: ${fmtR(v.total)}"></div>
-          </div>
-          <div style="font-size:10px;color:${isMelhor?cor:'#94a3b8'};font-weight:${isMelhor?700:400};margin-top:6px;white-space:nowrap">${picoLabel[mes]}</div>
-          <div style="font-size:9px;color:#60a5fa">${fmtN(v.pedidos)} ped.</div>
-        </div>`;
-      }).join('')}
-    </div>
-  </div>`;
+  </div>` : '';
 
-  // ── TABELA MENSAL DETALHADA ──
-  const tabelaMensal = `
-  <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:20px;margin-bottom:20px;overflow-x:auto">
-    <div style="font-size:14px;font-weight:700;color:#e2e8f0;margin-bottom:14px">📋 Detalhamento Mensal</div>
-    <table style="width:100%;border-collapse:collapse;font-size:12px;min-width:700px">
-      <thead>
-        <tr style="border-bottom:1px solid rgba(255,255,255,.1)">
-          <th style="text-align:left;padding:8px 10px;color:#94a3b8;font-weight:600">Mês</th>
-          <th style="text-align:right;padding:8px 10px;color:#94a3b8">Receita</th>
-          <th style="text-align:right;padding:8px 10px;color:#f87171">Tar. ML</th>
-          <th style="text-align:right;padding:8px 10px;color:#fb923c">Tar. Frete</th>
-          <th style="text-align:right;padding:8px 10px;color:#f43f5e">Cancelam.</th>
-          <th style="text-align:right;padding:8px 10px;color:#4ade80">Líquido</th>
-          <th style="text-align:right;padding:8px 10px;color:#60a5fa">Pedidos</th>
-          <th style="text-align:right;padding:8px 10px;color:#c084fc">Ticket</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${meses.map(([mes,v],i)=>{
-          const isMelhor = mes===picoMes[0];
-          return `<tr style="border-bottom:1px solid rgba(255,255,255,.04);background:${isMelhor?'rgba(245,158,11,.06)':''}">
-            <td style="padding:8px 10px;font-weight:${isMelhor?700:400};color:${isMelhor?cor:'#e2e8f0'}">${picoLabel[mes]}${isMelhor?' 🏆':''}</td>
-            <td style="padding:8px 10px;text-align:right;color:#e2e8f0;font-weight:600">${fmtR(v.receita)}</td>
-            <td style="padding:8px 10px;text-align:right;color:#f87171">${fmtR(v.tarifa_venda)}</td>
-            <td style="padding:8px 10px;text-align:right;color:#fb923c">${fmtR(v.tarifa_envio)}</td>
-            <td style="padding:8px 10px;text-align:right;color:#f43f5e">${fmtR(v.cancel)}</td>
-            <td style="padding:8px 10px;text-align:right;color:#4ade80;font-weight:700">${fmtR(v.total)}</td>
-            <td style="padding:8px 10px;text-align:right;color:#60a5fa">${fmtN(v.pedidos)}</td>
-            <td style="padding:8px 10px;text-align:right;color:#c084fc">${fmtR(v.receita/v.pedidos)}</td>
-          </tr>`;
-        }).join('')}
-        <tr style="border-top:2px solid rgba(245,158,11,.4);background:rgba(245,158,11,.08)">
-          <td style="padding:8px 10px;font-weight:800;color:${cor}">TOTAL</td>
-          <td style="padding:8px 10px;text-align:right;font-weight:800;color:${cor}">${fmtR(T.receita)}</td>
-          <td style="padding:8px 10px;text-align:right;font-weight:700;color:#f87171">${fmtR(T.tarifa_venda)}</td>
-          <td style="padding:8px 10px;text-align:right;font-weight:700;color:#fb923c">${fmtR(T.tarifa_envio)}</td>
-          <td style="padding:8px 10px;text-align:right;font-weight:700;color:#f43f5e">${fmtR(T.cancel)}</td>
-          <td style="padding:8px 10px;text-align:right;font-weight:800;color:#4ade80">${fmtR(T.total)}</td>
-          <td style="padding:8px 10px;text-align:right;font-weight:700;color:#60a5fa">${fmtN(T.pedidos)}</td>
-          <td style="padding:8px 10px;text-align:right;font-weight:700;color:#c084fc">${fmtR(ticketMedio)}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>`;
-
-  // ── WATERFALL TARIFAS ──
-  const custoTotalAbs = Math.abs(T.tarifa_venda)+Math.abs(T.tarifa_envio)+Math.abs(T.cancel);
-  const waterfall = `
-  <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:20px;margin-bottom:20px">
-    <div style="font-size:14px;font-weight:700;color:#e2e8f0;margin-bottom:4px">💸 Composição do Resultado</div>
-    <div style="font-size:11px;color:#64748b;margin-bottom:16px">Destino de cada R$ recebido na plataforma</div>
-    <div style="display:flex;flex-direction:column;gap:10px">
-      ${[
-        {label:'Receita Bruta',val:T.receita,color:'#f59e0b',pct:100,dir:1},
-        {label:'(+) Acréscimos ML',val:T.acrescimo,color:'#34d399',pct:T.acrescimo/T.receita*100,dir:1},
-        {label:'(+) Rec. Frete',val:T.receita_envio,color:'#67e8f9',pct:T.receita_envio/T.receita*100,dir:1},
-        {label:'(−) Tarifa de Venda ML',val:T.tarifa_venda,color:'#f87171',pct:Math.abs(T.tarifa_venda)/T.receita*100,dir:-1},
-        {label:'(−) Tarifa de Envio ML',val:T.tarifa_envio,color:'#fb923c',pct:Math.abs(T.tarifa_envio)/T.receita*100,dir:-1},
-        {label:'(−) Cancelamentos/Reembolsos',val:T.cancel,color:'#f43f5e',pct:Math.abs(T.cancel)/T.receita*100,dir:-1},
-        {label:'(+) Descontos/Bônus',val:T.descontos,color:'#a3e635',pct:T.descontos/T.receita*100,dir:1},
-        {label:'= Total Líquido',val:T.total,color:'#4ade80',pct:T.total/T.receita*100,dir:1,destaque:true},
-      ].map(item=>`
-        <div>
-          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-            <span style="font-size:12px;color:${item.destaque?'#4ade80':'#94a3b8'};font-weight:${item.destaque?800:400}">${item.label}</span>
-            <div style="display:flex;gap:12px;align-items:center">
-              <span style="font-size:11px;color:#64748b">${item.pct.toFixed(1)}%</span>
-              <span style="font-size:12px;font-weight:${item.destaque?800:600};color:${item.color};min-width:120px;text-align:right">${fmtR(Math.abs(item.val))}</span>
-            </div>
-          </div>
-          <div style="background:rgba(255,255,255,.06);border-radius:4px;height:${item.destaque?10:6}px;overflow:hidden">
-            <div style="height:100%;width:${Math.min(item.pct,100)}%;background:${item.color};border-radius:4px;transition:width .6s ease"></div>
+  // ── TOP ESTADOS ──
+  // Recalcular estados só dos meses filtrados
+  const estsFiltrados = {};
+  meses.forEach(([ch, m]) => {
+    // Não temos estados por mês, então se filtro = todos, usa por_estado; senão avisa
+  });
+  const estadosHtml = D.por_estado && D.por_estado.length ? `
+  <div style="background:#1e1e2e;border-radius:12px;padding:20px;border:1px solid #2a2a3e;margin-bottom:20px">
+    <h3 style="margin:0 0 16px;font-size:14px;color:#ccc">🗺️ Top Estados ${mesesSel.size < todosMeses.length ? '(período total)' : ''}</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px">
+      ${D.por_estado.slice(0,15).map((e,i)=>`
+        <div style="background:#13131f;border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:12px;color:#ccc">${i+1}. ${e.sigla} – ${e.nome.length>12?e.nome.substring(0,12)+'…':e.nome}</span>
+          <div style="text-align:right">
+            <div style="font-size:12px;font-weight:600;color:#f59e0b">${fmtR(e.receita)}</div>
+            <div style="font-size:10px;color:#666">${fmtN(e.pedidos)} ped.</div>
           </div>
         </div>`).join('')}
     </div>
-  </div>`;
-
-  // ── TOP ESTADOS ──
-  const maxEstRec = D.por_estado[0].receita;
-  const topEstados = `
-  <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:20px;margin-bottom:20px">
-    <div style="font-size:14px;font-weight:700;color:#e2e8f0;margin-bottom:4px">🗺️ Top 15 Estados</div>
-    <div style="font-size:11px;color:#64748b;margin-bottom:16px">Por receita bruta</div>
-    <div style="display:flex;flex-direction:column;gap:8px">
-      ${D.por_estado.map((e,i)=>{
-        const pctBar = (e.receita/maxEstRec*100).toFixed(1);
-        const gradColors = ['#f59e0b','#f59e0b','#60a5fa','#60a5fa','#4ade80','#4ade80','#c084fc','#c084fc','#34d399','#34d399','#67e8f9','#67e8f9','#fb923c','#fb923c','#a3e635'];
-        const c2 = gradColors[i]||'#64748b';
-        return `
-        <div>
-          <div style="display:flex;justify-content:space-between;margin-bottom:3px">
-            <div style="display:flex;align-items:center;gap:8px">
-              <span style="font-size:11px;color:#64748b;width:16px;text-align:right">${i+1}.</span>
-              <span style="background:rgba(255,255,255,.08);border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700;color:${c2}">${e.sigla}</span>
-              <span style="font-size:12px;color:#cbd5e1">${e.nome}</span>
-            </div>
-            <div style="display:flex;gap:12px;font-size:11px">
-              <span style="color:#64748b">${fmtN(e.pedidos)} ped.</span>
-              <span style="color:${c2};font-weight:600">${fmtR(e.receita)}</span>
-            </div>
-          </div>
-          <div style="background:rgba(255,255,255,.06);border-radius:3px;height:5px;overflow:hidden">
-            <div style="height:100%;width:${pctBar}%;background:${c2};border-radius:3px"></div>
-          </div>
-        </div>`;
-      }).join('')}
-    </div>
-  </div>`;
+  </div>` : '';
 
   // ── TOP CIDADES ──
-  const maxCidRec = D.por_cidade[0].receita;
-  const topCidades = `
-  <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:20px;margin-bottom:20px">
-    <div style="font-size:14px;font-weight:700;color:#e2e8f0;margin-bottom:4px">🏙️ Top 20 Cidades</div>
-    <div style="font-size:11px;color:#64748b;margin-bottom:16px">Por receita bruta</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      ${D.por_cidade.map((c3,i)=>{
-        const pctBar = (c3.receita/maxCidRec*100).toFixed(1);
-        return `
-        <div style="background:rgba(255,255,255,.03);border-radius:10px;padding:10px 12px">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-            <div style="display:flex;align-items:center;gap:6px">
-              <span style="font-size:10px;color:#475569;width:14px">${i+1}</span>
-              <span style="font-size:12px;color:#cbd5e1;font-weight:500">${c3.nome}</span>
-            </div>
-            <span style="font-size:10px;color:#64748b">${fmtN(c3.pedidos)} ped.</span>
+  const cidadesHtml = D.por_cidade && D.por_cidade.length ? `
+  <div style="background:#1e1e2e;border-radius:12px;padding:20px;border:1px solid #2a2a3e;margin-bottom:20px">
+    <h3 style="margin:0 0 16px;font-size:14px;color:#ccc">🏙️ Top Cidades</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px">
+      ${D.por_cidade.slice(0,20).map((c,i)=>`
+        <div style="background:#13131f;border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:12px;color:#ccc">${i+1}. ${c.nome.length>14?c.nome.substring(0,14)+'…':c.nome}</span>
+          <div style="text-align:right">
+            <div style="font-size:12px;font-weight:600;color:#60a5fa">${fmtR(c.receita)}</div>
+            <div style="font-size:10px;color:#666">${fmtN(c.pedidos)} ped.</div>
           </div>
-          <div style="font-size:12px;font-weight:700;color:${cor};margin-bottom:4px">${fmtR(c3.receita)}</div>
-          <div style="background:rgba(255,255,255,.06);border-radius:3px;height:3px;overflow:hidden">
-            <div style="height:100%;width:${pctBar}%;background:${cor};opacity:.7;border-radius:3px"></div>
-          </div>
-        </div>`;
-      }).join('')}
+        </div>`).join('')}
     </div>
-  </div>`;
+  </div>` : '';
 
-  // ── CANCELAMENTOS DETALHADOS ──
-  const cancelamentos = `
-  <div style="background:rgba(244,63,94,.05);border:1px solid rgba(244,63,94,.2);border-radius:16px;padding:20px;margin-bottom:20px">
-    <div style="font-size:14px;font-weight:700;color:#e2e8f0;margin-bottom:4px">❌ Cancelamentos & Reembolsos</div>
-    <div style="font-size:11px;color:#64748b;margin-bottom:16px">Análise mensal de perdas</div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">
-      <div style="background:rgba(244,63,94,.08);border-radius:12px;padding:14px;text-align:center">
-        <div style="font-size:11px;color:#94a3b8;margin-bottom:4px">Total Cancelado</div>
-        <div style="font-size:18px;font-weight:800;color:#f43f5e">${fmtR(Math.abs(T.cancel))}</div>
-      </div>
-      <div style="background:rgba(244,63,94,.08);border-radius:12px;padding:14px;text-align:center">
-        <div style="font-size:11px;color:#94a3b8;margin-bottom:4px">Qtd. Pedidos</div>
-        <div style="font-size:18px;font-weight:800;color:#f43f5e">${fmtN(T.cancel_count)}</div>
-      </div>
-      <div style="background:rgba(244,63,94,.08);border-radius:12px;padding:14px;text-align:center">
-        <div style="font-size:11px;color:#94a3b8;margin-bottom:4px">Taxa Cancel.</div>
-        <div style="font-size:18px;font-weight:800;color:#f43f5e">${fmtP(txCancel)}</div>
-      </div>
-    </div>
-    <table style="width:100%;border-collapse:collapse;font-size:12px">
-      <thead>
-        <tr style="border-bottom:1px solid rgba(244,63,94,.2)">
-          <th style="text-align:left;padding:7px 10px;color:#94a3b8">Mês</th>
-          <th style="text-align:right;padding:7px 10px;color:#94a3b8">Valor Cancelado</th>
-          <th style="text-align:right;padding:7px 10px;color:#94a3b8">% da Receita</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${meses.map(([mes,v])=>{
-          const pctC = Math.abs(v.cancel)/v.receita*100;
-          return `<tr style="border-bottom:1px solid rgba(255,255,255,.04)">
-            <td style="padding:7px 10px;color:#cbd5e1">${picoLabel[mes]}</td>
-            <td style="padding:7px 10px;text-align:right;color:#f43f5e;font-weight:600">${fmtR(Math.abs(v.cancel))}</td>
-            <td style="padding:7px 10px;text-align:right">
-              <span style="background:rgba(244,63,94,.15);color:#f43f5e;border-radius:6px;padding:2px 8px;font-size:11px">${fmtP(pctC)}</span>
-            </td>
-          </tr>`;
-        }).join('')}
-      </tbody>
-    </table>
-  </div>`;
-
-  // ── MONTAR TUDO ──
-  container.innerHTML = `
-  <div style="padding:0 0 24px">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,.08)">
-      <div style="background:rgba(245,158,11,.15);border-radius:10px;padding:8px 14px">
-        <span style="font-size:16px">🟡</span>
-        <span style="font-size:14px;font-weight:800;color:#f59e0b;margin-left:6px">Mercado Livre · VIP</span>
-      </div>
-      <div style="font-size:11px;color:#64748b">Jan–Jul 2026 · ${fmtN(T.pedidos)} pedidos · Dados importados da planilha</div>
-    </div>
-    ${kpis}
-    <div style="display:grid;grid-template-columns:1fr;gap:0">
-      ${chartMensal}
-      ${tabelaMensal}
-      ${waterfall}
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
-        <div>${topEstados}</div>
-        <div>
-          ${topCidades}
-          ${cancelamentos}
-        </div>
-      </div>
-    </div>
-  </div>`;
+  container.innerHTML = filtroHtml + kpis + evolHtml + estadosHtml + cidadesHtml;
 }
 
+// Funções auxiliares do filtro ML VIP
+window._mlvipFiltroSel = null;
+function mlvipFiltroToggle(ch){
+  const D = window.VENDAS_ML_VIP_DATA;
+  if(!D) return;
+  if(!window._mlvipFiltroSel){
+    window._mlvipFiltroSel = new Set(Object.keys(D.por_mes));
+  }
+  if(window._mlvipFiltroSel.has(ch)) {
+    if(window._mlvipFiltroSel.size > 1) window._mlvipFiltroSel.delete(ch);
+  } else {
+    window._mlvipFiltroSel.add(ch);
+  }
+  const el = document.getElementById('vendas-canal-content');
+  if(el){ el.innerHTML=''; renderVendasMLVip(el, window._mlvipFiltroSel); }
+}
+function mlvipFiltroTodos(){
+  window._mlvipFiltroSel = null;
+  const el = document.getElementById('vendas-canal-content');
+  if(el){ el.innerHTML=''; renderVendasMLVip(el); }
+}
 
 // ── VENDAS ML ─────────────────────────────────────────────────────────────────
 function renderVendasML(){
