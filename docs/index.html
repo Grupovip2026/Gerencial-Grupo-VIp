@@ -6514,6 +6514,18 @@ loadData();
   window.cpDeleteManual = function(id){ if(!confirm('Remover?'))return; saveManualCP(getManualCP().filter(r=>r.id!==id)); cpRender(); };
   window.crDeleteManual = function(id){ if(!confirm('Remover?'))return; saveManualCR(getManualCR().filter(r=>r.id!==id)); crRender(); };
 
+
+  /* Converte entrada do usuário com vírgula ou ponto para float — preserva centavos */
+  function parseMoedaInput(s){
+    if(typeof s==='number') return s;
+    s=String(s).trim().replace(/[R$\s]/g,'');
+    // Formato BR: 1.264,70 → remove ponto de milhar, troca vírgula por ponto
+    if(s.includes(',')&&s.includes('.')) s=s.replace(/\./g,'').replace(',','.');
+    else if(s.includes(',')) s=s.replace(',','.');
+    const v=parseFloat(s);
+    return isNaN(v)?0:v;
+  }
+
   window.cpEditManual = function(id){ window.cpEditLanc(id, true); };
 
   /* Editar qualquer lançamento do CP (manual ou do fluxo) */
@@ -6526,7 +6538,8 @@ loadData();
     const desc  = prompt('Descrição:', item.desc||'');   if(desc===null) return;
     const cat   = prompt('Categoria:', item.cat||'');    if(cat===null) return;
     const data  = prompt('Data (AAAA-MM-DD):', item.data||''); if(data===null) return;
-    const valor = parseFloat(prompt('Valor (número):', item.valor||0)); if(isNaN(valor)) return;
+    const _vStr1 = prompt('Valor (use ponto ou vírgula p/ centavos, ex: 1264,70):', item.valor||0); if(_vStr1===null) return;
+    const valor = parseMoedaInput(_vStr1); if(isNaN(valor)||valor<=0) return;
     const st    = confirm('Marcar como Pago?') ? 'pago' : 'aberto';
     if(isManual){
       const arr = getManualCP();
@@ -6553,7 +6566,8 @@ loadData();
     const desc  = prompt('Descrição:', item.desc||'');   if(desc===null) return;
     const cat   = prompt('Categoria:', item.cat||'');    if(cat===null) return;
     const data  = prompt('Data (AAAA-MM-DD):', item.data||''); if(data===null) return;
-    const valor = parseFloat(prompt('Valor (número):', item.valor||0)); if(isNaN(valor)) return;
+    const _vStr2 = prompt('Valor (use ponto ou vírgula p/ centavos, ex: 1264,70):', item.valor||0); if(_vStr2===null) return;
+    const valor = parseMoedaInput(_vStr2); if(isNaN(valor)||valor<=0) return;
     const st    = confirm('Marcar como Recebido?') ? 'pago' : 'aberto';
     if(isManual){
       const arr = getManualCR();
@@ -6577,7 +6591,8 @@ loadData();
     const desc  = prompt('Descrição:', item.desc||'');   if(desc===null) return;
     const cat   = prompt('Categoria:', item.cat||'');    if(cat===null) return;
     const data  = prompt('Data (AAAA-MM-DD):', item.data||''); if(data===null) return;
-    const valor = parseFloat(prompt('Valor:', item.valor||0)); if(isNaN(valor)) return;
+    const _vStr3 = prompt('Valor (use ponto ou vírgula p/ centavos, ex: 1264,70):', item.valor||0); if(_vStr3===null) return;
+    const valor = parseMoedaInput(_vStr3); if(isNaN(valor)||valor<=0) return;
     const st    = confirm('Marcar como Recebido?') ? 'pago' : 'aberto';
     const idx   = arr.findIndex(r=>String(r.id)===String(id));
     arr[idx] = {...item, desc, cat, data, valor, status:st};
@@ -6629,7 +6644,7 @@ loadData();
       <div><label style="font-size:11px;color:#64748b">Data venc.</label>
         <input id="cp-m-data" type="date" class="forn-search" style="width:100%"></div>
       <div><label style="font-size:11px;color:#64748b">Valor (R$)</label>
-        <input id="cp-m-valor" type="number" class="forn-search" style="width:100%" placeholder="0,00" min="0" step="0.01"></div>
+        <input id="cp-m-valor" type="text" inputmode="decimal" class="forn-search" style="width:100%" placeholder="ex: 1264,70"></div>
       <div><label style="font-size:11px;color:#64748b">Status</label>
         <select id="cp-m-status" class="forn-search" style="width:100%">
           <option value="aberto">A Pagar</option>
@@ -6655,7 +6670,7 @@ loadData();
     const desc = document.getElementById('cp-m-desc').value.trim();
     const cat  = document.getElementById('cp-m-cat').value.trim();
     const data = document.getElementById('cp-m-data').value;
-    const valor= parseFloat(document.getElementById('cp-m-valor').value||0);
+    const valor= parseMoedaInput(document.getElementById('cp-m-valor').value||'0');
     const status= document.getElementById('cp-m-status').value;
     if(!desc){ alert('Informe a descrição.'); return; }
     if(!valor){ alert('Informe o valor.'); return; }
@@ -6847,7 +6862,7 @@ loadData();
       <div><label style="font-size:11px;color:#64748b">Data prev.</label>
         <input id="cr-m-data" type="date" class="forn-search" style="width:100%"></div>
       <div><label style="font-size:11px;color:#64748b">Valor (R$)</label>
-        <input id="cr-m-valor" type="number" class="forn-search" style="width:100%" placeholder="0,00" min="0" step="0.01"></div>
+        <input id="cr-m-valor" type="text" inputmode="decimal" class="forn-search" style="width:100%" placeholder="ex: 1264,70"></div>
       <div><label style="font-size:11px;color:#64748b">Status</label>
         <select id="cr-m-status" class="forn-search" style="width:100%">
           <option value="aberto">A Receber</option>
@@ -6873,7 +6888,7 @@ loadData();
     const desc = document.getElementById('cr-m-desc').value.trim();
     const cat  = document.getElementById('cr-m-cat').value.trim();
     const data = document.getElementById('cr-m-data').value;
-    const valor= parseFloat(document.getElementById('cr-m-valor').value||0);
+    const valor= parseMoedaInput(document.getElementById('cr-m-valor').value||'0');
     const status= document.getElementById('cr-m-status').value;
     if(!desc){ alert('Informe a descrição.'); return; }
     if(!valor){ alert('Informe o valor.'); return; }
