@@ -1930,14 +1930,25 @@ window.fornImportarExcel = function(input){
 
       if(!novos.length){ alert(`Nenhum lançamento válido encontrado. Erros: ${erros}`); input.value=''; return; }
 
-      // Salva — ACUMULA com os existentes (evita duplicar por id)
+      // Salva — deduplicação por chave: data+desc+valor+conta
+      // Lançamentos que já existem com mesma chave são ignorados (não duplicados)
+      const chaveDedup = l => `${l.data}|${String(l.desc).trim().toLowerCase()}|${Number(l.valor).toFixed(2)}|${String(l.conta).toLowerCase()}`;
       let existentes = [];
       try{ existentes = JSON.parse(localStorage.getItem('fluxo_lancamentos_v1')||'[]'); }catch(e){}
-      // Mescla: mantém existentes + novos
-      const merged = [...existentes, ...novos];
+      const chavesExistentes = new Set(existentes.map(chaveDedup));
+      const aAdicionar = novos.filter(l => !chavesExistentes.has(chaveDedup(l)));
+      const duplicados = novos.length - aAdicionar.length;
+      const merged = [...existentes, ...aAdicionar];
       localStorage.setItem('fluxo_lancamentos_v1', JSON.stringify(merged));
 
-      alert(`✅ ${importados} lançamentos importados!${erros?' ('+erros+' linhas ignoradas por dados inválidos)':''}`);
+      const msg = aAdicionar.length > 0
+        ? `✅ ${aAdicionar.length} novo(s) lançamento(s) adicionado(s)!`
+        : `ℹ️ Nenhum lançamento novo encontrado.`;
+      const detalhes = [
+        duplicados > 0 ? `${duplicados} já existiam (ignorados)` : '',
+        erros > 0 ? `${erros} linhas inválidas` : ''
+      ].filter(Boolean).join(' · ');
+      alert(msg + (detalhes ? `\n${detalhes}` : ''));
       input.value='';
       fornRender();
     } catch(err){
