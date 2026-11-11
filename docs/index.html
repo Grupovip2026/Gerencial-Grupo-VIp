@@ -421,6 +421,7 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
       📥 Importar Excel
       <input type="file" accept=".xlsx,.xls" style="display:none" onchange="fornImportarExcel(this)">
     </label>
+    <button onclick="fornLimparDuplicatas()" style="background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.35);border-radius:7px;color:#fbbf24;font-size:12px;font-weight:700;padding:7px 14px;cursor:pointer;display:flex;align-items:center;gap:6px" title="Remove lançamentos duplicados mantendo apenas 1 de cada">🧹 Limpar Duplicatas</button>
     <button onclick="fornGerarPDF()" style="background:linear-gradient(135deg,#dc2626,#b91c1c);border:none;border-radius:7px;color:#fff;font-size:12px;font-weight:700;padding:7px 14px;cursor:pointer;display:flex;align-items:center;gap:6px">📄 Gerar PDF</button>
   </div>
 </div>
@@ -2054,6 +2055,31 @@ window.fornLimparData = function(){
   const d2 = document.getElementById('forn-dt2');
   if(d1) d1.value='';
   if(d2) d2.value='';
+  fornRender();
+};
+
+window.fornLimparDuplicatas = function(){
+  const KEY = 'fluxo_lancamentos_v1';
+  let todos = [];
+  try{ todos = JSON.parse(localStorage.getItem(KEY)||'[]'); }catch(e){}
+  if(!todos.length){ alert('Nenhum lançamento encontrado.'); return; }
+
+  // Chave de deduplicação: data + descrição + valor + conta
+  const chave = l => `${l.data}|${String(l.desc||'').trim().toLowerCase()}|${Number(l.valor||0).toFixed(2)}|${String(l.conta||'').toLowerCase()}`;
+  const vistos = new Set();
+  const limpos = todos.filter(l => {
+    const k = chave(l);
+    if(vistos.has(k)) return false;
+    vistos.add(k);
+    return true;
+  });
+
+  const removidos = todos.length - limpos.length;
+  if(removidos === 0){ alert('✅ Nenhum duplicado encontrado. Dados já estão limpos!'); return; }
+
+  if(!confirm(`Encontrados ${removidos} lançamento(s) duplicado(s).\nManter apenas ${limpos.length} únicos e remover os duplicados?`)) return;
+  localStorage.setItem(KEY, JSON.stringify(limpos));
+  alert(`✅ Feito! ${removidos} duplicata(s) removida(s). Restaram ${limpos.length} lançamentos.`);
   fornRender();
 };
 
