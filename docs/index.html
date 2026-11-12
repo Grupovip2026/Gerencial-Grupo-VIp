@@ -421,7 +421,7 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
       📥 Importar Excel
       <input type="file" accept=".xlsx,.xls" style="display:none" onchange="fornImportarExcel(this)">
     </label>
-    <button onclick="fornLimparDuplicatas()" style="background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.35);border-radius:7px;color:#fbbf24;font-size:12px;font-weight:700;padding:7px 14px;cursor:pointer;display:flex;align-items:center;gap:6px" title="Remove lançamentos duplicados mantendo apenas 1 de cada">🧹 Limpar Duplicatas</button>
+    <button onclick="fornExcluirTodos()" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);border-radius:7px;color:#f87171;font-size:12px;font-weight:700;padding:7px 14px;cursor:pointer;display:flex;align-items:center;gap:6px" title="Apaga todos os lançamentos para reimportar do zero">🗑️ Excluir Todos</button>
     <button onclick="fornGerarPDF()" style="background:linear-gradient(135deg,#dc2626,#b91c1c);border:none;border-radius:7px;color:#fff;font-size:12px;font-weight:700;padding:7px 14px;cursor:pointer;display:flex;align-items:center;gap:6px">📄 Gerar PDF</button>
   </div>
 </div>
@@ -1925,7 +1925,7 @@ window.fornImportarExcel = function(input){
         }
         if(!valor){ erros++; return; }
 
-        novos.push({ id: Date.now()+Math.random(), data, desc:String(desc), tipo, conta, valor, cat:String(cat), empresa:String(empresa), natureza:String(natureza) });
+        novos.push({ id: Date.now()+Math.random(), data, desc:String(desc), tipo, conta, valor, cat:String(cat), natureza:String(natureza) });
         importados++;
       });
 
@@ -2058,6 +2058,17 @@ window.fornLimparData = function(){
   fornRender();
 };
 
+window.fornExcluirTodos = function(){
+  const KEY = 'fluxo_lancamentos_v1';
+  let todos = [];
+  try{ todos = JSON.parse(localStorage.getItem(KEY)||'[]'); }catch(e){}
+  if(!todos.length){ alert('Não há lançamentos para excluir.'); return; }
+  if(!confirm(`⚠️ Isso vai apagar TODOS os ${todos.length} lançamentos de Dívida Fornecedores.\n\nTem certeza? Essa ação não pode ser desfeita.`)) return;
+  localStorage.removeItem(KEY);
+  alert('✅ Todos os lançamentos foram excluídos. Agora você pode reimportar a planilha atualizada.');
+  fornRender();
+};
+
 window.fornLimparDuplicatas = function(){
   const KEY = 'fluxo_lancamentos_v1';
   let todos = [];
@@ -2133,7 +2144,7 @@ window.fornRender = function(){
       </div>
       <table class="forn-tbl">
         <thead><tr>
-          <th>Data</th><th>Descrição</th><th>Categoria</th><th>Empresa</th><th>Valor</th>
+          <th>Data</th><th>Descrição</th><th>Categoria</th><th>Valor</th>
         </tr></thead>
         <tbody>`;
 
@@ -2143,14 +2154,13 @@ window.fornRender = function(){
         <td style="white-space:nowrap">${fmtD(l.data)}</td>
         <td>${l.desc||'—'}</td>
         <td style="font-size:11px;color:#64748b">${l.cat||'—'}</td>
-        <td style="font-size:11px;color:#64748b">${l.empresa||'—'}</td>
         <td class="forn-valor-neg">${fmtR(v)}</td>
       </tr>`;
     });
 
     html += `
         <tr class="total-row">
-          <td colspan="4" style="text-align:right;font-size:11px;color:#64748b">Subtotal ${conta}</td>
+          <td colspan="3" style="text-align:right;font-size:11px;color:#64748b">Subtotal ${conta}</td>
           <td class="forn-valor-neg">${fmtR(subtotal)}</td>
         </tr>
         </tbody></table>
