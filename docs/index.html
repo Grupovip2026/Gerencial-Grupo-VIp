@@ -6533,14 +6533,16 @@ function somaContasFiltradas(ks){
 
 function dateBarHTML(){
   // descobre range disponível de todos os diários
-  let minDia='9999', maxDia='0000';
-  contasComDados().forEach(k=>{const d=contaData(k).diario;if(d.length){if(d[0][0]<minDia)minDia=d[0][0];if(d[d.length-1][0]>maxDia)maxDia=d[d.length-1][0]}});
+  let minDia='', maxDia='';
+  contasComDados().forEach(k=>{const d=contaData(k).diario;if(d.length){if(!minDia||d[0][0]<minDia)minDia=d[0][0];if(!maxDia||d[d.length-1][0]>maxDia)maxDia=d[d.length-1][0]}});
+  if(!minDia||!maxDia)return ''; // sem dados ainda
   const ini=mpDateIni||minDia, fim=mpDateFim||maxDia;
   const diasSel=Math.round((new Date(fim)-new Date(ini))/86400000)+1;
   const ativo=(dias)=>{
-    if(!mpDateIni&&!mpDateFim)return dias==='tudo';
-    if(dias==='custom')return true;
-    const dFim=new Date(maxDia),dIni=new Date(dFim);dIni.setDate(dIni.getDate()-(dias-1));
+    if(dias==='tudo')return !mpDateIni&&!mpDateFim;
+    if(typeof dias!=='number')return false;
+    if(!mpDateIni||!mpDateFim)return false;
+    const dFim=new Date(maxDia+'T12:00:00'),dIni=new Date(dFim);dIni.setDate(dIni.getDate()-(dias-1));
     return dIni.toISOString().slice(0,10)===mpDateIni && maxDia===mpDateFim;
   };
   const btn=(label,v)=>`<button class="mp-btn${ativo(v)?' mp-btn-on':''}" onclick="${v==='tudo'?'mpClearDate()':'mpQuickDate('+v+')'}">${label}</button>`;
@@ -6549,9 +6551,9 @@ function dateBarHTML(){
     ${btn('Tudo','tudo')}${btn('7 dias',7)}${btn('15 dias',15)}${btn('30 dias',30)}
     <div class="mp-date-sep" style="margin:0 4px">|</div>
     <div class="mp-date-block">
-      <input type="date" value="${ini}" min="${minDia}" max="${maxDia}" onchange="mpSetDate(this.value,document.getElementById('mpDateFim').value)" style="width:140px">
+      <input type="date" id="mpDateIniInput" value="${ini}" min="${minDia}" max="${maxDia}" onchange="mpSetDate(this.value,document.getElementById('mpDateFimInput').value)" style="width:140px">
       <span class="mp-date-sep">até</span>
-      <input type="date" id="mpDateFim" value="${fim}" min="${minDia}" max="${maxDia}" onchange="mpSetDate(document.querySelector('.mp-date-bar input[type=date]').value,this.value)" style="width:140px">
+      <input type="date" id="mpDateFimInput" value="${fim}" min="${minDia}" max="${maxDia}" onchange="mpSetDate(document.getElementById('mpDateIniInput').value,this.value)" style="width:140px">
     </div>
     ${(mpDateIni||mpDateFim)?`<span style="font-size:11px;color:#fbbf24;margin-left:4px">↳ ${diasSel} dia${diasSel>1?'s':''} selecionado${diasSel>1?'s':''}</span>`:''}
   </div>`;
