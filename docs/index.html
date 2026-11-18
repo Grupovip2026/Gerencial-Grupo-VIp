@@ -293,6 +293,21 @@ tr.highlight-row td{background:rgba(245,158,11,.06);border-bottom:1px solid rgba
   <button class="nav-sub-item" onclick="setPage('rh-contracheque')">
     <span class="nav-icon">🧾</span> Contra-Cheque
   </button>
+
+  <!-- Marketplace -->
+  <div class="sidebar-section">Marketplace</div>
+  <button class="nav-item" onclick="setPage('mp-painel')">
+    <span class="nav-icon">🛒</span> Painel ML
+  </button>
+  <button class="nav-sub-item" onclick="setPage('mp-painel');mpSetConta('VIP')">📦 VIP MX</button>
+  <button class="nav-sub-item" onclick="setPage('mp-painel');mpSetConta('VIDAL')">📦 Vidal</button>
+  <button class="nav-sub-item" onclick="setPage('mp-painel');mpSetConta('V3')">📦 V3</button>
+  <button class="nav-item" onclick="setPage('mp-abc')">
+    <span class="nav-icon">📊</span> Curva ABC
+  </button>
+  <button class="nav-item" onclick="setPage('mp-compra')">
+    <span class="nav-icon">🔄</span> Relatório de Compra
+  </button>
 </nav>
 
 <!-- ── CONTENT ── -->
@@ -6274,6 +6289,478 @@ loadData();
 
 })();
 
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════
+     MARKETPLACE MODULE
+     ═══════════════════════════════════════════════════════════ -->
+
+<!-- ── PAINEL ML ─────────────────────────────────────────── -->
+<div id="page-mp-painel" class="page">
+<style>
+.mp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.mp-title{font-size:20px;font-weight:700;color:#e2e8f0}
+.mp-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.mp-tab{padding:6px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#94a3b8;font-size:12px;font-weight:600;cursor:pointer;transition:all .18s}
+.mp-tab.active{background:rgba(56,189,248,.15);border-color:rgba(56,189,248,.4);color:#38bdf8}
+.mp-kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+.mp-kpi{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px 16px}
+.mp-kpi-label{font-size:11px;color:#64748b;margin-bottom:6px;font-weight:500}
+.mp-kpi-val{font-size:22px;font-weight:700;color:#e2e8f0}
+.mp-kpi-sub{font-size:11px;color:#475569;margin-top:3px}
+.mp-kpi-up{color:#34d399!important}.mp-kpi-dn{color:#f87171!important}
+.mp-chart-wrap{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:16px;margin-bottom:16px}
+.mp-chart-title{font-size:13px;font-weight:600;color:#94a3b8;margin-bottom:12px}
+.mp-status{padding:40px;text-align:center;color:#475569;font-size:14px}
+.mp-warn{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:10px 14px;color:#fca5a5;font-size:12px;margin-bottom:12px}
+.mp-info{background:rgba(56,189,248,.07);border:1px solid rgba(56,189,248,.2);border-radius:8px;padding:10px 14px;color:#7dd3fc;font-size:12px;margin-bottom:12px}
+.mp-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.mp-tbl th{background:rgba(255,255,255,.05);color:#64748b;font-size:11px;font-weight:600;padding:8px 10px;text-align:left;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid rgba(255,255,255,.07)}
+.mp-tbl td{padding:9px 10px;border-bottom:1px solid rgba(255,255,255,.04);color:#cbd5e1;vertical-align:middle}
+.mp-tbl tr:hover td{background:rgba(255,255,255,.025)}
+.mp-badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700}
+.mp-badge-verde{background:rgba(52,211,153,.15);color:#34d399}
+.mp-badge-vermelho{background:rgba(248,113,113,.15);color:#f87171}
+.mp-badge-amarelo{background:rgba(251,191,36,.15);color:#fbbf24}
+</style>
+<div class="mp-header">
+  <div class="mp-title">🛒 Painel Mercado Livre</div>
+  <div class="mp-tabs" id="mp-conta-tabs">
+    <button class="mp-tab active" onclick="mpSetConta('VIP')">VIP MX</button>
+    <button class="mp-tab" onclick="mpSetConta('VIDAL')">Vidal</button>
+    <button class="mp-tab" onclick="mpSetConta('V3')">V3</button>
+  </div>
+</div>
+<div id="mp-painel-body"></div>
+</div><!-- /page-mp-painel -->
+
+<!-- ── CURVA ABC ──────────────────────────────────────────── -->
+<div id="page-mp-abc" class="page">
+<style>
+.abc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.abc-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.abc-select{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:7px 12px;color:#e2e8f0;font-size:12px;font-family:inherit;outline:none;cursor:pointer}
+.abc-legend{display:flex;gap:16px;margin-bottom:14px;flex-wrap:wrap}
+.abc-leg-item{display:flex;align-items:center;gap:6px;font-size:12px;color:#94a3b8}
+.abc-leg-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+.abc-tbl-wrap{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;overflow:auto}
+.abc-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.abc-tbl th{background:rgba(255,255,255,.05);color:#64748b;font-size:11px;font-weight:600;padding:8px 12px;text-align:left;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid rgba(255,255,255,.07);white-space:nowrap}
+.abc-tbl td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.04);color:#cbd5e1;vertical-align:middle}
+.abc-tbl tr:hover td{background:rgba(255,255,255,.025)}
+.abc-a{background:rgba(52,211,153,.12)!important;border-left:3px solid #34d399}
+.abc-b{background:rgba(251,191,36,.08)!important;border-left:3px solid #fbbf24}
+.abc-c{background:rgba(100,116,139,.08)!important;border-left:3px solid #64748b}
+.abc-bar-wrap{width:100px;background:rgba(255,255,255,.07);border-radius:4px;height:6px;display:inline-block;vertical-align:middle}
+.abc-bar{height:6px;border-radius:4px;background:#38bdf8}
+.abc-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.abc-summary-card{border-radius:10px;padding:12px 16px;text-align:center}
+.abc-summary-card.a{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.2)}
+.abc-summary-card.b{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2)}
+.abc-summary-card.c{background:rgba(100,116,139,.08);border:1px solid rgba(100,116,139,.2)}
+.abc-summary-card .sc-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.abc-summary-card.a .sc-label{color:#34d399}
+.abc-summary-card.b .sc-label{color:#fbbf24}
+.abc-summary-card.c .sc-label{color:#94a3b8}
+.abc-summary-card .sc-val{font-size:18px;font-weight:700;color:#e2e8f0}
+.abc-summary-card .sc-sub{font-size:11px;color:#64748b;margin-top:3px}
+</style>
+<div class="abc-header">
+  <div class="mp-title">📊 Curva ABC — Grupo VIP</div>
+  <div class="abc-controls">
+    <select class="abc-select" id="abc-criterio" onchange="mpRenderABC()">
+      <option value="fat">Por Faturamento</option>
+      <option value="qtd">Por Quantidade</option>
+    </select>
+    <select class="abc-select" id="abc-conta" onchange="mpRenderABC()">
+      <option value="GRUPO">Grupo VIP (consolidado)</option>
+      <option value="VIP">VIP MX</option>
+      <option value="VIDAL">Vidal</option>
+      <option value="V3">V3</option>
+    </select>
+  </div>
+</div>
+<div class="abc-summary" id="abc-summary"></div>
+<div class="abc-legend">
+  <div class="abc-leg-item"><div class="abc-leg-dot" style="background:#34d399"></div>Classe A — até 80% acumulado</div>
+  <div class="abc-leg-item"><div class="abc-leg-dot" style="background:#fbbf24"></div>Classe B — 80–95%</div>
+  <div class="abc-leg-item"><div class="abc-leg-dot" style="background:#64748b"></div>Classe C — restante</div>
+</div>
+<div class="abc-tbl-wrap">
+  <table class="abc-tbl">
+    <thead><tr>
+      <th>#</th><th>SKU</th><th>Produto</th><th>Conta(s)</th>
+      <th style="text-align:right">Vendas (R$)</th>
+      <th style="text-align:right">Qtd</th>
+      <th style="text-align:right">% Acum.</th>
+      <th>Participação</th><th>Classe</th>
+    </tr></thead>
+    <tbody id="abc-tbody"></tbody>
+  </table>
+</div>
+</div><!-- /page-mp-abc -->
+
+<!-- ── RELATÓRIO DE COMPRA ────────────────────────────────── -->
+<div id="page-mp-compra" class="page">
+<style>
+.compra-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.compra-kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:20px}
+.compra-kpi{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px 14px}
+.compra-kpi .ck-label{font-size:11px;color:#64748b;margin-bottom:4px;font-weight:500}
+.compra-kpi .ck-val{font-size:20px;font-weight:700;color:#e2e8f0}
+.compra-filtros{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+.compra-search{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:7px 12px;color:#e2e8f0;font-size:12px;font-family:inherit;outline:none;width:220px}
+.compra-search::placeholder{color:#475569}
+.compra-select{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:7px 12px;color:#e2e8f0;font-size:12px;font-family:inherit;outline:none}
+.compra-tbl-wrap{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;overflow:auto}
+.compra-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.compra-tbl th{background:rgba(255,255,255,.05);color:#64748b;font-size:11px;font-weight:600;padding:8px 12px;text-align:left;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid rgba(255,255,255,.07);white-space:nowrap}
+.compra-tbl td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.04);color:#cbd5e1;vertical-align:middle}
+.compra-tbl tr:hover td{background:rgba(255,255,255,.025)}
+.compra-tbl td.repor-sim{color:#34d399;font-weight:700}
+.compra-tbl td.repor-nao{color:#475569}
+.compra-tbl td.cob-critica{color:#f87171;font-weight:700}
+.compra-tbl td.cob-ok{color:#34d399}
+.compra-tbl td.cob-media{color:#fbbf24}
+.compra-row-urgente{background:rgba(239,68,68,.06)!important}
+.compra-row-atencao{background:rgba(251,191,36,.04)!important}
+</style>
+<div class="compra-header">
+  <div class="mp-title">🔄 Relatório de Compra — Reposição de Estoque</div>
+</div>
+<div class="compra-kpis" id="compra-kpis"></div>
+<div class="mp-info">
+  ℹ️ <strong>Regra de estoque:</strong> Para cada SKU, o estoque considerado é o <strong>maior anúncio</strong> entre as 3 contas (VIP, Vidal, V3) — sem somar. O estoque físico é único para o Grupo VIP.
+</div>
+<div class="compra-filtros">
+  <input class="compra-search" id="compra-search" placeholder="🔍 Buscar SKU ou produto..." oninput="mpRenderCompra()">
+  <select class="compra-select" id="compra-filtro" onchange="mpRenderCompra()">
+    <option value="">Todos</option>
+    <option value="urgente">🔴 Urgente (cobertura &lt; 7 dias)</option>
+    <option value="atencao">🟡 Atenção (7–14 dias)</option>
+    <option value="ok">🟢 OK (&gt; 14 dias)</option>
+    <option value="repor">Repor agora</option>
+  </select>
+  <select class="compra-select" id="compra-classe" onchange="mpRenderCompra()">
+    <option value="">Todas as classes</option>
+    <option value="A">Classe A</option>
+    <option value="B">Classe B</option>
+    <option value="C">Classe C</option>
+  </select>
+</div>
+<div class="compra-tbl-wrap">
+  <table class="compra-tbl">
+    <thead><tr>
+      <th>SKU</th><th>Produto</th><th>Classe</th>
+      <th style="text-align:right">Vendas 30d</th>
+      <th style="text-align:right">Venda/dia</th>
+      <th style="text-align:right">Estoque atual</th>
+      <th style="text-align:right">Cobertura</th>
+      <th style="text-align:right">Repor</th>
+      <th>Prioridade</th>
+    </tr></thead>
+    <tbody id="compra-tbody"></tbody>
+  </table>
+</div>
+</div><!-- /page-mp-compra -->
+
+<!-- ═══════════════════════════════════════════════════════════
+     DADOS E LÓGICA MARKETPLACE
+     ═══════════════════════════════════════════════════════════ -->
+<script>
+// ── Dados inline (preenchidos pela coleta no ML) ──────────
+window.__MP_INLINE__ = window.__MP_INLINE__ || {
+  gerado_em: null,
+  contas: {
+    VIP:   { nome:'VIP MX',   userId:2988453882, store:'79977466', dados: null },
+    VIDAL: { nome:'Vidal',    userId:3483371158, store:'',         dados: null },
+    V3:    { nome:'V3',       userId: null,      store:'',         dados: null }
+  }
+};
+
+// ── Estado ────────────────────────────────────────────────
+var _mpContaAtiva = 'VIP';
+
+window.mpSetConta = function(conta){
+  _mpContaAtiva = conta;
+  document.querySelectorAll('#mp-conta-tabs .mp-tab').forEach(function(t){
+    var label = t.textContent.trim();
+    t.classList.toggle('active',
+      (conta==='VIP' && label.includes('VIP')) ||
+      (conta==='VIDAL' && label.includes('Vidal')) ||
+      (conta==='V3' && label.includes('V3'))
+    );
+  });
+  mpRenderPainel();
+};
+
+// ── Helpers ───────────────────────────────────────────────
+function mpFmt(v){ return 'R$ '+(Number(v)||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function mpFmtN(v){ return (Number(v)||0).toLocaleString('pt-BR'); }
+function mpPct(v){ return ((Number(v)||0)*100).toFixed(1)+'%'; }
+function mpDelta(atual,anterior){
+  if(!anterior) return '';
+  var d=((atual-anterior)/anterior)*100;
+  var s=d>=0?'▲':'▼';
+  var cls=d>=0?'mp-kpi-up':'mp-kpi-dn';
+  return '<span class="'+cls+'">'+s+' '+Math.abs(d).toFixed(1)+'%</span>';
+}
+
+// ── Renderiza Painel ──────────────────────────────────────
+window.mpRenderPainel = function(){
+  var body=document.getElementById('mp-painel-body');
+  if(!body) return;
+  var mp=window.__MP_INLINE__;
+  var conta=mp.contas[_mpContaAtiva];
+  if(!conta||!conta.dados){
+    body.innerHTML='<div class="mp-status"><div style="font-size:28px;margin-bottom:12px">📡</div>'
+      +'<div style="color:#94a3b8;font-size:15px;font-weight:600">Dados de '+(conta&&conta.nome||_mpContaAtiva)+' ainda não coletados</div>'
+      +'<div style="color:#475569;font-size:13px;margin-top:8px">Acesse o <a href="https://vendedores.mercadolivre.com.br" target="_blank" style="color:#38bdf8">Painel de Vendedores ML</a>'
+      +' logado como <strong style="color:#94a3b8">'+(conta&&conta.nome||_mpContaAtiva)+'</strong>'
+      +' e use a skill <em>dash-marketplaces-grupo-vip</em> para coletar os dados.</div>'
+      +'<div style="color:#475569;font-size:12px;margin-top:8px">Os dados coletados ficam embutidos no index.html via <code>window.__MP_INLINE__</code>.</div>'
+      +'</div>';
+    return;
+  }
+  var d=conta.dados;
+  var gerado=mp.gerado_em?'<span style="font-size:11px;color:#475569">Atualizado em '+mp.gerado_em+'</span>':'';
+  var alertaRec='';
+  if(d.reputacao&&d.reputacao.pctReclamacoes>=1){
+    alertaRec='<div class="mp-warn">⚠️ <strong>Atenção:</strong> Taxa de reclamações em <strong>'+d.reputacao.pctReclamacoes.toFixed(1)+'%</strong> — acima do limite recomendado (1%).</div>';
+  }
+  var kpis=[
+    {l:'Vendas Brutas (R$)',v:mpFmt(d.vendasBrutas),sub:mpDelta(d.vendasBrutas,d.vendasBrutasAnt)},
+    {l:'Pedidos',v:mpFmtN(d.pedidos),sub:mpDelta(d.pedidos,d.pedidosAnt)},
+    {l:'Unidades',v:mpFmtN(d.unidades),sub:mpDelta(d.unidades,d.unidadesAnt)},
+    {l:'Ticket Médio',v:mpFmt(d.ticket),sub:mpDelta(d.ticket,d.ticketAnt)},
+    {l:'Visitas',v:mpFmtN(d.visitas),sub:mpDelta(d.visitas,d.visitasAnt)},
+    {l:'Conversão',v:mpPct(d.conversao),sub:mpDelta(d.conversao,d.conversaoAnt)},
+    {l:'Cancelamentos',v:mpFmtN(d.cancelamentos),sub:mpFmt(d.cancelamentosVal)},
+    {l:'Devoluções',v:mpFmtN(d.devolucoes),sub:mpFmt(d.devolucoesVal)},
+  ];
+  var kpiHtml=kpis.map(function(k){
+    return '<div class="mp-kpi"><div class="mp-kpi-label">'+k.l+'</div><div class="mp-kpi-val">'+k.v+'</div><div class="mp-kpi-sub">'+(k.sub||'—')+'</div></div>';
+  }).join('');
+  var repHtml='';
+  if(d.reputacao){
+    var r=d.reputacao;
+    repHtml='<div class="mp-chart-wrap"><div class="mp-chart-title">🏅 Reputação — '+conta.nome+'</div>'
+      +'<div style="display:flex;gap:24px;flex-wrap:wrap;font-size:13px">'
+      +'<div><span style="color:#64748b">Cor:</span> <strong style="color:#e2e8f0">'+(r.cor||'—')+'</strong></div>'
+      +'<div><span style="color:#64748b">% Reclamações:</span> <strong style="color:'+(r.pctReclamacoes>=1?'#f87171':'#34d399')+'">'+(r.pctReclamacoes||0).toFixed(1)+'%</strong></div>'
+      +'<div><span style="color:#64748b">% Canceladas:</span> <strong style="color:#e2e8f0">'+(r.pctCanceladas||0).toFixed(1)+'%</strong></div>'
+      +'<div><span style="color:#64748b">% Envios incorretos:</span> <strong style="color:#e2e8f0">'+(r.pctEnviosIncorretos||0).toFixed(1)+'%</strong></div>'
+      +'<div><span style="color:#64748b">Vendas para subir:</span> <strong style="color:#fbbf24">'+(mpFmtN(r.vendasParaSubir)||'—')+'</strong></div>'
+      +'</div></div>';
+  }
+  var probHtml='';
+  if(d.problemas&&d.problemas.length){
+    var rows=d.problemas.map(function(p){
+      return '<tr><td>'+(p.motivo||'—')+'</td><td style="text-align:right">'+(p.qtd||0)+'</td></tr>';
+    }).join('');
+    probHtml='<div class="mp-chart-wrap"><div class="mp-chart-title">🚨 Problemas nos últimos 30 dias ('+(d.totalProblemas||0)+' total)</div>'
+      +'<table class="mp-tbl"><thead><tr><th>Motivo</th><th style="text-align:right">Qtd</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+  }
+  var vendasHtml='';
+  if(d.vendas&&d.vendas.length){
+    var vrows=d.vendas.slice(0,20).map(function(v){
+      var sc=(v.status||'').includes('cancel')||(v.status||'').includes('return')?'mp-badge-vermelho':'mp-badge-verde';
+      var sl=(v.status||'').includes('cancel')?'Cancelado':(v.status||'').includes('return')?'Devolvido':'Concluído';
+      return '<tr><td style="white-space:nowrap;font-size:11px;color:#64748b">'+(v.data||'—')+'</td>'
+        +'<td style="font-size:12px">'+(v.produto||'—')+'</td>'
+        +'<td style="font-size:11px;color:#94a3b8">'+(v.sku||'—')+'</td>'
+        +'<td style="text-align:right">'+(v.qtd||0)+'</td>'
+        +'<td style="text-align:right">'+mpFmt((v.preco||0)*(v.qtd||1))+'</td>'
+        +'<td><span class="mp-badge '+sc+'">'+sl+'</span></td></tr>';
+    }).join('');
+    vendasHtml='<div class="mp-chart-wrap"><div class="mp-chart-title">📋 Vendas recentes (últimas 20)</div>'
+      +'<table class="mp-tbl"><thead><tr><th>Data</th><th>Produto</th><th>SKU</th>'
+      +'<th style="text-align:right">Qtd</th><th style="text-align:right">Valor</th><th>Status</th></tr></thead>'
+      +'<tbody>'+vrows+'</tbody></table></div>';
+  }
+  body.innerHTML='<div style="display:flex;justify-content:flex-end;margin-bottom:8px">'+gerado+'</div>'
+    +alertaRec+'<div class="mp-kpis">'+kpiHtml+'</div>'+repHtml+probHtml+vendasHtml;
+};
+
+// ── Renderiza Curva ABC ───────────────────────────────────
+window.mpRenderABC = function(){
+  var sumEl=document.getElementById('abc-summary');
+  var tbody=document.getElementById('abc-tbody');
+  if(!sumEl||!tbody) return;
+  var criterio=document.getElementById('abc-criterio')&&document.getElementById('abc-criterio').value||'fat';
+  var contaSel=document.getElementById('abc-conta')&&document.getElementById('abc-conta').value||'GRUPO';
+  var mp=window.__MP_INLINE__;
+  var skuMap={};
+  function processar(contaKey){
+    var c=mp.contas[contaKey];
+    if(!c||!c.dados||!c.dados.vendas) return;
+    c.dados.vendas.forEach(function(v){
+      if((v.status||'').includes('cancel')||(v.status||'').includes('return')) return;
+      var sku=v.sku||('sem-sku-'+(v.produto||'').substring(0,8));
+      if(!skuMap[sku]) skuMap[sku]={sku:sku,nome:v.produto||'—',fat:0,qtd:0,contas:[]};
+      skuMap[sku].fat+=(v.preco||0)*(v.qtd||1);
+      skuMap[sku].qtd+=(v.qtd||1);
+      if(skuMap[sku].contas.indexOf(contaKey)<0) skuMap[sku].contas.push(contaKey);
+    });
+  }
+  if(contaSel==='GRUPO'){ Object.keys(mp.contas).forEach(processar); } else { processar(contaSel); }
+  var items=Object.values(skuMap).map(function(x){ return Object.assign({},x,{contasStr:x.contas.join(', ')}); });
+  if(!items.length){
+    sumEl.innerHTML='';
+    tbody.innerHTML='<tr><td colspan="9" style="text-align:center;color:#475569;padding:30px">Nenhum dado coletado. Realize a coleta no ML primeiro.</td></tr>';
+    return;
+  }
+  items.sort(function(a,b){ return criterio==='fat'?b.fat-a.fat:b.qtd-a.qtd; });
+  var totalFat=items.reduce(function(s,x){ return s+x.fat; },0);
+  var totalQtd=items.reduce(function(s,x){ return s+x.qtd; },0);
+  var totalRef=criterio==='fat'?totalFat:totalQtd;
+  var acum=0;
+  var classified=items.map(function(x){
+    var val=criterio==='fat'?x.fat:x.qtd;
+    var pct=totalRef?val/totalRef:0;
+    acum+=pct;
+    var classe=acum<=0.80?'A':acum<=0.95?'B':'C';
+    return Object.assign({},x,{val:val,pct:pct,acum:acum,classe:classe});
+  });
+  var countA=classified.filter(function(x){ return x.classe==='A'; }).length;
+  var countB=classified.filter(function(x){ return x.classe==='B'; }).length;
+  var countC=classified.filter(function(x){ return x.classe==='C'; }).length;
+  var fatA=classified.filter(function(x){ return x.classe==='A'; }).reduce(function(s,x){ return s+x.fat; },0);
+  var fatB=classified.filter(function(x){ return x.classe==='B'; }).reduce(function(s,x){ return s+x.fat; },0);
+  var fatC=classified.filter(function(x){ return x.classe==='C'; }).reduce(function(s,x){ return s+x.fat; },0);
+  sumEl.innerHTML=['A','B','C'].map(function(cl,i){
+    var cnt=[countA,countB,countC][i];
+    var fat=[fatA,fatB,fatC][i];
+    var pct=totalFat?(fat/totalFat*100).toFixed(1):0;
+    return '<div class="abc-summary-card '+cl.toLowerCase()+'">'
+      +'<div class="sc-label">Classe '+cl+'</div>'
+      +'<div class="sc-val">'+cnt+' SKUs</div>'
+      +'<div class="sc-sub">'+mpFmt(fat)+' · '+pct+'% do faturamento</div></div>';
+  }).join('');
+  tbody.innerHTML=classified.map(function(x,i){
+    var barW=Math.round(x.pct*100);
+    var clRow=x.classe==='A'?'abc-a':x.classe==='B'?'abc-b':'abc-c';
+    var badgeCls=x.classe==='A'?'mp-badge-verde':x.classe==='B'?'mp-badge-amarelo':'';
+    var badgeStyle=x.classe==='C'?'style="background:rgba(100,116,139,.15);color:#94a3b8"':'';
+    return '<tr class="'+clRow+'">'
+      +'<td style="color:#64748b">'+(i+1)+'</td>'
+      +'<td style="font-family:monospace;font-size:12px">'+x.sku+'</td>'
+      +'<td style="max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+x.nome+'</td>'
+      +'<td style="font-size:11px;color:#94a3b8">'+x.contasStr+'</td>'
+      +'<td style="text-align:right">'+mpFmt(x.fat)+'</td>'
+      +'<td style="text-align:right">'+mpFmtN(x.qtd)+'</td>'
+      +'<td style="text-align:right">'+(x.acum*100).toFixed(1)+'%</td>'
+      +'<td><div class="abc-bar-wrap"><div class="abc-bar" style="width:'+barW+'%"></div></div>'
+      +'<span style="font-size:11px;color:#64748b;margin-left:6px">'+(x.pct*100).toFixed(1)+'%</span></td>'
+      +'<td><span class="mp-badge '+badgeCls+'" '+badgeStyle+'>'+x.classe+'</span></td>'
+      +'</tr>';
+  }).join('');
+};
+
+// ── Renderiza Relatório de Compra ─────────────────────────
+window.mpRenderCompra = function(){
+  var tbody=document.getElementById('compra-tbody');
+  var kpisEl=document.getElementById('compra-kpis');
+  if(!tbody) return;
+  var mp=window.__MP_INLINE__;
+  var q=(document.getElementById('compra-search')&&document.getElementById('compra-search').value||'').toLowerCase();
+  var filtro=document.getElementById('compra-filtro')&&document.getElementById('compra-filtro').value||'';
+  var classFil=document.getElementById('compra-classe')&&document.getElementById('compra-classe').value||'';
+  var skuMap={};
+  Object.entries(mp.contas).forEach(function(entry){
+    var contaKey=entry[0], conta=entry[1];
+    if(!conta.dados) return;
+    (conta.dados.vendas||[]).forEach(function(v){
+      if((v.status||'').includes('cancel')||(v.status||'').includes('return')) return;
+      var sku=v.sku||('sem-sku-'+(v.produto||'').substring(0,8));
+      if(!skuMap[sku]) skuMap[sku]={sku:sku,nome:v.produto||'—',qtd:0,fat:0,estoques:{},contas:[]};
+      skuMap[sku].qtd+=(v.qtd||1);
+      skuMap[sku].fat+=(v.preco||0)*(v.qtd||1);
+      if(skuMap[sku].contas.indexOf(contaKey)<0) skuMap[sku].contas.push(contaKey);
+    });
+    (conta.dados.estoque||[]).forEach(function(e){
+      var sku=e.sku||'';
+      if(!sku) return;
+      if(!skuMap[sku]) skuMap[sku]={sku:sku,nome:e.nome||'—',qtd:0,fat:0,estoques:{},contas:[]};
+      skuMap[sku].estoques[contaKey]=e.estoque||0;
+    });
+  });
+  var totalFat=Object.values(skuMap).reduce(function(s,x){ return s+x.fat; },0);
+  var sorted=Object.values(skuMap).sort(function(a,b){ return b.fat-a.fat; });
+  var acum=0;
+  sorted.forEach(function(x){
+    var pct=totalFat?x.fat/totalFat:0;
+    acum+=pct;
+    x.classe=acum<=0.80?'A':acum<=0.95?'B':'C';
+  });
+  var rows=sorted.map(function(x){
+    var estoques=Object.values(x.estoques);
+    var estoqueMax=estoques.length?Math.max.apply(null,estoques):0;
+    var vendaDia=x.qtd/30;
+    var cobertura=vendaDia>0?estoqueMax/vendaDia:Infinity;
+    var repor=Math.max(0,Math.ceil(x.qtd-estoqueMax));
+    var prioridade=cobertura<7?'urgente':cobertura<14?'atencao':'ok';
+    return Object.assign({},x,{estoqueMax:estoqueMax,vendaDia:vendaDia,cobertura:cobertura,repor:repor,prioridade:prioridade});
+  });
+  if(kpisEl){
+    var skusRepor=rows.filter(function(r){ return r.repor>0; }).length;
+    var skusUrg=rows.filter(function(r){ return r.prioridade==='urgente'; }).length;
+    var totRepor=rows.reduce(function(s,r){ return s+r.repor; },0);
+    kpisEl.innerHTML=[
+      {l:'SKUs analisados',v:mpFmtN(rows.length)},
+      {l:'SKUs para repor',v:mpFmtN(skusRepor)},
+      {l:'🔴 Urgentes',v:mpFmtN(skusUrg)},
+      {l:'Total unidades a repor',v:mpFmtN(totRepor)},
+    ].map(function(k){ return '<div class="compra-kpi"><div class="ck-label">'+k.l+'</div><div class="ck-val">'+k.v+'</div></div>'; }).join('');
+  }
+  var filtered=rows.filter(function(r){
+    if(q&&!r.sku.toLowerCase().includes(q)&&!r.nome.toLowerCase().includes(q)) return false;
+    if(filtro==='urgente'&&r.prioridade!=='urgente') return false;
+    if(filtro==='atencao'&&r.prioridade!=='atencao') return false;
+    if(filtro==='ok'&&r.prioridade!=='ok') return false;
+    if(filtro==='repor'&&r.repor<=0) return false;
+    if(classFil&&r.classe!==classFil) return false;
+    return true;
+  });
+  if(!filtered.length){
+    tbody.innerHTML='<tr><td colspan="9" style="text-align:center;color:#475569;padding:30px">'
+      +(rows.length===0?'Nenhum dado coletado. Realize a coleta no ML primeiro.':'Nenhum item corresponde ao filtro.')
+      +'</td></tr>';
+    return;
+  }
+  tbody.innerHTML=filtered.map(function(r){
+    var cobTxt=r.cobertura===Infinity?'∞':r.cobertura.toFixed(1)+'d';
+    var cobCls=r.prioridade==='urgente'?'cob-critica':r.prioridade==='atencao'?'cob-media':'cob-ok';
+    var reporCls=r.repor>0?'repor-sim':'repor-nao';
+    var rowCls=r.prioridade==='urgente'?'compra-row-urgente':r.prioridade==='atencao'?'compra-row-atencao':'';
+    var badgeCls=r.classe==='A'?'mp-badge-verde':r.classe==='B'?'mp-badge-amarelo':'';
+    var badgeStyle=r.classe==='C'?'style="background:rgba(100,116,139,.15);color:#94a3b8"':'';
+    var prioBadge=r.prioridade==='urgente'?'<span class="mp-badge mp-badge-vermelho">🔴 Urgente</span>'
+      :r.prioridade==='atencao'?'<span class="mp-badge mp-badge-amarelo">🟡 Atenção</span>'
+      :'<span class="mp-badge" style="background:rgba(52,211,153,.12);color:#34d399">🟢 OK</span>';
+    return '<tr class="'+rowCls+'">'
+      +'<td style="font-family:monospace;font-size:12px">'+r.sku+'</td>'
+      +'<td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+r.nome+'</td>'
+      +'<td><span class="mp-badge '+badgeCls+'" '+badgeStyle+'>'+r.classe+'</span></td>'
+      +'<td style="text-align:right">'+mpFmtN(r.qtd)+'</td>'
+      +'<td style="text-align:right">'+r.vendaDia.toFixed(1)+'</td>'
+      +'<td style="text-align:right">'+mpFmtN(r.estoqueMax)+'</td>'
+      +'<td class="'+cobCls+'" style="text-align:right">'+cobTxt+'</td>'
+      +'<td class="'+reporCls+'" style="text-align:right">'+(r.repor>0?mpFmtN(r.repor)+' un.':'—')+'</td>'
+      +'<td>'+prioBadge+'</td></tr>';
+  }).join('');
+};
+
+// ── Hook no setPage ───────────────────────────────────────
+(function(){
+  var orig=window.setPage;
+  window.setPage=function(p){
+    if(orig) orig(p);
+    if(p==='mp-painel') setTimeout(mpRenderPainel,0);
+    if(p==='mp-abc')    setTimeout(mpRenderABC,0);
+    if(p==='mp-compra') setTimeout(mpRenderCompra,0);
+  };
+})();
 </script>
 </body>
 </html>
