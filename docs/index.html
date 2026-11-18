@@ -6312,6 +6312,8 @@ const CONTAS=[
 ];
 let MP=null, mpErr=null, mpConta='VIP', mpCharts={}, _mpContaInited=false;
 const st={abcCrit:'receita',abcClasse:'',abcBusca:'',cpClasse:'',cpSo:true,cpBusca:'',cpSort:'repor',estModo:'soma'};
+// filtro de datas do painel
+let mpDateIni=null, mpDateFim=null; // 'YYYY-MM-DD' ou null = sem filtro
 
 /* ── formatação ── */
 const R$=v=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0}).format(v||0);
@@ -6362,6 +6364,11 @@ const css=`
 .mp-bar-row .nt{font-size:10px;color:#666;margin-top:5px}
 .mp-tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
 .mp-tools input[type=text]{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#eee;padding:7px 12px;font-size:12px;min-width:220px;font-family:'Inter',sans-serif}
+.mp-tools input[type=date]{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#eee;padding:7px 10px;font-size:12px;font-family:'Inter',sans-serif;cursor:pointer}
+.mp-tools input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1);opacity:.5}
+.mp-date-sep{font-size:12px;color:#555}
+.mp-date-block{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.mp-btn-on{background:rgba(56,189,248,.25)!important;border-color:rgba(56,189,248,.6)!important;color:#7dd3fc!important}
 .mp-tools select{background:#1a1a2e;border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#eee;padding:7px 10px;font-size:12px;font-family:'Inter',sans-serif}
 .mp-tools label{font-size:12px;color:#aaa;display:flex;gap:6px;align-items:center;cursor:pointer}
 .mp-btn{padding:7px 14px;background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.35);border-radius:8px;color:#7dd3fc;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
@@ -6454,6 +6461,38 @@ function chart(id,cfg){
 const gridOpt={color:'rgba(255,255,255,.05)'};
 const tickOpt={color:'#666',font:{size:10}};
 
+/* ══════════ FILTRO DE DATAS ══════════ */
+function diarioFiltrado(diario){
+  if(!mpDateIni&&!mpDateFim)return diario;
+  return diario.filter(d=>(!mpDateIni||d[0]>=mpDateIni)&&(!mpDateFim||d[0]<=mpDateFim));
+}
+function kpisDoDiario(diario){
+  // recalcula KPIs a partir do diário filtrado
+  let bruto=0,vendas=0,unidades=0,visitas=0,canc_qtd=0,canc_valor=0,devol_qtd=0,devol_valor=0;
+  diario.forEach(d=>{bruto+=d[1];vendas+=d[2];unidades+=d[3];visitas+=d[4];canc_qtd+=d[5];canc_valor+=d[6];devol_qtd+=d[7];devol_valor+=d[8]});
+  const ticket=bruto/(vendas||1), conversao=vendas/(visitas||1)*100;
+  return {bruto:[bruto,0],vendas:[vendas,0],unidades:[unidades,0],ticket:[ticket,0],conversao:[conversao,0],visitas:[visitas,0],
+    devol_qtd:[devol_qtd,0],devol_valor:[devol_valor,0],canc_qtd:[canc_qtd,0],canc_valor:[canc_valor,0]};
+}
+function mpSetDate(ini,fim){
+  mpDateIni=ini||null; mpDateFim=fim||null;
+  mpRender('mp-painel');
+}
+window.mpSetDate=mpSetDate;
+window.mpQuickDate=function(dias){
+  // usa o último dia disponível como âncora
+  const todasContas=contasComDados();
+  if(!todasContas.length)return;
+  const diarioRef=contaData(todasContas[0]).diario;
+  const ultimoDia=diarioRef[diarioRef.length-1][0];
+  const ini=new Date(ultimoDia);
+  ini.setDate(ini.getDate()-(dias-1));
+  const toISO=d=>d.toISOString().slice(0,10);
+  mpDateIni=toISO(ini); mpDateFim=ultimoDia;
+  mpRender('mp-painel');
+}
+window.mpClearDate=function(){mpDateIni=null;mpDateFim=null;mpRender('mp-painel')}
+
 /* ══════════ PAINEL ══════════ */
 function somaContas(ks){
   // agrega KPIs, série diária, devoluções/cancelamentos e problemas
@@ -6471,14 +6510,61 @@ function somaContas(ks){
   o.diario=[...dia.values()].sort((a,b)=>a[0]<b[0]?-1:1);
   return o;
 }
+function contaComFiltro(k){
+  // retorna dados da conta com diário filtrado e KPIs recalculados
+  const base=contaData(k);if(!base)return null;
+  const dFilt=diarioFiltrado(base.diario);
+  const temFiltro=mpDateIni||mpDateFim;
+  if(!temFiltro)return base;
+  return {...base,diario:dFilt,kpis:kpisDoDiario(dFilt),_filtrado:true};
+}
+function somaContasFiltradas(ks){
+  const dia=new Map();
+  ks.forEach(k=>{
+    const dFilt=diarioFiltrado(contaData(k).diario);
+    dFilt.forEach(d=>{const x=dia.get(d[0])||[d[0],0,0,0,0,0,0,0,0];for(let i=1;i<9;i++)x[i]+=d[i];dia.set(d[0],x)});
+  });
+  const diario=[...dia.values()].sort((a,b)=>a[0]<b[0]?-1:1);
+  const base=contaData(ks[0]);
+  const temFiltro=mpDateIni||mpDateFim;
+  if(!temFiltro)return somaContas(ks);
+  return {...somaContas(ks),diario,kpis:kpisDoDiario(diario),_filtrado:true};
+}
 
+function dateBarHTML(){
+  // descobre range disponível de todos os diários
+  let minDia='9999', maxDia='0000';
+  contasComDados().forEach(k=>{const d=contaData(k).diario;if(d.length){if(d[0][0]<minDia)minDia=d[0][0];if(d[d.length-1][0]>maxDia)maxDia=d[d.length-1][0]}});
+  const ini=mpDateIni||minDia, fim=mpDateFim||maxDia;
+  const diasSel=Math.round((new Date(fim)-new Date(ini))/86400000)+1;
+  const ativo=(dias)=>{
+    if(!mpDateIni&&!mpDateFim)return dias==='tudo';
+    if(dias==='custom')return true;
+    const dFim=new Date(maxDia),dIni=new Date(dFim);dIni.setDate(dIni.getDate()-(dias-1));
+    return dIni.toISOString().slice(0,10)===mpDateIni && maxDia===mpDateFim;
+  };
+  const btn=(label,v)=>`<button class="mp-btn${ativo(v)?' mp-btn-on':''}" onclick="${v==='tudo'?'mpClearDate()':'mpQuickDate('+v+')'}">${label}</button>`;
+  return `<div class="mp-tools mp-date-bar" style="margin-bottom:16px;padding:10px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px">
+    <span style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.6px;font-weight:600">Período</span>
+    ${btn('Tudo','tudo')}${btn('7 dias',7)}${btn('15 dias',15)}${btn('30 dias',30)}
+    <div class="mp-date-sep" style="margin:0 4px">|</div>
+    <div class="mp-date-block">
+      <input type="date" value="${ini}" min="${minDia}" max="${maxDia}" onchange="mpSetDate(this.value,document.getElementById('mpDateFim').value)" style="width:140px">
+      <span class="mp-date-sep">até</span>
+      <input type="date" id="mpDateFim" value="${fim}" min="${minDia}" max="${maxDia}" onchange="mpSetDate(document.querySelector('.mp-date-bar input[type=date]').value,this.value)" style="width:140px">
+    </div>
+    ${(mpDateIni||mpDateFim)?`<span style="font-size:11px;color:#fbbf24;margin-left:4px">↳ ${diasSel} dia${diasSel>1?'s':''} selecionado${diasSel>1?'s':''}</span>`:''}
+  </div>`;
+}
 function renderPainel(){
   const pg=document.getElementById('page-mp-painel');
-  let h=`<div class="mp-head"><div><h2>🛒 Marketplaces · Painel</h2><p>Vendas, devoluções, cancelamentos e reclamações dos últimos 30 dias.</p></div>${srcHTML(contaData(mpConta)||contaData(contasComDados()[0]))}</div>`;
+  const descPeriodo=(mpDateIni||mpDateFim)?`${dt(mpDateIni||'?')} a ${dt(mpDateFim||'?')}`:'últimos 30 dias';
+  let h=`<div class="mp-head"><div><h2>🛒 Marketplaces · Painel</h2><p>Vendas, devoluções, cancelamentos e reclamações · ${descPeriodo}.</p></div>${srcHTML(contaData(mpConta)||contaData(contasComDados()[0]))}</div>`;
   h+=tabsHTML('mp-painel');
+  h+=dateBarHTML();
   const ks=mpConta==='GRUPO'?contasComDados():(contaData(mpConta)?[mpConta]:[]);
   if(!ks.length){pg.innerHTML=h+emptyHTML(mpConta);return}
-  const c=ks.length===1?contaData(ks[0]):somaContas(ks);
+  const c=ks.length===1?contaComFiltro(ks[0]):somaContasFiltradas(ks);
   const K=c.kpis;
   const rep=ks.length===1?c.reputacao:null;
 
