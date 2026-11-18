@@ -6310,9 +6310,7 @@ const CONTAS=[
   {k:'V3',nome:'V3',cor:'#FF6B6B'},
   {k:'GRUPO',nome:'Grupo VIP',cor:'#F5A623'}
 ];
-let MP=null, mpErr=null, mpConta='VIP', mpCharts={};
-// Inicializar na primeira conta com dados ao carregar
-function mpInitConta(){if(MP&&mpConta==='VIP'&&!contaData('VIP')){const p=contasComDados()[0];if(p)mpConta=p;}}
+let MP=null, mpErr=null, mpConta='VIP', mpCharts={}, _mpContaInited=false;
 const st={abcCrit:'receita',abcClasse:'',abcBusca:'',cpClasse:'',cpSo:true,cpBusca:'',cpSort:'repor',estModo:'soma'};
 
 /* ── formatação ── */
@@ -6687,7 +6685,7 @@ window.mpRender=async function(page){
   const pg=document.getElementById('page-'+page);if(!pg)return;
   if(!MP&&!mpErr){pg.innerHTML='<div class="loading">Carregando dados dos marketplaces…</div>';await load()}
   if(mpErr){pg.innerHTML=`<div class="mp-empty"><b>Não foi possível carregar marketplace.json</b><br>${esc(mpErr)}</div>`;return}
-  mpInitConta();
+  if(!_mpContaInited){_mpContaInited=true;const p=contasComDados()[0];if(p)mpConta=p;}
   if(page==='mp-painel')renderPainel();
   if(page==='mp-abc')renderABC();
   if(page==='mp-compra')renderCompra();
