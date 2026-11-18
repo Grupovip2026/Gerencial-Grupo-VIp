@@ -6485,7 +6485,7 @@ function renderPainel(){
   // alerta de reputação
   if(rep){
     const perto=rep.reclamacoes_pct>=1;
-    if(perto)h+=`<div class="mp-alert${rep.reclamacoes_pct>=1.5?' red':''}">⚠️<div><b>Reputação perto do limite.</b> Reclamações em <b>${P(rep.reclamacoes_pct,2)}</b> nos últimos 60 dias (${rep.reclamacoes_n} vendas). O limite da cor verde é 2% e o do MercadoLíder é 1%. Faltam <b>${N(rep.faltam_sem_reclamacao)} vendas sem reclamação</b> para MercadoLíder.${c.problemas&&c.problemas.motivos_reputacao?` Principal motivo: <b>${esc(c.problemas.motivos_reputacao[0][0].toLowerCase())}</b> (${c.problemas.motivos_reputacao[0][1]} de ${c.problemas.motivos_reputacao.reduce((t,m)=>t+m[1],0)}).`:''}</div></div>`;
+    if(perto)h+=`<div class="mp-alert${rep.reclamacoes_pct>=1.5?' red':''}">⚠️<div><b>Reputação perto do limite.</b> Reclamações em <b>${P(rep.reclamacoes_pct,2)}</b> nos últimos 60 dias (${rep.reclamacoes_n} vendas). O limite da cor verde é 2% e o do MercadoLíder é 1%. Faltam <b>${N(rep.faltam_sem_reclamacao)} vendas sem reclamação</b> para MercadoLíder.${c.problemas&&c.problemas.motivos_reputacao&&c.problemas.motivos_reputacao.length?` Principal motivo: <b>${esc(c.problemas.motivos_reputacao[0][0].toLowerCase())}</b> (${c.problemas.motivos_reputacao[0][1]} de ${c.problemas.motivos_reputacao.reduce((t,m)=>t+m[1],0)}).`:''}</div></div>`;
   }
 
   const brutoV=K.bruto[0]||1;
