@@ -2713,7 +2713,10 @@ function renderOrc2027(){
     try{
       const cc=JSON.parse(localStorage.getItem('cc_data_v2')||'{}');
       const itau  =(cc.itau  &&cc.itau.result  &&cc.itau.result.saldoFinal  !=null)?cc.itau.result.saldoFinal  :null;
-      const sicoob=(cc.sicoob&&cc.sicoob.result&&cc.sicoob.result.saldoFinal!=null)?cc.sicoob.result.saldoFinal:null;
+      let sicoob=(cc.sicoob&&cc.sicoob.result&&cc.sicoob.result.saldoFinal!=null)?cc.sicoob.result.saldoFinal:null;
+      // Exclui cheque especial do saldo Sicoob (limite com juros, não é saldo próprio)
+      if(sicoob!==null && cc.sicoob && cc.sicoob.result && cc.sicoob.result.chequeEspecial)
+        sicoob = sicoob - cc.sicoob.result.chequeEspecial;
       return {itau, sicoob, total:(itau||0)+(sicoob||0)};
     }catch(e){ return {itau:null,sicoob:null,total:0}; }
   }
