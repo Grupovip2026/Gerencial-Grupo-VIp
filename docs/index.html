@@ -3687,6 +3687,12 @@ loadData();
           CC[banco].lancamentos = p[banco].lancamentos;
           CC[banco].result      = p[banco].result || null;
           CC[banco].nome        = p[banco].nome   || '';
+          // Sicoob: recalcula saldoFinal excluindo cheque especial (limite com juros)
+          if(banco==='sicoob' && CC[banco].result){
+            const r = CC[banco].result;
+            const che = r.chequeEspecial || 0;
+            if(che > 0) r.saldoFinal = (r.saldoFinal || 0) - che;
+          }
           ccRender(banco, CC[banco].result, CC[banco].nome, true);
         }
       });
